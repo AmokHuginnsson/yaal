@@ -98,10 +98,10 @@ public:
 		for ( word_t* i( _buf ), * e( end( _buf ) ); i != e; ++ i ) {
 			c += bit::count( *i );
 		}
-		return ( c );
+		return c;
 	}
 	int size( void ) const {
-		return ( SIZE );
+		return SIZE;
 	}
 	bool all( void ) const {
 		bool ok( true );
@@ -121,7 +121,7 @@ public:
 				}
 			}
 		}
-		return ( ok );
+		return ok;
 	}
 	bool none( void ) const {
 		bool ok( true );
@@ -131,7 +131,7 @@ public:
 				break;
 			}
 		}
-		return ( ok );
+		return ok;
 	}
 	bool any( void ) const {
 		return ( !none() );
@@ -165,7 +165,7 @@ YAAL_DEFINE_OPER( ^= )
 	HBitset<SIZE> operator OP ( HBitset const& bs_ ) const { \
 		HBitset<SIZE> bs( *this ); \
 		bs OP##= bs_; \
-		return ( bs ); \
+		return bs; \
 	}
 YAAL_DEFINE_OPER( | )
 YAAL_DEFINE_OPER( & )
@@ -174,7 +174,7 @@ YAAL_DEFINE_OPER( ^ )
 	HBitset<SIZE> operator ~ ( void ) const {
 		HBitset<SIZE> bs( *this );
 		bs.flip();
-		return ( bs );
+		return bs;
 	}
 	word_t to_integer( void ) const {
 		static_assert( SIZE <= BITS_IN_WORD, "integer overflow" );
@@ -191,7 +191,7 @@ YAAL_DEFINE_OPER( ^ )
 				s.set_at( i, trueChar_ );
 			}
 		}
-		return ( s );
+		return s;
 		M_EPILOG
 	}
 };

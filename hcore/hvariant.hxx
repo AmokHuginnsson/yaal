@@ -239,7 +239,7 @@ public:
 				default: M_ASSERT( 0 && "Absurd type number." ); break;
 			}
 		}
-		return ( eq );
+		return eq;
 	}
 	bool operator != ( HVariant const& other_ ) const {
 		return ( ! operator == ( other_ ) );

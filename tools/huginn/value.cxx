@@ -179,7 +179,7 @@ HHuginn::value_t fallback_unary_arithmetic( HThread* thread_, HHuginn::identifie
 			);
 		}
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::value_t nullary_fallback( HThread* thread_, HHuginn::value_t const& v_, HHuginn::identifier_id_t methodIdentifier_, HClass const* resType_, int position_ ) {
@@ -218,7 +218,7 @@ HHuginn::value_t nullary_fallback( HThread* thread_, HHuginn::value_t const& v_,
 			);
 		}
 	}
-	return ( res );
+	return res;
 }
 
 char const* type_to_cycle_str( HHuginn::TYPE type_ ) {
@@ -229,7 +229,7 @@ char const* type_to_cycle_str( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::LOOKUP ): { sym = "/*{cycle}*/"; } break;
 		default:;
 	}
-	return ( sym );
+	return sym;
 }
 
 }
@@ -327,7 +327,7 @@ HHuginn::value_t HValue::do_operator_subscript( HThread* thread_, HHuginn::value
 	if ( ! thread_->can_continue() ) {
 		throw instruction::Interrupt();
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -395,7 +395,7 @@ HHuginn::value_t HValue::do_operator_call( huginn::HThread* thread_, HHuginn::va
 			);
 		}
 	}
-	return ( v );
+	return v;
 }
 
 yaal::hcore::HString HValue::do_code( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker&, int position_ ) const {
@@ -427,7 +427,7 @@ yaal::hcore::HString HValue::code( HThread* thread_, HHuginn::value_t const& sel
 		}
 	} while ( false );
 	cycleTracker_.done( this );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HValue::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker&, int position_ ) const {
@@ -459,7 +459,7 @@ yaal::hcore::HString HValue::to_string( HThread* thread_, HHuginn::value_t const
 		}
 	} while ( false );
 	cycleTracker_.done( this );
-	return ( str );
+	return str;
 }
 
 HCycleTracker::HCycleTracker( void )

@@ -402,7 +402,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 0, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t fa0, fa1_t = fa1_t(), fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa0 ); }
+		{ return fa0; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -410,7 +410,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t fa1, fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa1 ); }
+		{ return fa1; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -418,7 +418,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 2, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t fa2, fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa2 ); }
+		{ return fa2; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -426,7 +426,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 3, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t fa3, fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa3 ); }
+		{ return fa3; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -434,7 +434,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t fa4, fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa4 ); }
+		{ return fa4; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -442,7 +442,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t fa5, fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa5 ); }
+		{ return fa5; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -450,7 +450,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t fa6, fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa6 ); }
+		{ return fa6; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -458,7 +458,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t fa7, fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa7 ); }
+		{ return fa7; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -466,7 +466,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t fa8, fa9_t = fa9_t(), fa10_t = fa10_t() )
-		{ return ( fa8 ); }
+		{ return fa8; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -474,7 +474,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t fa9, fa10_t = fa10_t() )
-		{ return ( fa9 ); }
+		{ return fa9; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -482,7 +482,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, 10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t fa10 )
-		{ return ( fa10 ); }
+		{ return fa10; }
 };
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
@@ -490,7 +490,7 @@ template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, 
 struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	template<typename return_t>
 	inline static return_t get( arg_t a, fa0_t, fa1_t = fa1_t(), fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t() )
-		{ return ( a ); }
+		{ return a; }
 };
 
 }
@@ -574,7 +574,7 @@ struct object_resolver {
 		}
 		template<typename CLASS_t, typename dummy_t>
 		static CLASS_t id( CLASS_t object_, dummy_t ) {
-			return ( object_ );
+			return object_;
 		}
 	};
 	template<typename return_t>
@@ -596,7 +596,7 @@ struct object_resolver {
 		}
 		template<typename dummy_t, typename CLASS_t>
 		static CLASS_t id( dummy_t, CLASS_t object_ ) {
-			return ( object_ );
+			return object_;
 		}
 	};
 };

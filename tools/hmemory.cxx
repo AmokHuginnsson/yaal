@@ -81,7 +81,7 @@ int long HMemory::do_write( void const* src_, int long size_ ) {
 	}
 	::memcpy( static_cast<char*>( _memory->get_memory() ) + _cursorWrite, src, static_cast<size_t>( size ) );
 	_cursorWrite += size;
-	return ( size );
+	return size;
 	M_EPILOG
 }
 
@@ -114,7 +114,7 @@ int long HMemory::do_read( void* dest_, int long size_ ) {
 		_valid = UNINITIALIZED;
 		size = -1;
 	}
-	return ( size );
+	return size;
 	M_EPILOG
 }
 

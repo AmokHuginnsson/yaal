@@ -134,7 +134,7 @@ int long long HInfoMultiVal::do_get_integer( void ) const {
 			M_ASSERT( ! _integer && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
 	}
-	return ( val );
+	return val;
 	M_EPILOG
 }
 
@@ -152,7 +152,7 @@ double long HInfoMultiVal::do_get_real( void ) const {
 			M_ASSERT( ( _real == 0. ) && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
 	}
-	return ( val );
+	return val;
 	M_EPILOG
 }
 

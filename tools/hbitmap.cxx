@@ -319,7 +319,7 @@ HBitmap HBitmap::operator | ( HBitmap const& b ) const {
 	M_PROLOG
 	HBitmap m( *this );
 	m |= b;
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -327,7 +327,7 @@ HBitmap HBitmap::operator & ( HBitmap const& b ) const {
 	M_PROLOG
 	HBitmap m( *this );
 	m &= b;
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -335,7 +335,7 @@ HBitmap HBitmap::operator ^ ( HBitmap const& b ) const {
 	M_PROLOG
 	HBitmap m( *this );
 	m ^= b;
-	return ( m );
+	return m;
 	M_EPILOG
 }
 

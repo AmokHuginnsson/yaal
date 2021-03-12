@@ -30,7 +30,7 @@ template<typename iterator_t, typename value_t>
 inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
 	for ( ; ( it != end ) && ( *it != v ); ++ it ) {
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Find first element in range that meets a given condition.
@@ -44,7 +44,7 @@ template<typename iterator_t, typename condition_t>
 inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
 	for ( ; ( it != end ) && ( ! cond( *it ) ); ++ it ) {
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Find first element in range that does not meet a given condition.
@@ -58,7 +58,7 @@ template<typename iterator_t, typename condition_t>
 inline iterator_t find_if_not( iterator_t it, iterator_t end, condition_t cond ) {
 	for ( ; ( it != end ) && cond( *it ); ++ it ) {
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Tell if all element of a range meet predicate condition.
@@ -112,7 +112,7 @@ inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_,
 			break;
 		}
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Find first occurrence of value from given set in given range of elements, using condition to match elements.
@@ -134,7 +134,7 @@ inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_,
 			break;
 		}
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Find first occurrence of value that is not in given set of values in given range of elements.
@@ -152,7 +152,7 @@ inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t firs
 			break;
 		}
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Find first occurrence of value that is not in given set of values in given range of elements, using condition to match elements.
@@ -174,7 +174,7 @@ inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t firs
 			break;
 		}
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Count number of occurrences of element in range.
@@ -192,7 +192,7 @@ inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
 			++ counter;
 		}
 	}
-	return ( counter );
+	return counter;
 }
 
 /*! \brief Count number of element meeting a predicate in range.
@@ -210,7 +210,7 @@ inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
 			++ counter;
 		}
 	}
-	return ( counter );
+	return counter;
 }
 
 /*! \brief For each element in range pass its value into function.
@@ -239,7 +239,7 @@ inline dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, oper
 	for ( ; it != end; ++ it, ++ dst ) {
 		*dst = op( *it );
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Replace elements in destination container by transformed elements, from source range, that are not equal to some value.
@@ -259,7 +259,7 @@ inline dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t ds
 			++ dst;
 		}
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Replace elements in destination container by transformed elements, from source range, that do not satisfy some predicate.
@@ -279,7 +279,7 @@ inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t
 			++ dst;
 		}
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Replace elements in destination container by elements from source range conditionally transformed.
@@ -300,7 +300,7 @@ inline dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, o
 			*dst = *it;
 		}
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Replace elements in destination container by elements resulting from transformation of elements from source range and another container.
@@ -317,7 +317,7 @@ inline dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_
 	for ( ; it != end; ++ it, ++ arg, ++ dst ) {
 		*dst = op( *it, *arg );
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Replace all occurrences of given value in range with new value.
@@ -402,7 +402,7 @@ inline dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
 	for ( ; src != end; ++ src, ++ dst ) {
 		*dst = *src;
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Copy range of values onto another range.
@@ -422,7 +422,7 @@ inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t ds
 		}
 		*dst = *last;
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Copy given number of elements from range of values onto another range.
@@ -437,7 +437,7 @@ inline dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
 	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst ) {
 		*dst = *src;
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Move range of values onto another range.
@@ -452,7 +452,7 @@ inline dst_it_t move( src_it_t src, src_it_t const& end, dst_it_t dst ) {
 	for ( ; src != end; ++ src, ++ dst ) {
 		*dst = yaal::move( *src );
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Move range of values onto another range.
@@ -472,7 +472,7 @@ inline dst_it_t move_backward( src_it_t const& first, src_it_t last, dst_it_t ds
 		}
 		*dst = yaal::move( *last );
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Move given number of elements from range of values onto another range.
@@ -487,7 +487,7 @@ inline dst_it_t move_n( src_it_t src, int long count, dst_it_t dst ) {
 	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst ) {
 		*dst = yaal::move( *src );
 	}
-	return ( dst );
+	return dst;
 }
 
 /*! \brief Remove all occurrences of given value from range.
@@ -510,7 +510,7 @@ inline iterator_t remove( iterator_t first_, iterator_t const& last_, value_t va
 		}
 		++ first_;
 	}
-	return ( first_ );
+	return first_;
 }
 
 /*! \brief Remove elements meeting a predicate from range.
@@ -533,7 +533,7 @@ inline iterator_t remove_if( iterator_t first_, iterator_t const& last_, conditi
 		}
 		++ first_;
 	}
-	return ( first_ );
+	return first_;
 }
 
 /*! \brief Copy elements all elements not equal to given value from one range to another.
@@ -552,7 +552,7 @@ inline iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, 
 			++ res_;
 		}
 	}
-	return ( res_ );
+	return res_;
 }
 
 /*! \brief Copy elements that do not meet given predicate from first one to another.
@@ -571,7 +571,7 @@ inline iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res
 			++ res_;
 		}
 	}
-	return ( res_ );
+	return res_;
 }
 
 /*! \brief Checks if two ranges are of same size and have same set of values.
@@ -628,7 +628,7 @@ inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t la
 	while ( ( first1 != last1 ) && ! search_try_subsequence( first2, last2, first1, last1, equity ) ) {
 		++ first1;
 	}
-	return ( first1 );
+	return first1;
 }
 
 /*! \brief Search for sequence of elements in another sequence.
@@ -777,7 +777,7 @@ inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ )
 			}
 		}
 	}
-	return ( newMid );
+	return newMid;
 }
 
 /*! \brief Rotate range of elements, or "swap" two consecutive ranges of elements storing result in another range.
@@ -791,7 +791,7 @@ template<typename iterator_t, typename out_it_t>
 inline out_it_t rotate_copy( iterator_t first_, iterator_t mid_, iterator_t last_, out_it_t out_ ) {
 	out_it_t it( copy( mid_, last_, out_ ) );
 	it = copy( first_, mid_, it );
-	return ( it );
+	return it;
 }
 
 /*! \cond */
@@ -818,7 +818,7 @@ inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t cons
 			++ mid;
 		}
 	}
-	return ( mid );
+	return mid;
 }
 template<typename iterator_t, typename value_t, typename compare_t>
 inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
@@ -834,7 +834,7 @@ inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t cons
 	if ( ( mid != last_ ) && comp_( *mid, value_ ) ) {
 		++ mid;
 	}
-	return ( mid );
+	return mid;
 }
 /*! \endcond */
 
@@ -891,7 +891,7 @@ inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t cons
 			++ mid;
 		}
 	}
-	return ( mid );
+	return mid;
 }
 template<typename iterator_t, typename value_t, typename compare_t>
 inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
@@ -907,7 +907,7 @@ inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t cons
 	if ( ( mid != last_ ) && ! comp_( value_, *mid ) ) {
 		++ mid;
 	}
-	return ( mid );
+	return mid;
 }
 /*! \endcond */
 
@@ -967,7 +967,7 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 	} else {
 		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
 	}
-	return ( found );
+	return found;
 }
 template<typename iterator_t, typename value_t, typename compare_t>
 inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
@@ -988,7 +988,7 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 	if ( ! found ) {
 		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
 	}
-	return ( found );
+	return found;
 }
 /*! \endcond */
 
@@ -1201,7 +1201,7 @@ inline iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
 		}
 		++ out;
 	}
-	return ( out );
+	return out;
 }
 
 /*! \brief Create intersection of two sorted ranges of elements.
@@ -1229,7 +1229,7 @@ inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t 
 		++ it1;
 		++ it2;
 	}
-	return ( out );
+	return out;
 }
 
 /*! \brief Check if given two sorted ranges intersect.
@@ -1255,7 +1255,7 @@ inline bool does_intersect( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, ite
 		intersect = true;
 		break;
 	}
-	return ( intersect );
+	return intersect;
 }
 
 /*! \brief Fill range of elements with given value.
@@ -1380,7 +1380,7 @@ inline bool next_permutation( iterator_t it, iterator_t end, compare_t comp_ ) {
 			reverse( it, end );
 		}
 	}
-	return ( gotNext );
+	return gotNext;
 }
 
 /*! \brief Generate next, in lexicographical order, permutation of the range of elements.
@@ -1438,7 +1438,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end, compare_t comp_ ) {
 			reverse( it, end );
 		}
 	}
-	return ( gotPrev );
+	return gotPrev;
 }
 
 /*! \brief Generate previous, in lexicographical order, permutation of the range of elements.
@@ -1464,7 +1464,7 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
 	for ( ; it != end; ++ it ) {
 		ret += *it;
 	}
-	return ( ret );
+	return ret;
 }
 
 /*! \brief Calculate generalized sum of elements in range.
@@ -1480,7 +1480,7 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operato
 	for ( ; it != end; ++ it ) {
 		ret = oper( ret, *it );
 	}
-	return ( ret );
+	return ret;
 }
 
 /*! \brief Calculate inner product of elements in given two ranges of equal length.
@@ -1501,7 +1501,7 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
 	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret += ( ( *itLeft ) * ( *itRight ) );
 	}
-	return ( ret );
+	return ret;
 }
 
 /*! \brief Calculate generalized inner product of elements in given two ranges of equal length.
@@ -1527,7 +1527,7 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
 	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret = summator( ret, multiplicator( *itLeft, *itRight ) );
 	}
-	return ( ret );
+	return ret;
 }
 
 /*! \brief Find minimum element in a range.
@@ -1545,7 +1545,7 @@ inline iterator_t min_element( iterator_t it, iterator_t end ) {
 			min = it;
 		}
 	}
-	return ( min );
+	return min;
 }
 
 /*! \brief Find element in a range that is best with respect to some predicate.
@@ -1564,7 +1564,7 @@ inline iterator_t min_element( iterator_t it, iterator_t end, predicate_t predic
 			min = it;
 		}
 	}
-	return ( min );
+	return min;
 }
 
 template<typename tType, typename predicate_t>
@@ -1592,7 +1592,7 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
 			max = it;
 		}
 	}
-	return ( max );
+	return max;
 }
 
 /*! \brief Find element in a range that is best with respect to some predicate.
@@ -1611,7 +1611,7 @@ inline iterator_t max_element( iterator_t it, iterator_t end, predicate_t predic
 			max = it;
 		}
 	}
-	return ( max );
+	return max;
 }
 
 template<typename tType, typename predicate_t>
@@ -1766,7 +1766,7 @@ inline bool is_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 			}
 		}
 	}
-	return ( isHeap );
+	return isHeap;
 }
 
 /*! \brief Test if given range of elements forms a heap.
@@ -1987,7 +1987,7 @@ inline iterator_t choose_pivot( iterator_t first_, iterator_t last_, compare_t c
 			mid = last_;
 		}
 	}
-	return ( mid );
+	return mid;
 }
 /*! \endcond */
 
@@ -2011,7 +2011,7 @@ inline iterator_t partition( iterator_t first_, iterator_t last_, predicate_t pr
 			}
 		}
 	}
-	return ( fit );
+	return fit;
 }
 
 template<typename iterator_t, typename compare_t>
@@ -2023,7 +2023,7 @@ inline iterator_t partition_by_pivot(
 	bool& leftConstant_
 ) {
 	if ( first_ == last_ ) {
-		return ( first_ );
+		return first_;
 	}
 	iterator_t l( first_ );
 	iterator_t r( last_ - 1 );
@@ -2059,7 +2059,7 @@ inline iterator_t partition_by_pivot(
 			}
 		}
 	}
-	return ( l );
+	return l;
 }
 
 /*! \brief Reorder range of elements so element at given position would be preserved if range were to be sorted.
@@ -2121,7 +2121,7 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 			unfit = rotate( unfit, fit, first_ );
 		}
 	}
-	return ( unfit );
+	return unfit;
 }
 /*
  * Adaptive algorithm:
@@ -2177,7 +2177,7 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 	}	else {
 		unfit = it;
 	}
-	return ( unfit );
+	return unfit;
 }
 /*! \endcond */
 
@@ -2201,7 +2201,7 @@ inline iterator_t stable_partition( iterator_t first_, iterator_t last_, predica
 			it = stable_partition_impl( first_, last_, predicate_ );
 		}
 	}
-	return ( it );
+	return it;
 }
 
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
@@ -2263,7 +2263,7 @@ inline bool is_sorted( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 			}
 		}
 	}
-	return ( sorted );
+	return sorted;
 }
 
 /*! \brief Check is given range is sorted according to given ordering.
@@ -2302,7 +2302,7 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
 		}
 		++ dest_;
 	}
-	return ( dest_ );
+	return dest_;
 }
 
 /*! \brief Remove consecutive duplicates from range.

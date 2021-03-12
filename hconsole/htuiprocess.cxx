@@ -423,7 +423,7 @@ HMainWindow* HTUIProcess::main_window( void ) {
 	M_ASSERT( ( _foregroundWindow != cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );
-	return ( mainWindow );
+	return mainWindow;
 	M_EPILOG
 }
 

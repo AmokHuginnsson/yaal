@@ -86,7 +86,7 @@ HHuginn::class_t HIterator::get_class( HRuntime* runtime_, huginn::HClass const*
 	c->redefine( nullptr, fd );
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 }
 
 HHuginn::class_t HIterableAdaptor::get_class( HRuntime* runtime_ ) {
@@ -99,7 +99,7 @@ HHuginn::class_t HIterableAdaptor::get_class( HRuntime* runtime_ ) {
 		)
 	);
 	runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::HIDDEN );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -150,7 +150,7 @@ int long HIterableAdaptor::do_size( huginn::HThread* thread_, int position_ ) co
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
-	return ( s );
+	return s;
 }
 
 HIterableAdaptorIterator::HIterableAdaptorIterator( HThread* thread_, HHuginn::value_t const& source_, HHuginn::value_t const& iterator_, int position_ )
@@ -227,7 +227,7 @@ int long long HIterable::extract_index( huginn::HThread* thread_, HHuginn::value
 	if ( index < 0 ) {
 		index += s;
 	}
-	return ( index );
+	return index;
 	M_EPILOG
 }
 

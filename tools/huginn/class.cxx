@@ -229,7 +229,7 @@ int HClass::field_index( HHuginn::identifier_id_t const& identifierId_, MEMBER_T
 	) {
 		fieldIndex = it->second;
 	}
-	return ( fieldIndex );
+	return fieldIndex;
 	M_EPILOG
 }
 
@@ -298,7 +298,7 @@ HHuginn::value_t HClass::make_constructor( HObjectFactory* objectFactory_, HHugi
 			this
 		)
 	);
-	return ( ctor );
+	return ctor;
 	M_EPILOG
 }
 
@@ -314,7 +314,7 @@ HHuginn::value_t HClass::make_constructor( HObjectFactory* objectFactory_, const
 			this
 		)
 	);
-	return ( ctor );
+	return ctor;
 	M_EPILOG
 }
 
@@ -351,7 +351,7 @@ HHuginn::value_t HClass::do_create_instance( huginn::HThread* thread_, HHuginn::
 			);
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -365,7 +365,7 @@ HHuginn::values_t HClass::get_defaults( huginn::HThread* thread_, int position_ 
 				: v
 		);
 	}
-	return ( defaults );
+	return defaults;
 	M_EPILOG
 }
 
@@ -395,7 +395,7 @@ HHuginn::identifier_id_t HClass::method_id( void const* functionId_ ) const {
 			break;
 		}
 	}
-	return ( id );
+	return id;
 }
 
 yaal::hcore::HString const& HClass::doc( void ) const {

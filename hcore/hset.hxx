@@ -22,7 +22,7 @@ template<typename type_t>
 struct set_helper {
 	typedef type_t key_type;
 	inline static key_type const& key( type_t const& key_ ) {
-		return ( key_ );
+		return key_;
 	}
 };
 
@@ -70,7 +70,7 @@ public:
 		HIterator const operator ++ ( int ) {
 			HIterator it( *this );
 			++ _engine;
-			return ( it );
+			return it;
 		}
 		HIterator& operator -- ( void ) {
 			-- _engine;
@@ -79,7 +79,7 @@ public:
 		HIterator const operator -- ( int ) {
 			HIterator it( *this );
 			-- _engine;
-			return ( it );
+			return it;
 		}
 		value_type const& operator * ( void ) const {
 			return ( *_engine );
@@ -214,7 +214,7 @@ public:
 			_engine.remove( it._engine );
 			erased = 1;
 		}
-		return ( erased );
+		return erased;
 		M_EPILOG
 	}
 	HIterator erase( HIterator const& it ) {
@@ -229,7 +229,7 @@ public:
 			++ it;
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	HIterator find( value_type const& e ) const

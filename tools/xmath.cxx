@@ -55,7 +55,7 @@ int long long AGGREGATE_TYPE::required_data_points( aggregate_type_t const& aggr
 	if ( aggregateType_ & SAMPLE_VARIANCE ) {
 		rdp = max( rdp, 1LL );
 	}
-	return ( rdp );
+	return rdp;
 }
 
 int long long HModularMultiplicativeInverse::inverse( void ) const {

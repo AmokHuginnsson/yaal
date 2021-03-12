@@ -70,7 +70,7 @@ HHuginn::class_t HClock::get_class( HRuntime* runtime_, HClass const* origin_ ) 
 	c->redefine( nullptr, fd );
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

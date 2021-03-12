@@ -177,7 +177,7 @@ int HDateWidget::do_process_input( int code_ ) {
 			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -270,7 +270,7 @@ bool HDateWidget::do_click( mouse::OMouse& mouse_ ) {
 			handled = true;
 		}
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 

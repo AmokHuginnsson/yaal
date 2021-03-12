@@ -900,12 +900,12 @@ public:
 	HConstIterator operator ++ ( int ) {
 		HConstIterator it( *this );
 		++ _index;
-		return ( it );
+		return it;
 	}
 	HConstIterator operator -- ( int ) {
 		HConstIterator it( *this );
 		-- _index;
-		return ( it );
+		return it;
 	}
 	HConstIterator& operator += ( int offset_ ) {
 		_index += offset_;
@@ -1142,25 +1142,25 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void );
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( size_type );
 	HIterator operator + ( size_type by_ ) const {
 		HIterator it( *this );
 		it += by_;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( size_type );
 	HIterator operator - ( size_type by_ ) const {
 		HIterator it( *this );
 		it -= by_;
-		return ( it );
+		return it;
 	}
 	size_type operator - ( HIterator const& other_ ) const {
 		return ( _characterIndex - other_._characterIndex );
@@ -1202,7 +1202,7 @@ HString to_string( double long );
 HString to_string( char const* );
 HString to_string( void const* );
 inline HString to_string( HString const& v_ ) {
-	return ( v_ );
+	return v_;
 }
 void copy_ascii( HString const&, char*, int );
 void copy_ascii( HString::const_iterator, HString::const_iterator, char*, int );

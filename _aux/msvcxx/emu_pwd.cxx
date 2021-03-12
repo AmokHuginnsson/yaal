@@ -42,7 +42,7 @@ uid_t recode_sid( PSID psid_ ) {
 	} else {
 		uid = -uid;
 	}
-	return ( uid );
+	return uid;
 }
 
 owner_t get_path_owner( std::string const& path_ ) {
@@ -60,7 +60,7 @@ owner_t get_path_owner( std::string const& path_ ) {
 		)
 	);
 	if ( hFile == INVALID_HANDLE_VALUE ) {
-		return ( owner );
+		return owner;
 	}
 	PSID pSidOwner( nullptr );
 	PSID pSidGroup( nullptr );
@@ -82,7 +82,7 @@ owner_t get_path_owner( std::string const& path_ ) {
 	}
 	::LocalFree( pSD );
 	::CloseHandle( hFile );
-	return ( owner );
+	return owner;
 }
 
 }

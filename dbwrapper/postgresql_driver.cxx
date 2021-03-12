@@ -67,7 +67,7 @@ HString placeholder_generator( int no_ ) {
 	static int const PLACEHOLDER_SIZE( 16 );
 	char placeholder[PLACEHOLDER_SIZE];
 	snprintf( placeholder, PLACEHOLDER_SIZE, "$%d", no_ );
-	return ( placeholder );
+	return placeholder;
 }
 }
 
@@ -134,7 +134,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 		ConnStatusType connStatus( PQstatus( static_cast<PGconn*>( dbLink_._conn ) ) );
 		err = ( connStatus == CONNECTION_OK ) ? 0 : connStatus;
 	}
-	return ( err );
+	return err;
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
@@ -149,7 +149,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
 	result->_result = PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ );
 	result->_randomAccess = true;
-	return ( result );
+	return result;
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -176,7 +176,7 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	::PQsendQueryPrepared( conn, result->_id.c_str(), 0, nullptr, nullptr, nullptr, 0 );
 	::PQclear( r );
 /*	::PQsetSingleRowMode( conn ); */
-	return ( result );
+	return result;
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
@@ -185,7 +185,7 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
 	result->_randomAccess = false;
 	result->_query = transform_sql( query_, &placeholder_generator );
-	return ( result );
+	return result;
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HUTF8String const& );
@@ -227,7 +227,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 		++ pr->_useCount;
 		pr->_requireSync = true;
 	}
-	return ( pr );
+	return pr;
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
@@ -280,7 +280,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 		} else
 			pr->_total = 0;
 	}
-	return ( gotMore );
+	return gotMore;
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
@@ -312,7 +312,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 			count = ::PQntuples( pr->_result );
 		}
 	}
-	return ( count );
+	return count;
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
@@ -326,7 +326,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 			id = ::strtol( value, nullptr, 10 );
 		PQclear( result );
 	}
-	return ( id );
+	return id;
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );

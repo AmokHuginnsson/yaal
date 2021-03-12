@@ -33,7 +33,7 @@ protected:
 			int long ss( static_cast<HIterable const*>( v.raw() )->size( thread_, position_ ) );
 			s += ss;
 		}
-		return ( s );
+		return s;
 	}
 	virtual bool do_operator_contains( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int ) const override;
 private:

@@ -176,7 +176,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 		errBuf.realloc( MIN_ERROR_BUFFER_SIZE + msgLen );
 		msg = errBuf.get<char>();
 	}
-	return ( msg );
+	return msg;
 }
 
 namespace {
@@ -290,7 +290,7 @@ void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
 			res->_ok = false;
 		}
 	}
-	return ( res );
+	return res;
 }
 
 int yaal_firebird_rs_fields_count( void* data_ ) {
@@ -530,7 +530,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 			M_ENSURE( countBuffer[totalLen] == isc_info_end );
 		}
 	}
-	return ( count );
+	return count;
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );

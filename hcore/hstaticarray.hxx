@@ -79,10 +79,10 @@ public:
 		M_EPILOG
 	}
 	size_type size( void ) const {
-		return ( N );
+		return N;
 	}
 	size_type get_size( void ) const {
-		return ( N );
+		return N;
 	}
 	bool is_empty( void ) const {
 		return ( N == 0 );

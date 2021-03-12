@@ -96,7 +96,7 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 	M_PROLOG
 	M_ASSERT( _behavior & SKIP_EMPTY );
 	if ( start_ == HString::npos ) {
-		return ( start_ );
+		return start_;
 	}
 	if ( _behavior & DELIMITED_BY_WHOLE_STRING ) {
 		int long delimLen( _delimiter.get_length() );
@@ -114,7 +114,7 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 	if ( start_ >= _string.get_length() ) {
 		start_ = HString::npos;
 	}
-	return ( start_ );
+	return start_;
 	M_EPILOG
 }
 

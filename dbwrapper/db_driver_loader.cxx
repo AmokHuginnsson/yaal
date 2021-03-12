@@ -134,7 +134,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	if ( ! pConnector || ( pConnector->db_connect != nullptr ) ) {
 		hcore::log( LOG_LEVEL::NOTICE ) << _done_ << flush;
 	}
-	return ( pConnector );
+	return pConnector;
 	M_EPILOG
 }
 
@@ -226,7 +226,7 @@ yaal::hcore::HString transform_sql( yaal::hcore::HString sql_, place_holder_gene
 			}
 		}
 	}
-	return ( sql_ );
+	return sql_;
 	M_EPILOG
 }
 

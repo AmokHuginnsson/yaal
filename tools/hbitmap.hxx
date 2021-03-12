@@ -142,7 +142,7 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _index;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _index;
@@ -151,7 +151,7 @@ public:
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _index;
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( int long offset_ ) {
 		_index += offset_;
@@ -160,7 +160,7 @@ public:
 	HIterator operator + ( int long offset_ ) {
 		HIterator it( *this );
 		it += offset_;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( int long offset_ ) {
 		_index -= offset_;
@@ -169,7 +169,7 @@ public:
 	HIterator operator - ( int long offset_ ) {
 		HIterator it( *this );
 		it -= offset_;
-		return ( it );
+		return it;
 	}
 	HIterator& operator = ( HIterator const& it ) {
 		if ( &it != this ) {

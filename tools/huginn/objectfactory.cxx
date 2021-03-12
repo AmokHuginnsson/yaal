@@ -223,7 +223,7 @@ inline int try_release( HHuginn::value_t& owner_ ) {
 		coll.clear();
 		freed = 1;
 	}
-	return ( freed );
+	return freed;
 }
 
 inline int try_release( huginn::HObject& object_, HHuginn::value_t& none_ ) {
@@ -237,7 +237,7 @@ inline int try_release( huginn::HObject& object_, HHuginn::value_t& none_ ) {
 			freed = 1;
 		}
 	}
-	return ( freed );
+	return freed;
 }
 
 }
@@ -264,7 +264,7 @@ int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, 
 			}
 		}
 	}
-	return ( freed );
+	return freed;
 	M_EPILOG
 }
 

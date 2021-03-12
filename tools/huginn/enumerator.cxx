@@ -25,7 +25,7 @@ HHuginn::class_t HEnumerator::get_class( HRuntime* runtime_, huginn::HClass cons
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

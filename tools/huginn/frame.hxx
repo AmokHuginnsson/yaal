@@ -231,7 +231,7 @@ protected:
 		}
 		HHuginn::values_t& vals( *_valueCache[_valueCacheSize] );
 		++ _valueCacheSize;
-		return ( vals );
+		return vals;
 	}
 	void invalidate_value_cache( void ) {
 		-- _valueCacheSize;

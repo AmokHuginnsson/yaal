@@ -65,7 +65,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	M_ENSURE( hostNameStatus, hostName_ );
 	ip = ip_t( reinterpret_cast<in_addr*>( hostName.h_addr_list[ 0 ] )->s_addr );
 #endif /* #else #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
-	return ( ip );
+	return ip;
 	M_EPILOG
 }
 
@@ -82,7 +82,7 @@ HString resolver::ip_to_string( ip_t ip_ ) {
 			_cache->realloc( _cache->size() * 2 );
 		}
 	}
-	return ( name );
+	return name;
 	M_EPILOG
 }
 
@@ -127,7 +127,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	if ( ! name ) {
 		name = ip_to_string( ip_ );
 	}
-	return ( name );
+	return name;
 	M_EPILOG
 }
 

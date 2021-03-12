@@ -281,7 +281,7 @@ HString money_string( HNumber const& amount_ ) {
 		string += ".00";
 	else if ( pos == 1 )
 		string += "0";
-	return ( string );
+	return string;
 	M_EPILOG
 }
 
@@ -344,7 +344,7 @@ HString in_words_en( HNumber const& kwota_, CURRENCY currency_ ) {
 			break;
 		}
 	}
-	return ( inWords );
+	return inWords;
 	M_EPILOG
 }
 
@@ -410,7 +410,7 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 			break;
 		}
 	}
-	return ( inWords );
+	return inWords;
 	M_EPILOG
 }
 
@@ -504,7 +504,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 		}
 		valid = true;
 	} while ( false );
-	return ( valid );
+	return valid;
 	M_EPILOG
 }
 

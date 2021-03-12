@@ -34,7 +34,7 @@ HString placeholder_generator( int no_ ) {
 	static int const PLACEHOLDER_SIZE( 16 );
 	char placeholder[PLACEHOLDER_SIZE];
 	snprintf( placeholder, PLACEHOLDER_SIZE, ":%d", no_ );
-	return ( placeholder );
+	return placeholder;
 }
 
 }
@@ -187,7 +187,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
 		return ( oracle->_status );
 	OCIErrorGet( oracle->_error, 1, nullptr, &error, nullptr, 0,
 			OCI_HTYPE_ERROR );
-	return ( error );
+	return error;
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
@@ -218,7 +218,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 					"Error - %d", oracle->_status );
 		break;
 	}
-	return ( textBuffer );
+	return textBuffer;
 }
 
 namespace {
@@ -245,7 +245,7 @@ void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ )
 	} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO ) {
 		log( LOG_LEVEL::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, nullptr ) << endl;
 	}
-	return ( queryObj );
+	return queryObj;
 }
 
 void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
@@ -383,7 +383,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 	if ( fail ) {
 		log( LOG_LEVEL::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
 	}
-	return ( query );
+	return query;
 }
 
 }
@@ -516,7 +516,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	) {
 		rows = -1;
 	}
-	return ( rows );
+	return rows;
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
@@ -526,7 +526,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 					oracle_db_prepare_query( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual", OCI_STMT_SCROLLABLE_READONLY ) ) ) );
 	int long id( strtol( yaal_oracle_rs_get( autonumber, 0, 0 ), nullptr, 10 ) );
 	oracle_free_query( autonumber );
-	return ( id );
+	return id;
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );

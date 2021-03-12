@@ -26,7 +26,7 @@ HHuginn::class_t HPermutation::get_class( HRuntime* runtime_, huginn::HClass con
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -96,7 +96,7 @@ protected:
 				M_ASSERT( !"bad code path"[0] );
 			} break;
 		}
-		return ( v );
+		return v;
 	}
 private:
 	HPermutationIterator( HPermutationIterator const& ) = delete;

@@ -167,7 +167,7 @@ public:
 			erased = 1;
 			_engine.remove( it._engine );
 		}
-		return ( erased );
+		return erased;
 		M_EPILOG
 	}
 	iterator erase( iterator const& it ) {
@@ -182,7 +182,7 @@ public:
 			++ it;
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	iterator find( key_type const& e )
@@ -298,7 +298,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		++ _engine;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _engine;
@@ -307,7 +307,7 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		-- _engine;
-		return ( it );
+		return it;
 	}
 	const_qual_t& operator* ( void ) const {
 		return ( *_engine );

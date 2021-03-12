@@ -118,7 +118,7 @@ struct pointer_helper {
 			to._object = static_cast<to_t*>( from_._object );
 			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
-		return ( to );
+		return to;
 	}
 
 	template<typename to_t, typename from_t>
@@ -129,7 +129,7 @@ struct pointer_helper {
 			to._object = static_cast<to_t*>( from_._object );
 			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
-		return ( to );
+		return to;
 	}
 
 	template<typename to_t, typename from_t>
@@ -140,7 +140,7 @@ struct pointer_helper {
 			to._object = const_cast<to_t*>( from_._object );
 			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
-		return ( to );
+		return to;
 	}
 
 	template<typename tType>
@@ -763,7 +763,7 @@ HPointer<tType> make_pointer( arg_t&&... arg_ ) {
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
 	new ( p ) tType( yaal::forward<arg_t>( arg_ )... );
 	pointer_helper::do_make_pointer_post( ptr );
-	return ( ptr );
+	return ptr;
 }
 
 template<typename allocator_t, typename tType, typename... arg_t>
@@ -772,7 +772,7 @@ HPointer<tType> allocate_pointer( allocator_t const& allocator_, arg_t&&... arg_
 	tType* p( pointer_helper::do_allocate_pointer_pre( allocator_, ptr ) );
 	new ( p ) tType( yaal::forward<arg_t>( arg_ )... );
 	pointer_helper::do_allocate_pointer_post<allocator_t>( ptr );
-	return ( ptr );
+	return ptr;
 }
 
 template<typename tType>

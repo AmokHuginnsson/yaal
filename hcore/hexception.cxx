@@ -141,7 +141,7 @@ HString demangle( char const* symbolName_ ) {
 		symbol = p;
 		memory::free( p );
 	}
-	return ( symbol );
+	return symbol;
 }
 
 void kill_interior( yaal::hcore::HString const& msg_ ) {

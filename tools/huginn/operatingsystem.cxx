@@ -48,7 +48,7 @@ int locale_facet_to_category( LOCALE_FACET localeFacet_ ) {
 		case ( LOCALE_FACET::NUMERIC ): category = LC_NUMERIC; break;
 		case ( LOCALE_FACET::TIME ):    category = LC_TIME;    break;
 	}
-	return ( category );
+	return category;
 }
 }
 
@@ -125,7 +125,7 @@ public:
 			HOperatingSystem* osc( static_cast<HOperatingSystem*>( object_->raw() ) );
 			thread_->raise( osc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t core_count( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -330,7 +330,7 @@ public:
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	typedef yaal::hcore::HStreamInterface& ( HHuginn::* stream_getter_t )( void );
@@ -393,7 +393,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "OperatingSystem", &operatingsystemCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

@@ -148,7 +148,7 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 			row = draw_node( &*it, row );
 		}
 	}
-	return ( row );
+	return row;
 	M_EPILOG
 }
 
@@ -255,7 +255,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -268,7 +268,7 @@ bool HTreeWidget::do_click( OMouse& mouse_ ) {
 			handled = true;
 		}
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -309,7 +309,7 @@ HTreeWidget::tree_view_t::node_t HTreeWidget::previous( tree_view_t::node_t node
 			p = &*it;
 		}
 	}
-	return ( p );
+	return p;
 	M_EPILOG
 }
 
@@ -326,7 +326,7 @@ HTreeWidget::tree_view_t::node_t HTreeWidget::next( tree_view_t::node_t node ) {
 		if ( it != parent->end() )
 			n = &*it;
 	}
-	return ( n );
+	return n;
 	M_EPILOG
 }
 

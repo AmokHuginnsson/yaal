@@ -89,7 +89,7 @@ public:
 		HIterator const operator ++ ( int ) {
 			HIterator it( *this );
 			operator ++ ();
-			return ( it );
+			return it;
 		}
 		HIterator& operator -- ( void ) {
 			if ( _index > 0 ) {
@@ -105,7 +105,7 @@ public:
 		HIterator const operator -- ( int ) {
 			HIterator it( *this );
 			operator -- ();
-			return ( it );
+			return it;
 		}
 		value_type const& operator * ( void ) const {
 			M_ASSERT( _owner );
@@ -182,7 +182,7 @@ public:
 		size_type sizeAcc( 0 );
 		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second;
-		return ( sizeAcc );
+		return sizeAcc;
 		M_EPILOG
 	}
 	bool empty( void ) const {
@@ -232,7 +232,7 @@ public:
 			erased = it._engine->second;
 			_engine.remove( it._engine );
 		}
-		return ( erased );
+		return erased;
 		M_EPILOG
 	}
 	HIterator erase( HIterator const& it ) {
@@ -245,7 +245,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	HIterator find( value_type const& e ) const {

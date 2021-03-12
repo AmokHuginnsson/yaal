@@ -87,7 +87,7 @@ int HTimeWidget::do_process_input( int code_ ) {
 			_window->status_bar()->clear( COLOR::FG_LIGHTGRAY );
 		}
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 

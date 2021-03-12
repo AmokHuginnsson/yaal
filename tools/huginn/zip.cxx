@@ -25,7 +25,7 @@ HHuginn::class_t HZip::get_class( HRuntime* runtime_, huginn::HClass const* orig
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

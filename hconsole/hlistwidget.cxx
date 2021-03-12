@@ -46,7 +46,7 @@ char const* default_format( TYPE type_ ) {
 			M_ASSERT( !"bad type"[0] );
 		}
 	}
-	return ( df );
+	return df;
 }
 }
 
@@ -682,7 +682,7 @@ bool HListWidget::commit_edit( void ) {
 			M_ASSERT( !"bad column type"[0] );
 		}
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -702,7 +702,7 @@ int HListWidget::do_process_input( int code_ ) {
 	if ( code_ || ! _cellEditor._editing ) {
 		code_ = process_input_view( code_ );
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -733,7 +733,7 @@ int HListWidget::process_input_edit( int code_ ) {
 		_cellEditor._edit->schedule_repaint();
 		schedule_repaint();
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -800,7 +800,7 @@ int HListWidget::process_input_view( int code_ ) {
 			_window->status_bar()->message( COLOR::FG_LIGHTGRAY, _varTmpBuffer );
 		}
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -831,7 +831,7 @@ int HListWidget::column_offset( int column_ ) const {
 	for ( int i( 0 ); i < column_; ++ i ) {
 		offset += _header[ i ]->_widthRaw;
 	}
-	return ( offset );
+	return offset;
 	M_EPILOG
 }
 
@@ -939,7 +939,7 @@ bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 	if ( get_cursor_position() != origCursorPosition ) {
 		selection_change();
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -1343,7 +1343,7 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 		default:
 			break;
 	}
-	return ( lower );
+	return lower;
 	M_EPILOG
 }
 
@@ -1633,7 +1633,7 @@ bool HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 			ok = false;
 		}
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -1681,7 +1681,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 		list->add_column( placement, make_column( node_, list, columnName, width, align, type, !! format ? *format : "", field.raw() ) );
 		ok = true;
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

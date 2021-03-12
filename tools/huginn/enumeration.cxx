@@ -115,7 +115,7 @@ HHuginn::value_t HEnumerationClass::enumeral( HEnumeral::value_type id_ ) const 
 			break;
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -155,7 +155,7 @@ HHuginn::class_t create_class(
 		);
 		runtime_->huginn()->register_class( c, visibility_ );
 	}
-	return ( c );
+	return c;
 }
 
 HEnumeration::HEnumeration( HClass const* class_ )

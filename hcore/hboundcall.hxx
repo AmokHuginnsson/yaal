@@ -144,7 +144,7 @@ public:
 		} else if ( t == 1 ) {
 			return ( _call.template get<function_ptr_t>().raw() );
 		}
-		return ( nullptr );
+		return nullptr;
 	}
 	void reset( void ) {
 		int const t( _call.type() );

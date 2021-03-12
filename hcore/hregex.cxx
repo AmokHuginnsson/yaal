@@ -148,7 +148,7 @@ void HRegex::reset( void ) {
 HRegex HRegex::copy( void ) const {
 	M_PROLOG
 	HRegex regex( _pattern, _flags );
-	return ( regex );
+	return regex;
 	M_EPILOG
 }
 
@@ -275,7 +275,7 @@ HRegex::groups_t HRegex::groups_impl( HUTF8String const& string_, match_t match_
 			}
 		}
 	}
-	return ( g );
+	return g;
 	M_EPILOG
 }
 
@@ -336,7 +336,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, yaal::h
 		offset += g[0].start();
 		endPos += offset;
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -350,7 +350,7 @@ yaal::hcore::HString HRegex::replace( yaal::hcore::HString const& text_, replace
 		endPos = m.start() + m.size();
 	}
 	res.append( text_, endPos );
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -360,7 +360,7 @@ HRegex::HMatchIterator HRegex::find( HUTF8String const& str_, match_t match_ ) c
 	int len( 0 );
 	HUTF8String match( matches_impl( _utf8ConversionCache, start, len, match_ ) );
 	HMatchIterator it( this, match_, match, start, len );
-	return ( it );
+	return it;
 }
 
 HRegex::HMatchIterator HRegex::end( void ) const {

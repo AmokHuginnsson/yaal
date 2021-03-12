@@ -250,7 +250,7 @@ HSocket::ptr_t HSocket::accept( void ) {
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
 	::memcpy( socket->_address, address, static_cast<size_t>( addressSize ) );
-	return ( socket );
+	return socket;
 	M_EPILOG
 }
 

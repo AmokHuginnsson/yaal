@@ -135,7 +135,7 @@ int HStatusBarWidget::do_process_input( int code_ ) {
 		default :
 			break;
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -330,7 +330,7 @@ bool HStatusBarWidget::dialog( yaal::hcore::HString const& answer_ ) {
 			break;
 		}
 	}
-	return ( found );
+	return found;
 	M_EPILOG
 }
 
@@ -376,7 +376,7 @@ int HStatusBarWidget::process_input_normal( int code_ ) {
 			code_ = code;
 		break;
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 

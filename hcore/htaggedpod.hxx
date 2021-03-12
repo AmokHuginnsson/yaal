@@ -82,7 +82,7 @@ YAAL_DEFINE_OPER( |= )
 	HTaggedPOD operator OP ( int ) const { \
 		HTaggedPOD tp( *this ); \
 		OP tp; \
-		return ( tp ); \
+		return tp; \
 	}
 YAAL_DEFINE_OPER( ++ )
 YAAL_DEFINE_OPER( -- )

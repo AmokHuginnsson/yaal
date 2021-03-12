@@ -113,7 +113,7 @@ int HSource::real_position( int position_ ) const {
 		M_ENSURE( it != _skips.end() );
 		errorPosition = it->second + position_;
 	}
-	return ( errorPosition );
+	return errorPosition;
 	M_EPILOG
 }
 

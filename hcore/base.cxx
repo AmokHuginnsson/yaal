@@ -139,7 +139,7 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		*alternate_ = static_cast<char>( (*it).get() );
 	}
 	*alternate_ = 0;
-	return ( base );
+	return base;
 }
 
 }
@@ -350,7 +350,7 @@ bool lexical_cast( HString const& value_ ) {
 		typedef LexicalCast this_type;
 		M_THROW( message, bVal );
 	}
-	return ( bVal );
+	return bVal;
 	M_EPILOG
 }
 
@@ -374,105 +374,105 @@ char lexical_cast( HString const& val ) {
 template<>
 HString lexical_cast( HString const& val ) {
 	M_PROLOG
-	return ( val );
+	return val;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( char const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( char unsigned const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int short const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int short unsigned const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int unsigned const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int long const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int long unsigned const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int long long const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( int long long unsigned const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( float const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( double const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( double long const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 
 template<>
 HString lexical_cast( void* const& val_ ) {
 	M_PROLOG
-	return ( val_ );
+	return val_;
 	M_EPILOG
 }
 

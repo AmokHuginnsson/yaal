@@ -67,7 +67,7 @@ int kill( int pid_, int signal_ ) {
 		result = ::kill( pid_, signal_ );
 	}
 #endif /* #ifdef __HOST_OS_TYPE_CYGWIN__ */
-	return ( result );
+	return result;
 }
 
 IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, int timeout_, bool restartable_ ) {
@@ -95,7 +95,7 @@ IO_EVENT_TYPE wait_for_io( file_descriptor_t fd_, IO_EVENT_TYPE ioEventType_, in
 	} else if ( errno == EINTR ) {
 		res = IO_EVENT_TYPE::INTERRUPT;
 	}
-	return ( res );
+	return res;
 }
 
 namespace {
@@ -352,7 +352,7 @@ yaal::hcore::HString get_self_exec_path( void ) {
 #ifdef __HOST_OS_TYPE_WINDOWS__
 	ms_get_module_file_name( path );
 #endif
-	return ( path );
+	return path;
 	M_EPILOG
 }
 
@@ -381,7 +381,7 @@ yaal::hcore::HString home_path( void ) {
 		}
 #endif
 		hp.append( homePath );
-		return ( hp );
+		return hp;
 	}
 	char const* loginFromEnv( ::getenv( "LOGIN" ) );
 	if ( ! loginFromEnv ) {
@@ -405,7 +405,7 @@ yaal::hcore::HString home_path( void ) {
 	}
 	HString hp( "/home/" );
 	hp.append( login );
-	return ( hp );
+	return hp;
 }
 
 mode_t get_umask( void ) {
@@ -438,7 +438,7 @@ inline int resource_limit_type( RESOURCE_LIMIT_TYPE resourceLimitType_ ) {
 			throw HRuntimeException( "Unsupported resource limit type." );
 		} break;
 	}
-	return ( rlt );
+	return rlt;
 }
 
 HResourceLimit get_limit( RESOURCE_LIMIT_TYPE resourceLimitType_ ) {

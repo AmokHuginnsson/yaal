@@ -39,7 +39,7 @@ int HLockedFile::do_open( yaal::hcore::HString const& path_, open_t mode_ ) {
 	if ( ! ret ) {
 		lock();
 	}
-	return ( ret );
+	return ret;
 	M_EPILOG
 }
 

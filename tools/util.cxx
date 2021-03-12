@@ -54,7 +54,7 @@ HString& usun_ogonki( HString& string_ ) {
 			*it = t->second;
 		}
 	}
-	return ( string_ );
+	return string_;
 	M_EPILOG
 }
 
@@ -152,7 +152,7 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 	} else {
 		value = hidden::std_strtold( str, nullptr );
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -197,7 +197,7 @@ yaal::hcore::HString cardinal( int no_ ) {
 	} else {
 		c.append( no_ );
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -239,7 +239,7 @@ yaal::hcore::HString ordinal( int no_ ) {
 		o = cardinal( no_ );
 		o.append( SUFFIX[digit] );
 	}
-	return ( o );
+	return o;
 	M_EPILOG
 }
 
@@ -396,7 +396,7 @@ public:
 			}
 			s.append( c );
 		}
-		return ( s );
+		return s;
 		M_EPILOG
 	}
 };
@@ -416,7 +416,7 @@ yaal::hcore::HString hl( HHighlighter& highlighter_, yaal::hcore::HString const&
 		s = re1.replace( str_, "" );
 		s = re2.replace( s, "$1" );
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 yaal::hcore::HString hl( yaal::hcore::HString const& str_, HTheme const& theme_, bool color_, bool markdown_ ) {
@@ -439,7 +439,7 @@ yaal::hcore::HString escape_markdown( yaal::hcore::HString const& string_ ) {
 	s.replace( "_", "\\_" );
 	s.replace( "`", "\\`" );
 	s.replace( "{", "\\{" );
-	return ( s );
+	return s;
 	M_EPILOG
 }
 char const _nonBreakingSpace_[] = "\xc2\xa0";
@@ -496,7 +496,7 @@ yaal::hcore::HString alias_desc( HProgramOptionsHandler::HOption const& opt_ ) {
 		}
 		aliasDesc.append( "**--" ).append( opt_.long_form() ).append( "**" );
 	}
-	return ( aliasDesc );
+	return aliasDesc;
 	M_EPILOG
 }
 }
@@ -972,7 +972,7 @@ char const* near_keys( char key_ ) {
 		case ( '>' ):  near = "<L:?";      break;
 		case ( '?' ):  near = ">:\"";      break;
 	}
-	return ( near );
+	return near;
 }
 
 }

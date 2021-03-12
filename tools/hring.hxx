@@ -348,7 +348,7 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _index;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _index;
@@ -357,11 +357,11 @@ public:
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _index;
-		return ( it );
+		return it;
 	}
 	HIterator operator + ( int long off_ ) const {
 		HIterator it( _owner, _index + off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( int long off_ ) {
 		_index += off_;
@@ -369,7 +369,7 @@ public:
 	}
 	HIterator operator - ( int long off_ ) const {
 		HIterator it( _owner, _index - off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( int long off_ ) {
 		_index -= off_;
@@ -606,7 +606,7 @@ typename HRing<type_t>::iterator HRing<type_t>::insert( iterator pos_, type_t co
 	value_type* arr( _buf.get<value_type>() );
 	int long idx( ( pos_._index + _start ) >= curCapacity ? pos_._index + _start - curCapacity : pos_._index + _start );
 	new ( arr + idx ) value_type( value_ );
-	return ( pos_ );
+	return pos_;
 	M_EPILOG
 }
 
@@ -662,7 +662,7 @@ typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first_, iterator
 		}
 	}
 	_size -= ( last_._index - first_._index );
-	return ( first_ );
+	return first_;
 	M_EPILOG
 }
 

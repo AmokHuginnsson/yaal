@@ -23,10 +23,10 @@ int distance( yaal::hcore::HString const& one_, yaal::hcore::HString const& two_
 	int lengthOne = static_cast<int>( one_.length() );
 	int lengthTwo = static_cast<int>( two_.length() );
 	if ( ! lengthTwo ) {
-		return ( lengthOne );
+		return lengthOne;
 	}
 	if ( ! lengthOne ) {
-		return ( lengthTwo );
+		return lengthTwo;
 	}
 	++ lengthOne;
 	++ lengthTwo;
@@ -93,7 +93,7 @@ yaal::hcore::HString::size_type common_prefix_length(
 	while ( ( len < maxLen_ ) && ( str1_[len] == str2_[len] ) ) {
 		++ len;
 	}
-	return ( len );
+	return len;
 }
 
 }

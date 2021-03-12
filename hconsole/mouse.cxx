@@ -69,7 +69,7 @@ int hunt_tty( int offset_ ) {
 			throw HConsoleException( "cannot find controlling virtual console", errno );
 		}
 	}
-	return ( vC );
+	return vC;
 	M_EPILOG
 }
 
@@ -156,7 +156,7 @@ int console_mouse_open( void ) {
 		throw HMouseException( "Can't open mouse connection: "_ys.append( error_message( errno ) ), vC );
 	}
 	hcore::log( LOG_LEVEL::INFO ) << "i have opened device: `" << vC << '\'' << endl;
-	return ( gpm_fd );
+	return gpm_fd;
 	M_EPILOG
 }
 

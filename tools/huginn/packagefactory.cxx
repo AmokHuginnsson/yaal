@@ -165,7 +165,7 @@ HPackageCreatorInterface::HInstance HPackageFactory::load_binary( HRuntime* runt
 			throw HHuginn::HHuginnRuntimeException( e.what(), runtime_->file_id(), position_ );
 		}
 	}
-	return ( package );
+	return package;
 	M_EPILOG
 }
 
@@ -179,7 +179,7 @@ HPackageCreatorInterface::HInstance HPackageFactory::load_module( HRuntime* runt
 		substitute_environment( module, ENV_SUBST_MODE::RECURSIVE );
 		try {
 			if ( filesystem::is_regular_file( module ) ) {
-				return ( module );
+				return module;
 			}
 		} catch ( filesystem::HFileSystemException const& ) {
 		}
@@ -249,7 +249,7 @@ HPackageFactory::creators_t::iterator HPackageFactory::end( void ) {
 }
 
 int HPackageFactory::life_time( int lifeTime_ ) {
-	return ( lifeTime_ );
+	return lifeTime_;
 }
 
 void HPackageFactory::initialize_globals( void ) {

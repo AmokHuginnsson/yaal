@@ -55,7 +55,7 @@ yaal::hcore::HTime const& OMenuItem::get_time( void ) const {
 	M_ASSERT( 0 && "invalid call" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HTime t( HTime::TZ::LOCAL );
-	return ( t );
+	return t;
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 

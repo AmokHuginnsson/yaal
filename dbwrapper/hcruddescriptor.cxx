@@ -79,7 +79,7 @@ char const* cond_to_str( HCRUDDescriptor::OFilter::CONDITION condition_ ) {
 		case ( HCRUDDescriptor::OFilter::CONDITION::IS_NOT_NULL ):      str = " IS NOT NULL"; break;
 		default: {}
 	}
-	return ( str );
+	return str;
 }
 
 bool cond_req_bind( HCRUDDescriptor::OFilter::CONDITION condition_ ) {
@@ -246,7 +246,7 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 		_setSize = rs->get_dml_size();
 	}
 	fill( _mutated.begin(), _mutated.end(), false );
-	return ( rs );
+	return rs;
 	M_EPILOG
 }
 
@@ -407,7 +407,7 @@ HString HCRUDDescriptor::get_filter( void ) const {
 	OFilter const& filterInfo( _filter[static_cast<int>( _mode )] );
 	HString filterStr( filterInfo._column );
 	filterStr.append( cond_to_str( filterInfo._condition ) ).replace( "?", _filterValue );
-	return ( filterStr );
+	return filterStr;
 }
 
 HString HCRUDDescriptor::get_sort( void ) const {

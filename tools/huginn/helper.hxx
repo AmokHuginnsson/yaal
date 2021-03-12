@@ -424,7 +424,7 @@ struct huginn_type_from_integer {
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
-		return ( val );
+		return val;
 	}
 	static HHuginn::value_t make( HRuntime& runtime_, T value_ ) {
 		return ( runtime_.object_factory()->create_integer( value_ ) );
@@ -441,7 +441,7 @@ struct huginn_type_from_character {
 		} catch ( yaal::hcore::HOutOfRangeException const& e ) {
 			throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 		}
-		return ( val );
+		return val;
 	}
 	static HHuginn::value_t make( HRuntime& runtime_, T value_ ) {
 		return ( runtime_.object_factory()->create_character( code_point_t( value_ ) ) );

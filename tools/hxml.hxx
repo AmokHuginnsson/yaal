@@ -314,7 +314,7 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _iterator;
@@ -323,7 +323,7 @@ public:
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	void const* node_id( void ) const {
 		return ( _iterator.node_id() );
@@ -355,7 +355,7 @@ public:
 	HConstIterator operator ++ ( int ) {
 		HConstIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HConstIterator& operator -- ( void ) {
 		-- _iterator;
@@ -364,7 +364,7 @@ public:
 	HConstIterator operator -- ( int ) {
 		HConstIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	void const* node_id( void ) const {
 		return ( _iterator.node_id() );
@@ -433,7 +433,7 @@ public:
 	HConstIterator operator ++ ( int ) {
 		HConstIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HConstIterator& operator -- ( void ) {
 		-- _iterator;
@@ -442,7 +442,7 @@ public:
 	HConstIterator operator -- ( int ) {
 		HConstIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	HConstIterator& operator = ( HConstIterator const& );
 	bool operator == ( HConstIterator const& ) const;

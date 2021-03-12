@@ -1485,7 +1485,7 @@ HHuginn::values_t HExpression::grab_args( HFrame* frame_, HPartial::unbound_inde
 		unboundIndexes_[unboundIndex].shift( offset );
 		++ unboundIndex;
 	}
-	return ( arguments );
+	return arguments;
 	M_EPILOG
 }
 
@@ -2276,7 +2276,7 @@ HHuginn::value_t HExpression::evaluate( huginn::HThread* thread_ ) const {
 			f->values().clear();
 		}
 		f->end_expression();
-		return ( result );
+		return result;
 	} catch ( HHuginn::HHuginnRuntimeException const& e ) {
 		if ( e.position() <= 0 ) {
 			throw HHuginn::HHuginnRuntimeException( e.message(), file_id(), position() );

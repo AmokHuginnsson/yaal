@@ -36,7 +36,7 @@ HHuginn::class_t make_node_class( HRuntime* runtime_, HClass const* origin_, cha
 	c->set_origin( origin_ );
 	c->redefine( runtime_->object_factory()->string_class(), {} );
 	runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -230,7 +230,7 @@ public:
 			)
 		);
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 private:
@@ -368,7 +368,7 @@ public:
 			)
 		);
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 private:
@@ -630,7 +630,7 @@ public:
 			)
 		);
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::PACKAGE );
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 private:
@@ -661,7 +661,7 @@ HHuginn::value_t make_node_ref( HObjectFactory& of_, HDocumentClass const* dc_, 
 			v = of_.create<HString>( dc_->entity_class(), n_.get_value() );
 		} break;
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -691,7 +691,7 @@ HHuginn::value_t HDocument::create_element( HObjectFactory& of_, HHuginn::value_
 		v = of_.create<HElement>( dc->element_class(), doc_, node_ );
 		_elementRefs.insert( make_pair( node_.node_id(), HHuginn::value_ref_t( v ) ) );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -809,7 +809,7 @@ HHuginn::value_t HElement::attributes( HThread* thread_, HHuginn::value_t* self_
 		attrs = thread_->object_factory().create<HAttributes>( ec->attributes_class(), *self_ );
 		_attributes = attrs;
 	}
-	return ( attrs );
+	return attrs;
 	M_EPILOG
 }
 
@@ -933,7 +933,7 @@ public:
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( XML._exceptionClass.raw(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t create( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -977,7 +977,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "XML", &xmlCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

@@ -108,7 +108,7 @@ HString type_name( bool stripTemplateParams_ = false ) {
 		if ( idx != HString::npos )
 			typeName.erase( idx );
 	}
-	return ( typeName );
+	return typeName;
 }
 
 /*! \brief Template used to create type specific exceptions.

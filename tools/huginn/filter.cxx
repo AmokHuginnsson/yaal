@@ -25,7 +25,7 @@ HHuginn::class_t HFilter::get_class( HRuntime* runtime_, huginn::HClass const* o
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -91,7 +91,7 @@ private:
 
 HFilter::iterator_t HFilter::do_iterator( HThread* thread_, int position_ ) {
 	iterator_t impl( hcore::make_pointer<HFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _callable, thread_, position_ ) );
-	return ( impl );
+	return impl;
 }
 
 }

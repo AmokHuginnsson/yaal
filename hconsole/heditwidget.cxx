@@ -187,7 +187,7 @@ int HEditWidget::find_eow( int length_ ) {
 			index = length_;
 		}
 	}
-	return ( index );
+	return index;
 	M_EPILOG
 }
 
@@ -205,7 +205,7 @@ int HEditWidget::go_to_eow( int length_ ) {
 			}
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -232,7 +232,7 @@ int HEditWidget::move_right( int length_ ) {
 			++ _widgetOffset;
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -247,7 +247,7 @@ int HEditWidget::move_left( void ) {
 			-- _widgetOffset;
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -279,7 +279,7 @@ int HEditWidget::delete_char( int length_ ) {
 			}
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -296,7 +296,7 @@ int HEditWidget::kill_char( void ) {
 			_varTmpBuffer.erase( _widgetOffset + _cursorPosition, 1 );
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -311,7 +311,7 @@ int HEditWidget::find_bow( int length_ ) {
 			index = length_ - index;
 		}
 	}
-	return ( index );
+	return index;
 	M_EPILOG
 }
 
@@ -332,7 +332,7 @@ int HEditWidget::go_to_bow( int length_ ) {
 			_cursorPosition = 0;
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -350,7 +350,7 @@ int HEditWidget::delete_word( int length_ ) {
 			_varTmpBuffer.erase( oldIndex, index - oldIndex );
 		}
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -376,7 +376,7 @@ int HEditWidget::kill_word( int length_ ) {
 		} else
 			err = 1;
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -398,7 +398,7 @@ int HEditWidget::insert_char( int code_, int length_ ) {
 	} else {
 		err = code_;
 	}
-	return ( err );
+	return err;
 	M_EPILOG
 }
 
@@ -536,7 +536,7 @@ int HEditWidget::do_process_input( int code_ ) {
 		_cursorPosition = oldCursorPosition;
 		HConsole::get_instance().bell();
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -580,7 +580,7 @@ bool HEditWidget::do_click( mouse::OMouse & mouse_ ) {
 			handled = true;
 		}
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -738,7 +738,7 @@ bool HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 	} else {
 		ok = false;
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -781,7 +781,7 @@ HTime const& HInfoString::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HTime const dummy( HTime::TZ::LOCAL );
-	return ( dummy );
+	return dummy;
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 

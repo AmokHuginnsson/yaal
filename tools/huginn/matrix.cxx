@@ -136,7 +136,7 @@ HHuginn::value_t HMatrix::columns( huginn::HThread* thread_, HHuginn::value_t* o
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		v = thread_->runtime().object_factory()->create_integer( m.columns() );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -153,7 +153,7 @@ HHuginn::value_t HMatrix::rows( huginn::HThread* thread_, HHuginn::value_t* obje
 		floating_point_matrix_t& m( *( o->_data.get<floating_point_matrix_ptr_t>().raw() ) );
 		v = thread_->runtime().object_factory()->create_integer( m.rows() );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -183,7 +183,7 @@ HHuginn::value_t HMatrix::get( huginn::HThread* thread_, HHuginn::value_t* objec
 		}
 		v = thread_->runtime().object_factory()->create_real( m[row][col] );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -305,7 +305,7 @@ HHuginn::value_t HMatrix::do_operator_modulus( HThread* thread_, HHuginn::value_
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -384,7 +384,7 @@ HHuginn::value_t HMatrix::inverse( huginn::HThread* thread_, HHuginn::value_t* o
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -400,7 +400,7 @@ HHuginn::value_t HMatrix::do_operator_negate( HThread* thread_, HHuginn::value_t
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -423,7 +423,7 @@ bool HMatrix::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHu
 	} catch ( hcore::HException const& e ) {
 		throw HHuginn::HHuginnRuntimeException( e.what(), thread_->file_id(), position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -437,7 +437,7 @@ HHuginn::value_t HMatrix::transpose( huginn::HThread* thread_, HHuginn::value_t*
 	} else {
 		v = thread_->object_factory().create<HMatrix>( o->HValue::get_class(), make_resource<floating_point_matrix_t>( o->_data.get<floating_point_matrix_ptr_t>()->transpose() ) );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -563,7 +563,7 @@ HHuginn::class_t HMatrix::get_class( HRuntime* runtime_, HClass const* origin_ )
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -575,7 +575,7 @@ HHuginn::value_t HMatrix::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 	} else {
 		v = thread_->object_factory().create<HMatrix>( HValue::get_class(), make_resource<floating_point_matrix_t>( *( _data.get<floating_point_matrix_ptr_t>() ) ) );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 

@@ -35,7 +35,7 @@ protected:
 				s = ss;
 			}
 		}
-		return ( s );
+		return s;
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;

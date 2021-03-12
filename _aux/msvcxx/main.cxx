@@ -58,7 +58,7 @@ namespace abi {
 char* __cxa_demangle( char const* a, void*, void*, int* ) {
 	char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
 	::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
-	return ( buf );
+	return buf;
 }
 
 }
@@ -90,7 +90,7 @@ int backtrace( void** buf_, int size_ ) {
 		}
 	}
 	char** strings = reinterpret_cast<char**>( buf_ );
-	return ( got );
+	return got;
 }
 
 extern "C"
@@ -131,7 +131,7 @@ char** backtrace_symbols( void* const* buf_, int size_ ) {
 		memory::free( strings );
 		strings = nullptr;
 	}
-	return ( strings );
+	return strings;
 }
 
 int setenv( char const* name_, char const* value_, int replace_ ) {
@@ -143,7 +143,7 @@ int setenv( char const* name_, char const* value_, int replace_ ) {
 		HUTF8String utf8( s );
 		ret = ::putenv( utf8.c_str() );
 	}
-	return ( ret );
+	return ret;
 }
 
 int unsetenv( char const* name_ ) {
@@ -151,7 +151,7 @@ int unsetenv( char const* name_ ) {
 	n += "=";
 	HUTF8String utf8( n );
 	int ret( ::putenv( utf8.c_str() ) );
-	return ( ret );
+	return ret;
 }
 
 char* basename( char* path_ ) {
@@ -165,7 +165,7 @@ char* basename( char* path_ ) {
 			r = u ? u + 1 : w + 1;
 		}
 	}
-	return ( r );
+	return r;
 }
 
 char* strptime( char const* source_, char const* format_, struct tm* broken_ ) {
@@ -202,7 +202,7 @@ DIR* opendir( char const* path_ ) {
 		dir->_hasData = true;
 		dir->_index = 0;
 	}
-	return ( dir );
+	return dir;
 }
 
 int closedir( DIR* dir_ ) {
@@ -242,7 +242,7 @@ PSID get_base_sid( char* buffer_, int size_, TOKEN_INFORMATION_CLASS tic_ ) {
 	HANDLE hToken( nullptr );
 	if ( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_QUERY, &hToken ) ) {
 		log_windows_error( "OpenProcessToken" );
-		return ( nullptr );
+		return nullptr;
 	}
 
 	::memset( buffer_, 0, size_ );
@@ -250,14 +250,14 @@ PSID get_base_sid( char* buffer_, int size_, TOKEN_INFORMATION_CLASS tic_ ) {
 	DWORD dummy( 0 );
 	if ( ! ::GetTokenInformation( hToken, tic_, buffer_, size_, &dummy ) ) {
 		log_windows_error( "GetTokenInformation" );
-		return ( nullptr );
+		return nullptr;
 	}
 
 	::CloseHandle( hToken );
 	PTOKEN_USER tokenUser( static_cast<PTOKEN_USER>( static_cast<void*>( buffer_ ) ) );
 	if ( ! ::IsValidSid( tokenUser->User.Sid ) ) {
 		log_windows_error( "IsValidSid" );
-		return ( nullptr );
+		return nullptr;
 	}
 	return ( tokenUser->User.Sid );
 }
@@ -268,7 +268,7 @@ uid_t getuid( void ) {
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
 	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenUser ) );
 	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
-	return ( uid );
+	return uid;
 }
 
 uid_t getgid( void ) {
@@ -277,7 +277,7 @@ uid_t getgid( void ) {
 	char tokenUserBuffer[ TOKEN_USER_SIZE ];
 	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE, TokenPrimaryGroup ) );
 	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
-	return ( uid );
+	return uid;
 }
 
 int getpgrp( void ) {
@@ -364,7 +364,7 @@ int readlink( char const* path_, char* buffer_, size_t size_ ) {
 			nullptr
 		);
 		if ( h == INVALID_HANDLE_VALUE ) {
-			return ( len );
+			return len;
 		}
 		DWORD returnedDataSize( 0 );
 		int size( sizeof ( REPARSE_DATA_BUFFER ) + size_ * 2 + 1 );
@@ -388,7 +388,7 @@ int readlink( char const* path_, char* buffer_, size_t size_ ) {
 				len = size_ * 2;
 			}
 			memory::free( buf );
-			return ( len );
+			return len;
 		}
 		REPARSE_DATA_BUFFER* reparseDataBuffer( static_cast<REPARSE_DATA_BUFFER*>( buf ) );
 		static int long unsigned const IO_REPARSE_TAG_LX_SYMLINK( 0xa000001d );
@@ -409,7 +409,7 @@ int readlink( char const* path_, char* buffer_, size_t size_ ) {
 		}
 		memory::free( buf );
 	}
-	return ( len );
+	return len;
 }
 
 bool get_system_account_name( int id_, char* buf_, int size_ ) {
@@ -474,7 +474,7 @@ bool get_system_account_name( int id_, char* buf_, int size_ ) {
 		log_windows_error( "LookupAccountSid" );
 	}
 	::LocalFree( newSid );
-	return ( ok );
+	return ok;
 }
 
 int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct passwd** result_ ) {
@@ -484,7 +484,7 @@ int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct pas
 		err = 0;
 		*result_ = p_;
 	}
-	return ( err );
+	return err;
 }
 
 int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct group** result_ ) {
@@ -494,7 +494,7 @@ int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct grou
 		err = 0;
 		*result_ = g_;
 	}
-	return ( err );
+	return err;
 }
 
 const DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -527,7 +527,7 @@ void pthread_setname_np( pthread_t, char const* name_ ) {
 void* get_module_func_address( char const* moduleName_, char const* funcName_ ) {
 	HMODULE h( ::GetModuleHandle( moduleName_ ) );
 	void* p( ::GetProcAddress( h, funcName_ ) );
-	return ( p );
+	return p;
 }
 
 int* iconv_errno( void ) {
@@ -574,7 +574,7 @@ int getrusage( rusage_who_t who_, struct rusage* usage_ ) {
 		::GetProcessMemoryInfo( ::GetCurrentProcess(), &pmc, sizeof ( pmc ) );
 		usage_->ru_maxrss = pmc.WorkingSetSize;
 	}
-	return ( err );
+	return err;
 }
 
 int getrlimit( rlimit_resource_t limType_, struct rlimit* rl_ ) {
@@ -648,7 +648,7 @@ int long sysconf( int id_ ) {
 			errno = EINVAL;
 		}
 	}
-	return ( result );
+	return result;
 }
 
 int long pathconf( char const* path_, int id_ ) {
@@ -669,7 +669,7 @@ int long pathconf( char const* path_, int id_ ) {
 			errno = EINVAL;
 		}
 	}
-	return ( result );
+	return result;
 }
 
 driver_names_t get_drivers( void ) {
@@ -694,7 +694,7 @@ driver_names_t get_drivers( void ) {
 	} else {
 		log_windows_error( "EnumDeviceDrivers" );
 	}
-	return ( driverNames );
+	return driverNames;
 }
 
 int statvfs( char const* path_, struct statvfs* fs_ ) {
@@ -721,7 +721,7 @@ int statvfs( char const* path_, struct statvfs* fs_ ) {
 		code = -1;
 		errno = ENOENT;
 	}
-	return ( code );
+	return code;
 }
 
 int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {
@@ -750,7 +750,7 @@ int gettimeofday( struct timeval* tv_, struct timezone* tz_ ) {
 		tv_->tv_sec = static_cast<int long>( li.QuadPart / HECTONANOSEC_PER_SEC );
 		tv_->tv_usec = ( li.QuadPart % HECTONANOSEC_PER_SEC ) / 10;
 	}
-	return ( ret );
+	return ret;
 }
 
 void* dlopen( char const* name_, int flags_ ) {
@@ -761,7 +761,7 @@ void* dlopen( char const* name_, int flags_ ) {
 	} else {
 		dll = LoadLibraryEx( name_, nullptr, flags );
 	}
-	return ( dll );
+	return dll;
 }
 
 int dlclose( void* dll_ ) {
@@ -812,7 +812,7 @@ void* mmap( void* ptr_, size_t size_, int mode_, int access_, int fd_, off_t off
 			break;
 		}
 	} while ( false );
-	return ( ptr );
+	return ptr;
 }
 
 int munmap( void* ptr_, size_t ) {

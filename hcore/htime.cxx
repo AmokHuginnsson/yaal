@@ -388,7 +388,7 @@ HTime HTime::operator - ( HTime const& time_ ) const {
 	M_PROLOG
 	HTime time( *this );
 	time -= time_;
-	return ( time );
+	return time;
 	M_EPILOG
 }
 
@@ -406,7 +406,7 @@ HTime HTime::operator + ( HTime const& time_ ) const {
 	M_PROLOG
 	HTime time( *this );
 	time += time_;
-	return ( time );
+	return time;
 	M_EPILOG
 }
 

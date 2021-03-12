@@ -39,7 +39,7 @@ COLOR::color_t COLOR::fg_to_bg( COLOR::color_t fg_ ) {
 			M_THROW( "Invalid color:", fg_ );
 		}
 	}
-	return ( bg );
+	return bg;
 	M_EPILOG
 }
 
@@ -100,7 +100,7 @@ COLOR::color_t COLOR::from_string( yaal::hcore::HString const& name_ ) {
 	} else {
 		throw HColorException( "Bad color name: `"_ys.append( name_ ).append( "'." ) );
 	}
-	return ( color );
+	return color;
 }
 
 yaal::ansi::HSequence const& COLOR::to_ansi( color_t color_ ) {

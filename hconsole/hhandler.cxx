@@ -70,7 +70,7 @@ bool HHandler::process_input_with_handlers( HKeyPressEvent const& keyPress_, pro
 	if ( it != map_.end() ) {
 		consumed = it->second( keyPress_ );
 	}
-	return ( consumed );
+	return consumed;
 	M_EPILOG
 }
 
@@ -95,7 +95,7 @@ bool HHandler::process_command( yaal::hcore::HString const& command_ ) {
 		found = true;
 		it->second( HCommandEvent( command_ ) );
 	}
-	return ( found );
+	return found;
 	M_EPILOG
 }
 

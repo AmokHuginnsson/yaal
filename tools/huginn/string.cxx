@@ -98,7 +98,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -378,7 +378,7 @@ inline HHuginn::value_t format( huginn::HThread* thread_, HHuginn::value_t* obje
 	hcore::HString& s( static_cast<HString*>( v.raw() )->value() );
 	HHuginnStringFormatter hsf( thread_, fmt, s, values_, position_ );
 	hsf.format();
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -412,7 +412,7 @@ inline HHuginn::value_t strip( hcore::HString&( hcore::HString::* trim_ )( hcore
 	} else {
 		v = *object_;
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -627,7 +627,7 @@ yaal::hcore::HString HString::do_code( huginn::HThread*, HHuginn::value_t const&
 		s.push_back( escaped );
 	}
 	s.push_back( '"'_ycp );
-	return ( s );
+	return s;
 }
 
 yaal::hcore::HString HString::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {

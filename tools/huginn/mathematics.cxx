@@ -101,7 +101,7 @@ public:
 				position_
 			);
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t pi( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -127,7 +127,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::natural_exponential( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t natural_logarithm( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -150,7 +150,7 @@ public:
 		if ( v == thread_->runtime().none_value() ) {
 			thread_->raise( static_cast<HMathematics*>( object_->raw() )->exception_class(), "bad domain", position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -166,7 +166,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::sinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -182,7 +182,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::cosinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -198,7 +198,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::tangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -214,7 +214,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::cotangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t arcus_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -230,7 +230,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::arcus_sinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t arcus_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -246,7 +246,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::arcus_cosinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t arcus_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -262,7 +262,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::arcus_tangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t arcus_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -278,7 +278,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::arcus_cotangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t hyperbolic_sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -294,7 +294,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::hyperbolic_sinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t hyperbolic_cosinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -310,7 +310,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::hyperbolic_cosinus( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t hyperbolic_tangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -326,7 +326,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::hyperbolic_tangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t hyperbolic_cotangens( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -342,7 +342,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::hyperbolic_cotangens( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t sigmoid( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -358,7 +358,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::sigmoid( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t error_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -374,7 +374,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( math::error_function( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t cumulative_distribution_function( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -395,7 +395,7 @@ public:
 			double long sigma( get_real( values_[2] ) );
 			v = thread_->object_factory().create_real( xmath::cumulative_distribution_function( val, mu, sigma ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -425,7 +425,7 @@ public:
 			val = to == 0 ? roundl( val ) : roundl( val * order ) / order;
 			v = thread_->object_factory().create_real( val );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t floor( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -441,7 +441,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( floorl( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t ceil( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -457,7 +457,7 @@ public:
 			double long val( get_real( values_[0] ) );
 			v = thread_->object_factory().create_real( ceill( val ) );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t differs_at( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -488,7 +488,7 @@ public:
 				math::greatest_common_divisor( get_integer( values_[0] ), get_integer( values_[1] ) )
 			);
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t binomial_coefficient( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -636,7 +636,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Mathematics", &mathematicsCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

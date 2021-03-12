@@ -365,7 +365,7 @@ int HSerial::timed_read( void* buffer_, int const size_, int timeOut_ ) {
 	if ( system::wait_for_io( _fileDescriptor, IO_EVENT_TYPE::READ, timeOut_ ) == IO_EVENT_TYPE::READ ) {
 		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 

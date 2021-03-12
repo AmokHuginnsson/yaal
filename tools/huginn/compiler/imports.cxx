@@ -54,7 +54,7 @@ HHuginn::identifier_id_t OCompiler::prep_import_result( yaal::hcore::HString con
 		check_name_function( importResultIdentifier, range_ );
 	}
 	_usedIdentifiers[importResultIdentifier].write( range_.start(), kind_ );
-	return ( importResultIdentifier );
+	return importResultIdentifier;
 	M_EPILOG
 }
 

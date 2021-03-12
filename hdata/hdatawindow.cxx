@@ -363,7 +363,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 	M_ENSURE( dp );
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HDataWindow>( name, dp ) );
-	return ( window );
+	return window;
 	M_EPILOG
 }
 

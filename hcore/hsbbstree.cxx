@@ -44,7 +44,7 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::next( HAbstractNode* node_ ) const 
 			node_ = node_->_left;
 		}
 	}
-	return ( node_ );
+	return node_;
 	M_EPILOG
 }
 
@@ -73,7 +73,7 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::previous( HAbstractNode* node_ ) co
 			node_ = node_->_right;
 		}
 	}
-	return ( node_ );
+	return node_;
 	M_EPILOG
 }
 
@@ -333,7 +333,7 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::leftmost( void ) const {
 	while ( node && node->_left ) {
 		node = node->_left;
 	}
-	return ( node );
+	return node;
 }
 
 HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::rightmost( void ) const {
@@ -341,7 +341,7 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::rightmost( void ) const {
 	while ( node && node->_right ) {
 		node = node->_right;
 	}
-	return ( node );
+	return node;
 }
 
 void HSBBSTreeBase::swap( HAbstractNode* first_, HAbstractNode* second_ ) {

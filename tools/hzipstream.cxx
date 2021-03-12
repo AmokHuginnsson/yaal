@@ -160,7 +160,7 @@ int long HZipStream::do_write( void const* buf_, int long size_ ) {
 		size_ -= CHUNK;
 	} while ( zstream->avail_out == 0 );
 	M_ASSERT( zstream->avail_in == 0 ); /* yeah, why the f*ck not */
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -208,7 +208,7 @@ int long HZipStream::do_read( void* buf_, int long size_ ) {
 		copied += have;
 		_offset += have;
 	}
-	return ( copied );
+	return copied;
 	M_EPILOG
 }
 
@@ -278,7 +278,7 @@ char const* HZipStream::error_message( int ) {
 			msg = "zlib: unknown error";
 		break;
 	}
-	return ( msg );
+	return msg;
 }
 
 }

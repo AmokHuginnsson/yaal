@@ -46,7 +46,7 @@ bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 		}
 	}
 	bool ret( _operator == OPERATOR::BOOLEAN_AND ? all : ! all );
-	return ( ret );
+	return ret;
 	M_EPILOG
 }
 

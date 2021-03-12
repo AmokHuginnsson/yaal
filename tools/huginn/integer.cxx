@@ -37,7 +37,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			&builtin::integer
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -125,7 +125,7 @@ HHuginn::value_t HInteger::do_operator_modulus( HThread* thread_, HHuginn::value
 	} else {
 		thread_->raise( of.arithmetic_exception_class(), "Integer overflow.", position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t HInteger::do_operator_negate( HThread* thread_, HHuginn::value_t const&, int position_ ) const {
@@ -136,7 +136,7 @@ HHuginn::value_t HInteger::do_operator_negate( HThread* thread_, HHuginn::value_
 	} else {
 		thread_->raise( of.arithmetic_exception_class(), "Integer overflow.", position_ );
 	}
-	return ( res );
+	return res;
 }
 
 hash_value_t HInteger::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {

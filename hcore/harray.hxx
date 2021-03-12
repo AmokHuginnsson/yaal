@@ -614,7 +614,7 @@ public:
 		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( value_ );
-		return ( pos_ );
+		return pos_;
 		M_EPILOG
 	}
 	iterator insert( iterator pos_, type_t&& value_ ) {
@@ -625,7 +625,7 @@ public:
 		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( yaal::move( value_ ) );
-		return ( pos_ );
+		return pos_;
 		M_EPILOG
 	}
 	/*! \brief Insert value at given position, constructing it directly in place.
@@ -643,7 +643,7 @@ public:
 		}
 		insert_space( pos_._index, 1 );
 		new ( _buf + pos_._index ) value_type( yaal::forward<arg_t>( arg_ )... );
-		return ( pos_ );
+		return pos_;
 		M_EPILOG
 	}
 	/*! \brief Remove part of array.
@@ -676,7 +676,7 @@ public:
 			M_SAFE( (*it).~value_type() );
 		}
 		_size -= ( last_._index - first_._index );
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	/*! \brief Remove element at given position.
@@ -847,7 +847,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _index;
@@ -856,11 +856,11 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _index + off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( size_type off_ ) {
 		_index += off_;
@@ -868,7 +868,7 @@ public:
 	}
 	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _index - off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( size_type off_ ) {
 		_index -= off_;

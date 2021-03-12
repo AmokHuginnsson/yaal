@@ -26,7 +26,7 @@ hash<HString>::hash_value_type hash<HString>::operator () ( HString const& strin
 		h *= 101;
 		h += c.get();
 	}
-	return ( h );
+	return h;
 }
 
 template<>

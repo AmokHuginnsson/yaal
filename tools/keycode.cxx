@@ -25,7 +25,7 @@ int KEY_CODE::key( int code_ ) {
 	if ( ( ( code_ <= CONTROL_SIZE ) && ( code_ != TAB ) && ( code_ != ENTER ) ) || ( ( code_ >= ( BASE - CONTROL_BASE ) ) && ( code_ < BASE ) ) ) {
 		code_ += CONTROL_BASE;
 	}
-	return ( code_ );
+	return code_;
 }
 
 int KEY_CODE::modifiers( int code_ ) {
@@ -46,7 +46,7 @@ int KEY_CODE::modifiers( int code_ ) {
 		code_ += CONTROL_BASE;
 		m |= CONTROL_BASE;
 	}
-	return ( m );
+	return m;
 }
 
 KeyEncodingTable get_key_encoding_table( void ) {

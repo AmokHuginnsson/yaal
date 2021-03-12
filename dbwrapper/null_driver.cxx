@@ -33,7 +33,7 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& /*dbLink_*/ ) {
 }
 
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& /*dbLink_*/, void* /*dataR_*/ ) {
-	return ( errno );
+	return errno;
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dbLink_*/, void* /*dataR_*/ ) {
@@ -41,7 +41,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dbLink_*/, void* /*data
 }
 
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
-	return ( nullptr );
+	return nullptr;
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* /*data_*/ ) {
@@ -49,7 +49,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* /*data_*/ ) {
 }
 
 M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
-	return ( nullptr );
+	return nullptr;
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
@@ -57,7 +57,7 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
 }
 
 M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ ) {
-	return ( nullptr );
+	return nullptr;
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* ) {
@@ -65,7 +65,7 @@ M_EXPORT_SYMBOL bool rs_next( void* ) {
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {
-	return ( nullptr );
+	return nullptr;
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ ) {
@@ -81,7 +81,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void* /*dataR_*/, int /*field_*/ ) {
-	return ( nullptr );
+	return nullptr;
 }
 
 }

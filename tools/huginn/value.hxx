@@ -56,7 +56,7 @@ public:
 		} else {
 			res = _class->type_id() == other_->type_id();
 		}
-		return ( res );
+		return res;
 	}
 	bool operator_less( HThread* thread_, HHuginn::value_t const& self_, HHuginn::value_t const& other_, int position_ ) const {
 		M_ASSERT( self_.raw() == this );

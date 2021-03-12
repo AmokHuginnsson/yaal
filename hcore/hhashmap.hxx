@@ -294,7 +294,7 @@ public:
 		iterator next( it );
 		++ next;
 		_engine.erase( it._engine );
-		return ( next );
+		return next;
 		M_EPILOG
 	}
 	/*! \brief Remove given key from map.
@@ -316,7 +316,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	size_type count( key_t const& key_ ) const {
@@ -421,7 +421,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( _engine );
 		++ _engine;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _engine;
@@ -430,7 +430,7 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( _engine );
 		-- _engine;
-		return ( it );
+		return it;
 	}
 	const_qual_t& operator* ( void ) const {
 		return ( _engine.get() );

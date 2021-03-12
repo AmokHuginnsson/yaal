@@ -136,7 +136,7 @@ int HComboboxWidget::do_process_input( int code_ ) {
 			code = HListWidget::do_process_input( code_ );
 		}
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -163,7 +163,7 @@ bool HComboboxWidget::do_hit_test( int row_, int col_ ) const {
 	} else {
 		hit = HListWidget::do_hit_test( row_, col_ );
 	}
-	return ( hit );
+	return hit;
 	M_EPILOG
 }
 
@@ -188,7 +188,7 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 			handled = true;
 		}
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -357,7 +357,7 @@ bool HComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& 
 			attrs.none_text( xml::node_val( node_ ) );
 		}
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -370,7 +370,7 @@ bool HComboboxWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::t
 	if ( !ok ) {
 		ok = HEditWidgetCreator::do_apply_resources( widget_, node_ );
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

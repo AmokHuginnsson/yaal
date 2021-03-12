@@ -91,7 +91,7 @@ HHuginn::class_t HSlice::get_class( HRuntime* runtime_, huginn::HClass const* or
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

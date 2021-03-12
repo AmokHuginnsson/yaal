@@ -35,7 +35,7 @@ HString const& HInfoInteger::do_get_string( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HString const dummy;
-	return ( dummy );
+	return dummy;
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
@@ -43,7 +43,7 @@ HTime const& HInfoInteger::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HTime const dummy( HTime::TZ::LOCAL );
-	return ( dummy );
+	return dummy;
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 

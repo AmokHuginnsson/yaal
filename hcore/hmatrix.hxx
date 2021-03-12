@@ -143,7 +143,7 @@ public:
 				matrix._data[ c ][ r ] = _data[ r ][ c ];
 			}
 		}
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 	HMatrix& operator = ( HMatrix const& matrix_ ) {
@@ -238,7 +238,7 @@ public:
 		check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
 		HMatrix matrix ( *this );
 		matrix += matrix_;
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -247,7 +247,7 @@ public:
 		check_dimensions_rows_columns( matrix_._rows, matrix_._columns );
 		HMatrix matrix ( *this );
 		matrix -= matrix_;
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -256,7 +256,7 @@ public:
 		this_type matrix( _rows, _columns );
 		matrix = 0;
 		matrix -= ( *this );
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -265,7 +265,7 @@ public:
 		check_dimensions_columns_rows( matrix_._rows );
 		HMatrix matrix ( *this );
 		matrix *= matrix_;
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -273,7 +273,7 @@ public:
 		M_PROLOG
 		HMatrix matrix ( *this );
 		matrix *= scalar_;
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -281,7 +281,7 @@ public:
 		M_PROLOG
 		HMatrix matrix ( *this );
 		matrix /= scalar_;
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 
@@ -291,7 +291,7 @@ public:
 		for ( int r( 0 ); r < _rows; ++ r ) {
 			matrix [ r ] = ~ _data[ r ];
 		}
-		return ( matrix );
+		return matrix;
 		M_EPILOG
 	}
 	explicit operator bool ( void ) const {
@@ -410,7 +410,7 @@ typename HMatrix<value_type_t>::value_type HMatrix<value_type_t>::det( void ) co
 	if ( exchanges % 2 ) {
 		scalar = -scalar;
 	}
-	return ( scalar );
+	return scalar;
 	M_EPILOG
 }
 
@@ -482,7 +482,7 @@ HMatrix<value_type_t> HMatrix<value_type_t>::inverse( void ) const {
 		swaps.pop_back();
 	}
 #endif
-	return ( inversed );
+	return inversed;
 	M_EPILOG
 }
 
@@ -500,9 +500,9 @@ HVector<value_type_t> operator * ( HVector<value_type_t> const& vector_,
 			}
 			vector [ j ] = scalar;
 		}
-		return ( vector );
+		return vector;
 	}
-	return ( vector_ );
+	return vector_;
 	M_EPILOG
 }
 
@@ -514,7 +514,7 @@ HVector<value_type_t> operator *= ( HVector<value_type_t> const& vector_,
 		HVector<value_type_t> vector( vector_ * matrix_ );
 		vector_ = vector;
 	}
-	return ( vector_ );
+	return vector_;
 	M_EPILOG
 }
 
@@ -524,7 +524,7 @@ HMatrix<value_type_t> operator * ( typename HMatrix<value_type_t>::value_type co
 	M_PROLOG
 	HMatrix<value_type_t> matrix( matrix_ );
 	matrix *= scalar_;
-	return ( matrix );
+	return matrix;
 	M_EPILOG
 }
 

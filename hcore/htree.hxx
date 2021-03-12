@@ -86,7 +86,7 @@ public:
 			HNode const* p = this;
 			while ( ( p = p->_trunk ) )
 				++ level;
-			return ( level );
+			return level;
 			M_EPILOG
 		}
 		iterator replace_node( iterator pos, typename tree_t::node_t node ) {
@@ -109,7 +109,7 @@ public:
 				M_SAFE( wasted->~HNode() );
 				_allocator.deallocate( wasted, 1 );
 			}
-			return ( pos );
+			return pos;
 			M_EPILOG
 		}
 		iterator remove_node( iterator pos ) {
@@ -138,7 +138,7 @@ public:
 					allocator.deallocate( node, 1 );
 				}
 			}
-			return ( it );
+			return it;
 			M_EPILOG
 		}
 		iterator move_node( typename tree_t::node_t node ) {
@@ -159,7 +159,7 @@ public:
 				}
 				it = iterator( this, prev( _branch.end() ) );
 			}
-			return ( it );
+			return it;
 			M_EPILOG
 		}
 		iterator copy_node( iterator const& pos, typename tree_t::node_t node ) {
@@ -167,7 +167,7 @@ public:
 			M_ASSERT( disjointed( node ) );
 			M_ENSURE( pos._owner == this );
 			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, _branch.get_allocator(), this ) ) );
-			return ( it );
+			return it;
 			M_EPILOG
 		}
 		iterator copy_node( typename tree_t::node_t node ) {
@@ -175,7 +175,7 @@ public:
 			M_ASSERT( disjointed( node ) );
 			_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
 			iterator it( this, prev( _branch.end() ) );
-			return ( it );
+			return it;
 			M_EPILOG
 		}
 		iterator add_node( value_t const& value ) {
@@ -416,7 +416,7 @@ public:
 					it != endIt; ++ it ) {
 				node->_branch.push_back( (*it)->clone_self_to( allocator_, branchAllocator_, node ) );
 			}
-			return ( node );
+			return node;
 			M_EPILOG
 		}
 		friend class HTree<value_t, allocator_t, sequence_t>;
@@ -569,7 +569,7 @@ public:
 			M_SAFE( wasted->~HNode() );
 			_allocator.deallocate( wasted, 1 );
 		}
-		return ( node );
+		return node;
 		M_EPILOG
 	}
 	void clear( void ) {
@@ -594,14 +594,14 @@ public:
 		M_PROLOG
 		iterator it( this );
 		++ it;
-		return ( it );
+		return it;
 		M_EPILOG
 	}
 	const_iterator begin( void ) const {
 		M_PROLOG
 		const_iterator it( this );
 		++ it;
-		return ( it );
+		return it;
 		M_EPILOG
 	}
 	iterator end( void ) {
@@ -692,7 +692,7 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _iterator;
@@ -701,11 +701,11 @@ public:
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _iterator + off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( size_type off_ ) {
 		_iterator += off_;
@@ -713,7 +713,7 @@ public:
 	}
 	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _iterator - off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( size_type off_ ) {
 		_iterator -= off_;
@@ -829,7 +829,7 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		M_PROLOG
@@ -863,7 +863,7 @@ public:
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	bool operator == ( HIterator const& it ) const {
 		M_PROLOG

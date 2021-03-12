@@ -53,7 +53,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		{ "io", objectFactory_->create_method( &blob::io ), "create IO stream for this `blob`" }
 	};
 	c->redefine( nullptr, fd );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

@@ -410,14 +410,14 @@ HStreamInterface& endl( HStreamInterface& file_ ) {
 	}
 	file_.write( "\n", 1 );
 	file_.flush();
-	return ( file_ );
+	return file_;
 	M_EPILOG
 }
 
 HStreamInterface& flush( HStreamInterface& file_ ) {
 	M_PROLOG
 	file_.flush();
-	return ( file_ );
+	return file_;
 	M_EPILOG
 }
 
@@ -564,7 +564,7 @@ int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
 	while ( good() && ( nRead < 0 ) ) {
 		nRead = HStreamInterface::do_read_while( message_, acquire_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -575,7 +575,7 @@ int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
 	while ( good() && ( nRead < 0 ) ) {
 		nRead = HStreamInterface::do_read_until( message_, stopSet_, stripDelim_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -595,7 +595,7 @@ inline char const* find_first_of( char const* buffer_, int long size_, char cons
 		smallestIndex = index;
 		ptr = p;
 	}
-	return ( ptr );
+	return ptr;
 }
 
 inline char const* find_first_other_than( char const* buffer_, int long size_, char const* set_, int setLen_ ) {
@@ -608,7 +608,7 @@ inline char const* find_first_other_than( char const* buffer_, int long size_, c
 		ptr = buffer_ + i;
 		break;
 	}
-	return ( ptr );
+	return ptr;
 }
 
 inline char const* find_delim( char const* buffer_, int long size_, char const* set_, int setLen_, bool isStopSet_ ) {
@@ -710,7 +710,7 @@ int long HStreamInterface::semantic_read(
 	 * 1. nRead can carry error information ( nRead < 0 )
 	 * 2. nRead is number of *bytes* as opposed to number of *code points* in message_.
 	 */
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -1291,7 +1291,7 @@ int long HStreamInterface::read( void* buffer_, int long size_ ) {
 			_valid = false;
 		}
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -1351,7 +1351,7 @@ int long HStreamInterface::write( void const* buffer_, int long size_ ) {
 		_cachedBytes = 0;
 		_cacheContent = CACHE_CONTENT::READ;
 	}
-	return ( size_ );
+	return size_;
 	M_EPILOG
 }
 
@@ -1565,7 +1565,7 @@ HStreamInterface& getline( HStreamInterface& stream_, yaal::hcore::HString& stor
 	M_PROLOG
 	stream_.read_until( store_, HStreamInterface::eol );
 	store_.trim_right( "\r" );
-	return ( stream_ );
+	return stream_;
 	M_EPILOG
 }
 

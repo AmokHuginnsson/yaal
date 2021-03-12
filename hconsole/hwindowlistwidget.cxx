@@ -41,7 +41,7 @@ int HWindowListWidget::do_process_input( int code_ ) {
 			code_ = 0;
 		}
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 

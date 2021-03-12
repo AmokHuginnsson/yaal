@@ -443,7 +443,7 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 	}
 	using yaal::swap;
 	swap( _xml->_xPathContext, ctx );
-	return ( setSize );
+	return setSize;
 	M_EPILOG
 }
 
@@ -1467,7 +1467,7 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 	for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it ) {
 		result = get_element_by_id( &*it, id );
 	}
-	return ( result );
+	return result;
 	M_EPILOG
 }
 
@@ -1543,7 +1543,7 @@ HXml::HNodeSet HXml::HNodeProxy::get_elements_by_path( yaal::hcore::HString cons
 			get_elements_by_path( ns, _node, t, it );
 		}
 	}
-	return ( ns );
+	return ns;
 	M_EPILOG
 }
 
@@ -1560,7 +1560,7 @@ HXml::HConstNodeSet HXml::HConstNodeProxy::get_elements_by_path( yaal::hcore::HS
 			get_elements_by_path( ns, _node, t, it );
 		}
 	}
-	return ( ns );
+	return ns;
 	M_EPILOG
 }
 
@@ -1568,7 +1568,7 @@ HXml::HConstNodeSet HXml::HConstNodeProxy::get_elements_by_name( yaal::hcore::HS
 	M_PROLOG
 	HConstNodeSet ns;
 	get_elements_by_name( ns, _node, name_ );
-	return ( ns );
+	return ns;
 	M_EPILOG
 }
 
@@ -1576,7 +1576,7 @@ HXml::HNodeSet HXml::HNodeProxy::get_elements_by_name( yaal::hcore::HString cons
 	M_PROLOG
 	HNodeSet ns;
 	get_elements_by_name( ns, const_cast<const_xml_element_t>( _node ), name_ );
-	return ( ns );
+	return ns;
 	M_EPILOG
 }
 
@@ -1753,7 +1753,7 @@ char const* HXml::error_message( int code ) const {
 			msg = "No error.";
 		break;
 	}
-	return ( msg );
+	return msg;
 	M_EPILOG
 }
 
@@ -1772,7 +1772,7 @@ value_t try_node_val( HXml::HConstNodeProxy const& node ) {
 			}
 		}
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -1792,7 +1792,7 @@ value_t try_attr_val( HXml::HConstNodeProxy const& node, yaal::hcore::HString co
 			value = prop->second;
 		}
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -1843,7 +1843,7 @@ value_t try_node_val_by_path( HXml::HConstNodeProxy const& node_, yaal::hcore::H
 			v = xml::try_node_val( ns[0] );
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -1866,7 +1866,7 @@ value_t try_attr_val_by_path( HXml::HConstNodeProxy const& node_, yaal::hcore::H
 			v = xml::try_attr_val( ns[0], attr );
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 

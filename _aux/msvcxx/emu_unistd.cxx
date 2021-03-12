@@ -77,7 +77,7 @@ int poll( msvcxx::pollfd* pfd_, nfds_t count_, int timeout_ ) {
 		}
 	}
 	if ( ( waiterCount == 0 ) || ( ( waitingForConnect == 0 ) && ( ret > 0 ) ) ) {
-		return ( ret );
+		return ret;
 	}
 	HANDLE interrupt( _tlsSignalsSetup_->interrupt() );
 	handles[waiterCount] = interrupt;
@@ -103,7 +103,7 @@ int poll( msvcxx::pollfd* pfd_, nfds_t count_, int timeout_ ) {
 		ret = -1;
 		errno = EINTR;
 	}
-	return ( ret );
+	return ret;
 }
 
 M_EXPORT_SYMBOL
@@ -121,7 +121,7 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		ret = -1;
 		errno = EINTR;
 	}
-	return ( ret );
+	return ret;
 }
 
 int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
@@ -189,7 +189,7 @@ int fcntl( int fd_, int cmd_, int arg_ ) {
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		ret = io.fcntl( cmd_, arg_ );
 	}
-	return ( ret );
+	return ret;
 }
 
 M_EXPORT_SYMBOL
@@ -201,7 +201,7 @@ int dup( int fd_ ) {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		ret = sysIo.dup_io( fd_ );
 	}
-	return ( ret );
+	return ret;
 }
 
 M_EXPORT_SYMBOL
@@ -213,7 +213,7 @@ int dup2( int fd1_, int fd2_ ) {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		ret = sysIo.dup2_io( fd1_, fd2_ );
 	}
-	return ( ret );
+	return ret;
 }
 
 M_EXPORT_SYMBOL
@@ -285,7 +285,7 @@ int isatty( int fd_ ) {
 		}
 		val = 1;
 	} while ( false );
-	return ( val );
+	return val;
 }
 
 int close( int fd_ ) {
@@ -298,7 +298,7 @@ int close( int fd_ ) {
 	if ( ret < 0 ) {
 		log_windows_error( "close" );
 	}
-	return ( ret );
+	return ret;
 }
 
 M_EXPORT_SYMBOL
@@ -311,7 +311,7 @@ int long read( int fd_, void* buf_, int long size_ ) {
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		nRead = io.read( buf_, size_ );
 	}
-	return ( nRead );
+	return nRead;
 }
 
 M_EXPORT_SYMBOL
@@ -324,7 +324,7 @@ int long write( int fd_, void const* buf_, int long size_ ) {
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		nWritten = io.write( buf_, size_ );
 	}
-	return ( nWritten );
+	return nWritten;
 }
 
 M_EXPORT_SYMBOL
@@ -371,7 +371,7 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 		WIN32_FIND_DATA info;
 		HANDLE h( ::FindFirstFile( path_, &info ) );
 		if ( h == INVALID_HANDLE_VALUE ) {
-			return ( res );
+			return res;
 		}
 		s_->st_mtime = filetime_to_unix_epoch( info.ftLastWriteTime );
 		s_->st_ctime = filetime_to_unix_epoch( info.ftCreationTime );
@@ -406,7 +406,7 @@ int unix_stat( char const* path_, struct stat* s_ ) {
 		s_->st_uid = owner.first;
 		s_->st_gid = owner.second;
 	}
-	return ( res );
+	return res;
 }
 
 mode_t umask( mode_t umask_ ) {
@@ -423,7 +423,7 @@ mode_t umask( mode_t umask_ ) {
 		}
 	}
 	currentUmask = umask_;
-	return ( oldUmask );
+	return oldUmask;
 }
 
 M_EXPORT_SYMBOL
@@ -447,7 +447,7 @@ char const* windows_strerror( int code_ ) {
 		msg[lastCharPos] = 0;
 		-- lastCharPos;
 	}
-	return ( msg );
+	return msg;
 }
 
 M_EXPORT_SYMBOL
@@ -566,6 +566,6 @@ DWORD win_read_console_key( void ) {
 			break;
 		}
 	}
-	return ( key );
+	return key;
 }
 

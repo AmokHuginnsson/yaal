@@ -107,7 +107,7 @@ public:
 	HIterator operator ++ ( int ) const {
 		HIterator it( *this );
 		++ it;
-		return ( it );
+		return it;
 	}
 	bool operator == ( HIterator const& it_ ) const {
 		M_ASSERT( it_._owner == _owner );

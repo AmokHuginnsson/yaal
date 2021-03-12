@@ -132,7 +132,7 @@ template<typename str_ucs_t, typename value_t>
 inline HString::size_type find_last_impl( str_ucs_t const* str_, HString::size_type size_, value_t v ) {
 	for ( HString::size_type i( size_ - 1 ); i >= 0; -- i ) {
 		if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( v ) ) {
-			return ( i );
+			return i;
 		}
 	}
 	return ( HString::npos );
@@ -143,7 +143,7 @@ inline HString::size_type find_one_of_impl( str_ucs_t const* str_, HString::size
 	for ( HString::size_type i( 0 ); i < size_; ++ i ) {
 		for ( HString::size_type s( 0 ); s < setSize_; ++ s ) {
 			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
-				return ( i );
+				return i;
 			}
 		}
 	}
@@ -155,7 +155,7 @@ inline HString::size_type find_last_one_of_impl( str_ucs_t const* str_, HString:
 	for ( HString::size_type i( size_ - 1 ); i >= 0; -- i ) {
 		for ( HString::size_type s( 0 ); s < setSize_; ++ s ) {
 			if ( static_cast<code_point_t>( str_[i] ) == static_cast<code_point_t>( set_[s] ) ) {
-				return ( i );
+				return i;
 			}
 		}
 	}
@@ -177,7 +177,7 @@ inline HString::size_type find_other_than_impl( str_ucs_t const* str_, HString::
 			break;
 		}
 	}
-	return ( pos );
+	return pos;
 }
 
 template<typename str_ucs_t, typename set_ucs_t>
@@ -195,7 +195,7 @@ inline HString::size_type find_last_other_than_impl( str_ucs_t const* str_, HStr
 			break;
 		}
 	}
-	return ( pos );
+	return pos;
 }
 
 namespace adaptive {
@@ -209,7 +209,7 @@ inline code_point_t get( void const* mem_, int rank_, HString::size_type index_ 
 	} else {
 		codePoint = code_point_t( static_cast<yaal::u32_t const*>( mem_ )[index_] );
 	}
-	return ( codePoint );
+	return codePoint;
 }
 
 inline void set( void* mem_, int rank_, HString::size_type index_, code_point_t codePoint_ ) {
@@ -363,7 +363,7 @@ inline int compare( void const* left_, int leftRank_, HString::size_type leftOff
 			);
 		} break;
 	}
-	return ( res );
+	return res;
 }
 
 HString::size_type find( void const* mem_, int rank_, HString::size_type size_, HString::size_type after_, code_point_t value_ ) {
@@ -421,7 +421,7 @@ HString::size_type find_last( void const* mem_, int rank_, HString::size_type be
 			pos = find_last_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, value_.get() );
 		} break;
 	}
-	return ( pos );
+	return pos;
 }
 
 inline HString::size_type kmpsearch( void const* haystack_, int haystackRank_, HString::size_type haystackSize_, HString::size_type after_, void const* needle_, int needleRank_, HString::size_type needleSize_ ) {
@@ -489,7 +489,7 @@ inline HString::size_type kmpsearch_last( void const* haystack_, int haystackRan
 			pos = kmpsearch_last_impl( static_cast<yaal::u32_t const*>( haystack_ ), before_, static_cast<yaal::u32_t const*>( needle_ ), needleSize_ );
 		} break;
 	}
-	return ( pos );
+	return pos;
 }
 
 inline HString::size_type find_one_of( void const* mem_, int rank_, HString::size_type size_, HString::size_type after_, void const* set_, int setRank_, HString::size_type setSize_ ) {
@@ -557,7 +557,7 @@ inline HString::size_type find_last_one_of( void const* mem_, int rank_, HString
 			pos = find_last_one_of_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 	}
-	return ( pos );
+	return pos;
 }
 
 inline HString::size_type find_other_than( void const* mem_, int rank_, HString::size_type size_, HString::size_type after_, void const* set_, int setRank_, HString::size_type setSize_ ) {
@@ -625,7 +625,7 @@ inline HString::size_type find_last_other_than( void const* mem_, int rank_, HSt
 			pos = find_last_other_than_impl( static_cast<yaal::u32_t const*>( mem_ ), before_, static_cast<yaal::u32_t const*>( set_ ), setSize_ );
 		} break;
 	}
-	return ( pos );
+	return pos;
 }
 
 typedef wint_t ( *transformer_t )( wint_t );
@@ -709,7 +709,7 @@ OUTF8StringStats get_string_stats( char const* str_, HString::size_type size_ ) 
 	s._byteCount = byteCount;
 	s._characterCount = characterCount;
 	s._rank = rank;
-	return ( s );
+	return s;
 }
 
 void encode( code_point_t codePoint_, char*& dest_ ) {
@@ -736,7 +736,7 @@ code_point_t decode_forward( char const*& ptr_ ) {
 		character |= ( static_cast<u8_t>( *ptr_ ) & unicode::TAIL_BYTES_VALUE_MASK );
 	}
 	++ ptr_;
-	return ( character );
+	return character;
 }
 
 template<typename T>
@@ -1512,7 +1512,7 @@ HString operator + ( char const* left_, HString const& right_ ) {
 	M_PROLOG
 	HString tmp( left_ );
 	tmp.operator += ( right_ );
-	return ( tmp );
+	return tmp;
 	M_EPILOG
 }
 
@@ -1651,7 +1651,7 @@ void HString::clear( void ) {
 HString::size_type HString::get_length( void ) const {
 	M_PROLOG
 	M_ASSERT( ! GET_SIZE || ( GET_SIZE <= GET_ALLOC_BYTES ) );
-	return ( GET_SIZE );
+	return GET_SIZE;
 	M_EPILOG
 }
 
@@ -1681,16 +1681,16 @@ HString::size_type HString::capacity( void ) const {
 
 HString::size_type HString::get_capacity( void ) const {
 	M_PROLOG
-	return ( GET_ALLOC_BYTES );
+	return GET_ALLOC_BYTES;
 	M_EPILOG
 }
 
 HString::size_type HString::get_max_size( void ) const {
-	return ( MAX_STRING_LENGTH );
+	return MAX_STRING_LENGTH;
 }
 
 HString::size_type HString::max_size( void ) const {
-	return ( MAX_STRING_LENGTH );
+	return MAX_STRING_LENGTH;
 }
 
 void HString::swap( HString& other ) {
@@ -1817,7 +1817,7 @@ HString& HString::assign( size_type size_, code_point_t fill_ ) {
 HString::size_type HString::find( code_point_t char_, size_type after_ ) const {
 	M_PROLOG
 	if ( after_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	if ( after_ < 0 ) {
 		after_ = 0;
@@ -1829,7 +1829,7 @@ HString::size_type HString::find( code_point_t char_, size_type after_ ) const {
 HString::size_type HString::find( HString const& pattern_, size_type after_ ) const {
 	M_PROLOG
 	if ( pattern_.is_empty() ) {
-		return ( npos );
+		return npos;
 	}
 	if ( after_ < 0 ) {
 		after_ = 0;
@@ -1837,7 +1837,7 @@ HString::size_type HString::find( HString const& pattern_, size_type after_ ) co
 	size_type patternLength( EXT_GET_SIZE( pattern_ ) );
 	if ( ( ! patternLength )
 			|| ( ( after_ + patternLength ) > GET_SIZE ) ) {
-		return ( npos );
+		return npos;
 	}
 	return (
 		adaptive::kmpsearch( MEM, GET_RANK, GET_SIZE, after_, EXT_MEM( pattern_ ), EXT_GET_RANK( pattern_ ), patternLength )
@@ -1848,13 +1848,13 @@ HString::size_type HString::find( HString const& pattern_, size_type after_ ) co
 HString::size_type HString::find_one_of( HString const& set_, size_type after_ ) const {
 	M_PROLOG
 	if ( set_.is_empty() ) {
-		return ( npos );
+		return npos;
 	}
 	if ( after_ < 0 ) {
 		after_ = 0;
 	}
 	if ( after_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	return ( adaptive::find_one_of( MEM, GET_RANK, GET_SIZE, after_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
@@ -1863,13 +1863,13 @@ HString::size_type HString::find_one_of( HString const& set_, size_type after_ )
 HString::size_type HString::reverse_find_one_of( HString const& set_, size_type before_ ) const {
 	M_PROLOG
 	if ( set_.is_empty() ) {
-		return ( npos );
+		return npos;
 	}
 	if ( before_ < 0 ) {
 		before_ = 0;
 	}
 	if ( before_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	size_type pos( find_last_one_of( set_, ( GET_SIZE - before_ ) - 1 ) );
 	return ( pos != npos ? ( GET_SIZE - 1 ) - pos : pos );
@@ -1882,7 +1882,7 @@ HString::size_type HString::find_last_one_of( HString const& set_, size_type bef
 		before_ = GET_SIZE - 1;
 	}
 	if ( ( before_ < 0 ) || set_.is_empty() ) {
-		return ( npos );
+		return npos;
 	}
 	return ( adaptive::find_last_one_of( MEM, GET_RANK, before_ + 1, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
@@ -1894,10 +1894,10 @@ HString::size_type HString::find_other_than( HString const& set_, size_type afte
 		after_ = 0;
 	}
 	if ( after_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	if ( set_.is_empty() ) {
-		return ( after_ );
+		return after_;
 	}
 	return ( adaptive::find_other_than( MEM, GET_RANK, GET_SIZE, after_, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
@@ -1909,10 +1909,10 @@ HString::size_type HString::reverse_find_other_than( HString const& set_, size_t
 		before_ = 0;
 	}
 	if ( before_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	if ( set_.is_empty() ) {
-		return ( before_ );
+		return before_;
 	}
 	size_type pos( find_last_other_than( set_, ( GET_SIZE - before_ ) - 1 ) );
 	return ( pos != npos ? ( GET_SIZE - 1 ) - pos : pos );
@@ -1925,10 +1925,10 @@ HString::size_type HString::find_last_other_than( HString const& set_, size_type
 		before_ = GET_SIZE - 1;
 	}
 	if ( before_ < 0 ) {
-		return ( npos );
+		return npos;
 	}
 	if ( set_.is_empty() ) {
-		return ( before_ );
+		return before_;
 	}
 	return ( adaptive::find_last_other_than( MEM, GET_RANK, before_ + 1, EXT_MEM( set_ ), EXT_GET_RANK( set_ ), EXT_GET_SIZE( set_ ) ) );
 	M_EPILOG
@@ -1937,7 +1937,7 @@ HString::size_type HString::find_last_other_than( HString const& set_, size_type
 HString::size_type HString::reverse_find( code_point_t char_, size_type before_ ) const {
 	M_PROLOG
 	if ( before_ >= GET_SIZE ) {
-		return ( npos );
+		return npos;
 	}
 	if ( before_ < 0 ) {
 		before_ = 0;
@@ -1953,7 +1953,7 @@ HString::size_type HString::find_last( code_point_t char_, size_type before_ ) c
 		before_ = GET_SIZE - 1;
 	}
 	if ( before_ < 0 ) {
-		return ( npos );
+		return npos;
 	}
 	return ( adaptive::find_last( MEM, GET_RANK, before_ + 1, char_ ) );
 	M_EPILOG
@@ -1965,11 +1965,11 @@ HString::size_type HString::find_last( HString const& pattern_, size_type before
 		before_ = GET_SIZE - 1;
 	}
 	if ( before_ < 0 ) {
-		return ( npos );
+		return npos;
 	}
 	size_type patternLength( EXT_GET_SIZE( pattern_ ) );
 	if ( ( ! patternLength ) || ( patternLength > before_ ) ) {
-		return ( npos );
+		return npos;
 	}
 	return (
 		adaptive::kmpsearch_last( MEM, GET_RANK, before_ + 1, EXT_MEM( pattern_ ), EXT_GET_RANK( pattern_ ), patternLength )
@@ -2124,7 +2124,7 @@ wint_t case_swap( wint_t char_ ) {
 	} else {
 		c = towlower( char_ );
 	}
-	return ( c );
+	return c;
 }
 }
 
@@ -2161,7 +2161,7 @@ HString HString::substr( size_type from_, size_type length_ ) const {
 	M_PROLOG
 	HString str;
 	substr( str, from_, length_ );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -2169,13 +2169,13 @@ HString HString::left( size_type to_ ) const {
 	M_PROLOG
 	HString str;
 	if ( to_ < 1 ) {
-		return ( str );
+		return str;
 	}
 	size_type newSize( min( to_, GET_SIZE ) );
 	int rank( GET_RANK );
 	str.resize( newSize, rank );
 	adaptive::copy( EXT_MEM( str ), rank, 0, MEM, rank, 0, newSize );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -2183,7 +2183,7 @@ HString HString::mid( size_type from_, size_type length_ ) const {
 	M_PROLOG
 	HString str;
 	substr( str, from_, length_ );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -2191,13 +2191,13 @@ HString HString::right( size_type fromEnd_ ) const {
 	M_PROLOG
 	HString str;
 	if ( fromEnd_ < 1 ) {
-		return ( str );
+		return str;
 	}
 	size_type newSize( min( fromEnd_, GET_SIZE ) );
 	int rank( GET_RANK );
 	str.resize( newSize, rank );
 	adaptive::copy( EXT_MEM( str ), rank, 0, MEM, rank, GET_SIZE - newSize, newSize );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -2565,7 +2565,7 @@ bool HUTF8String::operator == ( yaal::hcore::HUTF8String const& other_ ) const {
 			same = ! other_._ptr;
 		}
 	}
-	return ( same );
+	return same;
 }
 
 bool HUTF8String::operator != ( yaal::hcore::HUTF8String const& other_ ) const {
@@ -2582,7 +2582,7 @@ bool HUTF8String::operator == ( char const* other_ ) const {
 			same = ! other_;
 		}
 	}
-	return ( same );
+	return same;
 }
 
 bool HUTF8String::operator != ( char const* other_ ) const {
@@ -2734,7 +2734,7 @@ HUTF8String HUTF8String::substr( size_type from_, size_type len_ ) const {
 	s._offset = it._byteIndex;
 	s._byteCount = endIt._byteIndex - it._byteIndex;
 	s._characterCount = safe_int::cast<int>( len_ );
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -3102,7 +3102,7 @@ int long long stoll_impl( char const* str_, int* endIdx_, int base_ ) {
 	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( end - str_ );
 	}
-	return ( val );
+	return val;
 	M_EPILOG
 }
 
@@ -3114,7 +3114,7 @@ int long long stoll( HString const& str_, int* endIdx_, int base_ ) {
 	if ( endIdx_ ) {
 		*endIdx_ += skip;
 	}
-	return ( result );
+	return result;
 	M_EPILOG
 }
 
@@ -3134,7 +3134,7 @@ int long long unsigned stoull_impl( char const* str_, int* endIdx_, int base_ ) 
 	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( end - str_ );
 	}
-	return ( val );
+	return val;
 	M_EPILOG
 }
 
@@ -3146,7 +3146,7 @@ int long long unsigned stoull( HString const& str_, int* endIdx_, int base_ ) {
 	if ( endIdx_ ) {
 		*endIdx_ += skip;
 	}
-	return ( result );
+	return result;
 	M_EPILOG
 }
 

@@ -119,7 +119,7 @@ int HWidget::do_process_input( int code_ ) {
 	M_PROLOG
 	if ( ! _focused )
 		M_THROW( "input in widget without focus", code_ );
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -137,7 +137,7 @@ bool HWidget::set_focus( int shortCut_ ) {
 			focusChanged = true;
 		}
 	}
-	return ( focusChanged );
+	return focusChanged;
 	M_EPILOG
 }
 
@@ -200,7 +200,7 @@ HInfo const& HWidget::get_data( void ) const {
 HInfo const& HWidget::do_get_data( void ) const {
 	M_PROLOG
 	static HInfoMultiVal info;
-	return ( info );
+	return info;
 	M_EPILOG
 }
 
@@ -341,7 +341,7 @@ bool HWidget::click( mouse::OMouse& mouse_ ) {
 		}
 		handled = do_click( mouse_ );
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -352,7 +352,7 @@ bool HWidget::do_click( mouse::OMouse& ) {
 		set_focus();
 		handled = true;
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 
@@ -366,7 +366,7 @@ bool HWidget::hit_test( int row_, int column_ ) const {
 	if ( _enabled ) {
 		hit = do_hit_test( row_, column_ );
 	}
-	return ( hit );
+	return hit;
 	M_EPILOG
 }
 
@@ -379,7 +379,7 @@ bool HWidget::do_hit_test( int row_, int column_ ) const {
 			|| ( column_ >= ( _columnRaw + _widthRaw ) ) ) {
 		hit = false;
 	}
-	return ( hit );
+	return hit;
 	M_EPILOG
 }
 

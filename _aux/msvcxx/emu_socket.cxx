@@ -53,7 +53,7 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ ) {
 		}
 		ret = ::bind( s, addr_, len_ );
 	}
-	return ( ret );
+	return ret;
 }
 
 #undef socket
@@ -83,7 +83,7 @@ int listen( int fd_, int backlog_ ) {
 			log_windows_error( "WSAEventSelect" );
 		ret = ::listen( s, backlog_ );
 	}
-	return ( ret );
+	return ret;
 }
 
 int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
@@ -117,7 +117,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 			ret = np.first;
 		np.second->accept();
 	}
-	return ( ret );
+	return ret;
 }
 
 int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
@@ -153,7 +153,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 	if ( ! ret ) {
 		ret = io.connect();
 	}
-	return ( ret );
+	return ret;
 }
 
 int shutdown( int fd_, int how_ ) {
@@ -162,7 +162,7 @@ int shutdown( int fd_, int how_ ) {
 	int ret( 0 );
 	if ( ( io.type() == IO::TYPE::SOCKET ) && io.is_connected() )
 		ret = ::shutdown( reinterpret_cast<SOCKET>( io.handle() ), how_ );
-	return ( ret );
+	return ret;
 }
 
 int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_t optlen_ ) {
@@ -174,7 +174,7 @@ int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_
 		ret = ::setsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_,
 				optname_ == SO_REUSEADDR ? SO_EXCLUSIVEADDRUSE : optname_,
 				static_cast<char const*>( optval_ ), optlen_ );
-	return ( ret );
+	return ret;
 }
 
 int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ ) {
@@ -190,7 +190,7 @@ int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* opt
 			*opt = 0;
 		}
 	}
-	return ( ret );
+	return ret;
 }
 
 }

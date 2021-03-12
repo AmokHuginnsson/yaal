@@ -80,7 +80,7 @@ template<typename T>
 inline T hton( T v_ ) {
 	static_assert( is_numeric<T>::value, "switching endianness on non integer type" );
 	reverse( static_cast<char*>( static_cast<void*>( &v_ ) ), static_cast<char*>( static_cast<void*>( &v_ ) ) + sizeof ( v_ ) );
-	return ( v_ );
+	return v_;
 }
 
 template<typename iter_t, typename pred_t>

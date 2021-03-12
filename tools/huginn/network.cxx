@@ -40,7 +40,7 @@ inline int socket_type_to_idx( HSocket::socket_type_t socketType_ ) {
 	} else {
 		idx = 0;
 	}
-	return ( idx );
+	return idx;
 }
 
 inline HSocket::socket_type_t connection_type_to_socket_type( HHuginn::value_t const& connectionType_ ) {
@@ -53,7 +53,7 @@ inline HSocket::socket_type_t connection_type_to_socket_type( HHuginn::value_t c
 	} else {
 		socketType |= HSocket::TYPE::FILE;
 	}
-	return ( socketType );
+	return socketType;
 }
 
 }
@@ -183,7 +183,7 @@ private:
 				thread_->raise( exception_class(), e.what(), position_ );
 			}
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	HHuginn::value_t do_get( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -222,7 +222,7 @@ private:
 		} catch ( http::HHTTPException const& e ) {
 			thread_->raise( exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	HHuginn::value_t do_post( huginn::HThread* thread_, HHuginn::values_t& values_, int position_ ) {
@@ -275,7 +275,7 @@ private:
 		} catch ( http::HHTTPException const& e ) {
 			thread_->raise( exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 };
@@ -315,7 +315,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Network", &networkCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

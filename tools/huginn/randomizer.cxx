@@ -219,7 +219,7 @@ yaal::hcore::HString HRandomizer::do_code( huginn::HThread* thread_, HHuginn::va
 		} break;
 	}
 	s.append( ")" );
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -244,7 +244,7 @@ HHuginn::class_t HRandomizer::get_class( HRuntime* runtime_, HClass const* origi
 		);
 		runtime_->huginn()->register_class( c );
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

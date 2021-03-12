@@ -31,7 +31,7 @@ protected:
 		for ( axes_t::value_type const& a : _axes ) {
 			s *= a.get_size();
 		}
-		return ( s );
+		return s;
 	}
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;

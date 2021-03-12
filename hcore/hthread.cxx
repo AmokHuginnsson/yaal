@@ -163,7 +163,7 @@ void* HThread::SPAWN( void* thread_ ) {
 		log( LOG_LEVEL::ERROR ) << "Unknown uncaught exception in thread!" << endl;
 		throw;
 	}
-	return ( nullptr );
+	return nullptr;
 	M_EPILOG
 }
 

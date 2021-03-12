@@ -125,7 +125,7 @@ private:
 		} else {
 			thread_->raise( _exceptionClass, regex->error(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 private:
@@ -157,7 +157,7 @@ HHuginn::value_t HCompiledRegularExpression::do_replace(
 		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 		thread_->raise( creClass->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 }
 
 namespace {
@@ -198,7 +198,7 @@ HHuginn::value_t HCompiledRegularExpression::do_map(
 		HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HValue::get_class() ) );
 		thread_->raise( creClass->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::value_t HCompiledRegularExpression::do_groups(
@@ -218,7 +218,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 			l->push_back( rt.object_factory()->create_string( string.substr( m.start(), m.size() ) ) );
 		}
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, huginn::HClass* origin_, HClass const* exceptionClass_ ) {
@@ -240,7 +240,7 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HRuntime* runtime_, hugi
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

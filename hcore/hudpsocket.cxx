@@ -156,7 +156,7 @@ int long HUDPSocket::receive( ODatagram& datagram_ ) {
 				static_cast<size_t>( datagram_._size ), 0, reinterpret_cast<sockaddr*>( &address ), &len ) );
 	datagram_._ip = ip_t( address.sin_addr.s_addr );
 	datagram_._port = fwd_ntohs( address.sin_port );
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 

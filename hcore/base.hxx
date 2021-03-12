@@ -152,7 +152,7 @@ bool is_hexadecimal( iter_t it_, iter_t end_ ) {
 			}
 		}
 	}
-	return ( isHex );
+	return isHex;
 }
 
 template<typename iter_t>
@@ -172,7 +172,7 @@ bool is_binary( iter_t it_, iter_t end_ ) {
 			}
 		}
 	}
-	return ( isBin );
+	return isBin;
 }
 
 template<typename iter_t>
@@ -192,7 +192,7 @@ bool is_octal( iter_t it_, iter_t end_ ) {
 		}
 		isOctal = ( ( len > 0 ) && ( *it_ >= '0' ) && ( *it_ <= '7' ) );
 	}
-	return ( isOctal );
+	return isOctal;
 }
 
 template<typename type_t>

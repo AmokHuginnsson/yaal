@@ -217,7 +217,7 @@ int HLogPad::do_process_input( int code_ ) {
 	if ( ! code ) {
 		schedule_repaint();
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 

@@ -68,7 +68,7 @@ inline typename collection::iterator n_th( collection& coll_, int long nth_ ) {
 	M_ENSURE( ( nth_ >= 0 ) && ( nth_ < coll_.size() ) );
 	typename collection::iterator it( coll_.begin() );
 	yaal::advance( it, nth_ );
-	return ( it );
+	return it;
 	M_EPILOG
 }
 
@@ -78,7 +78,7 @@ inline typename collection::const_iterator n_th( collection const& coll_, int lo
 	M_ENSURE( ( nth_ >= 0 ) && ( nth_ < coll_.size() ) );
 	typename collection::iterator it( coll_.begin() );
 	yaal::advance( it, nth_ );
-	return ( it );
+	return it;
 	M_EPILOG
 }
 

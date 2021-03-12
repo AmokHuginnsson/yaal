@@ -110,7 +110,7 @@ int HRawFile::do_close( void ) {
 	flush();
 	int error( static_cast<int>( M_TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) ) );
 	_fileDescriptor = -1;
-	return ( error );
+	return error;
 	M_EPILOG
 }
 
@@ -199,7 +199,7 @@ int long HRawFile::write_plain( void const* buffer_, int long size_ ) {
 			break;
 		}
 	} while ( totalWritten < size_ );
-	return ( totalWritten );
+	return totalWritten;
 	M_EPILOG
 }
 
@@ -229,7 +229,7 @@ int long HRawFile::write_ssl( void const* buffer_, int long size_ ) {
 			nWritten += ret;
 		}
 	} while ( nWritten < size_ );
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -262,7 +262,7 @@ int long HRawFile::read_some_plain( void* buffer_, int long size_ ) {
 	if ( ! wasNonBlocking ) {
 		::fcntl( _fileDescriptor, F_SETFL, statusFlags );
 	}
-	return ( len );
+	return len;
 	M_EPILOG
 }
 
@@ -279,7 +279,7 @@ int long HRawFile::read_some_ssl( void* buffer_, int long size_ ) {
 	if ( ! wasNonBlocking ) {
 		_ssl->set_nonblocking( false );
 	}
-	return ( len );
+	return len;
 	M_EPILOG
 }
 

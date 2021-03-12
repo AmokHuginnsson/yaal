@@ -116,7 +116,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 		}
 		break;
 	}
-	return ( pos );
+	return pos;
 }
 
 void HPrepocessor::HIterator::make_readable( void ) {
@@ -161,7 +161,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_whitespace( y
 		}
 		++ pos;
 	}
-	return ( pos );
+	return pos;
 }
 
 yaal::hcore::HString::const_iterator HPrepocessor::HIterator::try_skip_whitespace( yaal::hcore::HString::const_iterator pos_, code_point_t quote_ ) {
@@ -190,7 +190,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::try_skip_whitespac
 		pos = pos_;
 		_state = STATE::NORMAL;
 	}
-	return ( pos );
+	return pos;
 }
 
 }

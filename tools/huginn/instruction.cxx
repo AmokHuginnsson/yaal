@@ -70,7 +70,7 @@ HHuginn::value_t member_value( HThread* thread_, HHuginn::value_t const& object_
 	if ( ! thread_->can_continue() ) {
 		throw Interrupt();
 	}
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -181,7 +181,7 @@ HHuginn::value_t member( HThread* thread_, HFrame::ACCESS access_, HHuginn::valu
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( cls->name() ).append( "` is not a compound object." ), thread_->file_id(), position_ );
 	}
 	M_ASSERT( !! m );
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -255,7 +255,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_
 			);
 		}
 	}
-	return ( res );
+	return res;
 }
 
 }
@@ -272,7 +272,7 @@ HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int posi
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::BOOLEAN ), thread_, IDENTIFIER::INTERFACE::TO_BOOLEAN, v_, position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
@@ -303,7 +303,7 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::INTEGER ), thread_, IDENTIFIER::INTERFACE::TO_INTEGER, v_, position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
@@ -326,7 +326,7 @@ HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int positio
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::REAL ), thread_, IDENTIFIER::INTERFACE::TO_REAL, v_, position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
@@ -339,7 +339,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::CHARACTER ), thread_, IDENTIFIER::INTERFACE::TO_CHARACTER, v_, position_ );
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
@@ -364,7 +364,7 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 	} else {
 		res = fallback_conversion( type_id( HHuginn::TYPE::NUMBER ), thread_, IDENTIFIER::INTERFACE::TO_NUMBER, v_, position_ );
 	}
-	return ( res );
+	return res;
 }
 
 }

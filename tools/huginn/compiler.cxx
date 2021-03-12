@@ -74,7 +74,7 @@ huginn::HClass const* OCompiler::OScopeContext::guess_type( OCompiler const* com
 		}
 		sc = sc->_parent;
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -873,7 +873,7 @@ OCompiler::function_info_t OCompiler::create_function_low( executing_parser::ran
 	M_ASSERT( fc._scopeStack.get_size() == 1 );
 	function_info_t fi( fc._functionIdentifier, fun );
 	pop_function_context();
-	return ( fi );
+	return fi;
 	M_EPILOG
 }
 
@@ -973,7 +973,7 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 	}
 	HHuginn::scope_t virtScope( sc._scope );
 	pop_scope_context_low();
-	return ( virtScope );
+	return virtScope;
 	M_EPILOG
 }
 

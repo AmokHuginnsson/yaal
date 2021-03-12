@@ -119,7 +119,7 @@ yaal::hcore::HString HComplex::do_code( huginn::HThread* thread_, HHuginn::value
 	M_PROLOG
 	hcore::HString s( full_class_name( thread_->runtime(), HValue::get_class() ) );
 	s.append( "(" ).append( _data.re() ).append( ", " ).append( _data.im() ).append( ")" );
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -175,7 +175,7 @@ HHuginn::class_t HComplex::get_class( HRuntime* runtime_, HClass const* origin_ 
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

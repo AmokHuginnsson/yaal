@@ -110,7 +110,7 @@ class HTerminal::HSequenceScanner {
 					cp = code_point_t( static_cast<code_point_t::value_type>( KEY<>::meta_r( static_cast<int>( character.get() ) ) ) );
 				}
 			}
-			return ( cp );
+			return cp;
 			M_EPILOG
 		}
 	};
@@ -186,7 +186,7 @@ int terminal_action_to_cc_subscript( HTerminal::ACTION action_ ) {
 		case ( HTerminal::ACTION::QUIT ):      ccSubscript = VQUIT;  break;
 		case ( HTerminal::ACTION::SUSPEND ):   ccSubscript = VSUSP;  break;
 	}
-	return ( ccSubscript );
+	return ccSubscript;
 }
 
 char unsigned terminal_action_to_default_key_code( HTerminal::ACTION action_ ) {
@@ -198,7 +198,7 @@ char unsigned terminal_action_to_default_key_code( HTerminal::ACTION action_ ) {
 		case ( HTerminal::ACTION::QUIT ):      keyCode = 28; break;
 		case ( HTerminal::ACTION::SUSPEND ):   keyCode = 26; break;
 	}
-	return ( keyCode );
+	return keyCode;
 }
 
 }
@@ -307,7 +307,7 @@ code_point_t HTerminal::get_key( void ) {
 	if ( key == KEY_CODE::ESCAPE ) {
 		key = _sequenceScanner->scan( *this );
 	}
-	return ( key );
+	return key;
 	M_EPILOG
 }
 
@@ -331,7 +331,7 @@ int find_term_fd( void ) {
 	} else if ( ::isatty( STDIN_FILENO ) ) {
 		fd = STDIN_FILENO;
 	}
-	return ( fd );
+	return fd;
 }
 
 #pragma GCC diagnostic push
@@ -352,7 +352,7 @@ int from_env( char const* envVarName_ ) {
 		} catch ( HException const& ) {
 		}
 	}
-	return ( val );
+	return val;
 }
 
 }
@@ -394,7 +394,7 @@ bool is_a_tty( FILE* const& file_ ) {
 	} else if ( file_ == stdin ) {
 		isTty = ::isatty( STDIN_FILENO ) ? true : false;
 	}
-	return ( isTty );
+	return isTty;
 }
 
 template<>
@@ -409,7 +409,7 @@ bool is_a_tty( HStreamInterface const& stream_ ) {
 	} else if ( stream_.poll_type() == HStreamInterface::POLL_TYPE::NATIVE ) {
 		isTty = ::isatty( static_cast<int>( reinterpret_cast<int_native_t>( stream_.data() ) ) ) ? true : false;
 	}
-	return ( isTty );
+	return isTty;
 }
 
 template<>

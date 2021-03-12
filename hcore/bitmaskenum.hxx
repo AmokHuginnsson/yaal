@@ -20,19 +20,19 @@ namespace bitmaskenum {
 template<typename enum_t>
 inline typename yaal::trait::enable_if<is_bitmask_enum<enum_t>::value, enum_t>::type& operator &= ( enum_t& left_, enum_t right_ ) {
 	left_ = static_cast<enum_t>( static_cast<int long unsigned>( left_ ) & static_cast<int long unsigned>( right_ ) );
-	return ( left_ );
+	return left_;
 }
 
 template<typename enum_t>
 inline typename yaal::trait::enable_if<is_bitmask_enum<enum_t>::value, enum_t>::type& operator |= ( enum_t& left_, enum_t right_ ) {
 	left_ = static_cast<enum_t>( static_cast<int long unsigned>( left_ ) | static_cast<int long unsigned>( right_ ) );
-	return ( left_ );
+	return left_;
 }
 
 template<typename enum_t>
 inline typename yaal::trait::enable_if<is_bitmask_enum<enum_t>::value, enum_t>::type& operator ^= ( enum_t& left_, enum_t right_ ) {
 	left_ = static_cast<enum_t>( static_cast<int long unsigned>( left_ ) ^ static_cast<int long unsigned>( right_ ) );
-	return ( left_ );
+	return left_;
 }
 
 template<typename enum_t>

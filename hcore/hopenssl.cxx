@@ -88,7 +88,7 @@ inline HString& format_error_message( HString& buffer_, int err = 0 ) {
 	while ( ( code = ERR_get_error() ) ) {
 		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, nullptr ) );
 	}
-	return ( buffer_ );
+	return buffer_;
 }
 
 }
@@ -117,7 +117,7 @@ int bio_read( BIO* bio_, char* buf_, int size_ ) {
 	} else {
 		BIO_clear_retry_flags( bio_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -135,7 +135,7 @@ int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	} else {
 		BIO_clear_retry_flags( bio_ );
 	}
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -154,7 +154,7 @@ int long bio_ctrl( BIO*, int cmd_, int long, void* ) {
 		case ( BIO_CTRL_FLUSH ): code = 1; break;
 		default: break;
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -270,7 +270,7 @@ void* HOpenSSL::OSSLContext::create_ssl( void ) {
 		throw HOpenSSLException( openssl_helper::format_error_message( buffer ) );
 	}
 	++ _users;
-	return ( ssl );
+	return ssl;
 	M_EPILOG
 }
 
@@ -328,7 +328,7 @@ void const* HOpenSSL::OSSLContextServer::do_method( void ) const {
 	M_PROLOG
 	SSL_METHOD const* m( SSLv23_server_method() );
 	M_ENSURE( m );
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -346,7 +346,7 @@ void const* HOpenSSL::OSSLContextClient::do_method( void ) const {
 	M_PROLOG
 	SSL_METHOD const* m( SSLv23_client_method() );
 	M_ENSURE( m );
-	return ( m );
+	return m;
 	M_EPILOG
 }
 
@@ -457,7 +457,7 @@ int long HOpenSSL::read( void* buffer_, int long size_ ) {
 			nRead = check_err( nRead );
 		}
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -478,7 +478,7 @@ int long HOpenSSL::write( void const* buffer_, int long size_ ) {
 			nWritten = 0;
 		}
 	}
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 

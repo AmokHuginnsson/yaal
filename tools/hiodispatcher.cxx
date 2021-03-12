@@ -185,7 +185,7 @@ bool HIODispatcher::dispatch( dropped_io_handlers_t const& droppedIOHandlers_ ) 
 			active = true;
 		}
 	}
-	return ( active );
+	return active;
 	M_EPILOG
 }
 
@@ -199,7 +199,7 @@ bool HIODispatcher::dispatch_pending_reads( dropped_io_handlers_t const& dropped
 			active = true;
 		}
 	}
-	return ( active );
+	return active;
 	M_EPILOG
 }
 

@@ -25,7 +25,7 @@ HHuginn::class_t HMapper::get_class( HRuntime* runtime_, huginn::HClass const* o
 	);
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -66,7 +66,7 @@ private:
 
 HMapper::iterator_t HMapper::do_iterator( HThread* thread_, int position_ ) {
 	iterator_t impl( hcore::make_pointer<HMapperIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _callable ) );
-	return ( impl );
+	return impl;
 }
 
 }

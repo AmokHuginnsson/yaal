@@ -78,7 +78,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		{ "set_precision", objectFactory_->create_method( &number::set_precision ), "( *prec* ) set maximum precision of this number to *prec* (increasing precision works only on numbers that currently have exact representation)" }
 	};
 	c->redefine( nullptr, fd );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -179,7 +179,7 @@ HHuginn::value_t HNumber::do_operator_factorial( HThread* thread_, HHuginn::valu
 	} else {
 		res = of.create_number( hcore::number::factorial( _value.to_integer() ) );
 	}
-	return ( res );
+	return res;
 }
 
 hash_value_t HNumber::do_operator_hash( HThread*, HHuginn::value_t const&, int ) const {

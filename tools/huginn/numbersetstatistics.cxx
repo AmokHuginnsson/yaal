@@ -62,7 +62,7 @@ HNumberSetStatistics::number_set_stats_t make_data( HThread* thread_, HHuginn::t
 			)
 		);
 	}
-	return ( nss );
+	return nss;
 	M_EPILOG
 }
 
@@ -134,7 +134,7 @@ typename stats_t::value_type stats_impl( stats_t const& stats_, aggregate_type_t
 	} else if ( aggregateType_ == AGGREGATE_TYPE::POPULATION_KURTOSIS ) {
 		res = stats_.population_kurtosis();
 	}
-	return ( res );
+	return res;
 }
 
 template<typename stats_t>
@@ -145,7 +145,7 @@ typename stats_t::value_type derivative_stats_impl( stats_t const& stats_, HNumb
 	} else if ( derivativeStats_ == HNumberSetStatistics::DERIVATIVE_STAT::MID_RANGE ) {
 		res = stats_.mid_range();
 	}
-	return ( res );
+	return res;
 }
 
 HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate_type_t aggregateType_, huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -164,7 +164,7 @@ HHuginn::value_t HNumberSetStatistics::stat( char const* name_, xmath::aggregate
 			v = thread_->runtime().object_factory()->create_number( stats_impl( nss, aggregateType_ ) );
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -180,7 +180,7 @@ HHuginn::value_t HNumberSetStatistics::derivative_stat( char const* name_, DERIV
 		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
 		v = thread_->runtime().object_factory()->create_number( derivative_stats_impl( nss, derivativeStats_ ) );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -196,7 +196,7 @@ HHuginn::value_t HNumberSetStatistics::count( huginn::HThread* thread_, HHuginn:
 		number_set_stats_number_t& nss( *( o->_stats.get<number_set_stats_number_ptr_t>().raw() ) );
 		v = thread_->runtime().object_factory()->create_integer( nss.count() );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -272,7 +272,7 @@ HHuginn::class_t HNumberSetStatistics::get_class( HRuntime* runtime_, HClass con
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

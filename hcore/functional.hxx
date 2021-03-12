@@ -520,9 +520,9 @@ struct identity : public unary_function<tType, tType> {
 	typedef typename base_type::result_type result_type;
 	typedef typename base_type::argument_type argument_type;
 	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<argument_type const>::type v_ ) const
-		{ return ( v_ ); }
+		{ return v_; }
 	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<argument_type>::type v_ )
-		{ return ( v_ ); }
+		{ return v_; }
 };
 
 template<typename first_t, typename second_t>
@@ -533,9 +533,9 @@ struct project1st : public binary_function<first_t, first_t, second_t> {
 	typedef typename base_type::first_argument_type first_argument_type;
 	typedef typename base_type::second_argument_type second_argument_type;
 	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<first_argument_type const>::type first_, typename trait::make_reference<second_argument_type const>::type ) const
-		{ return ( first_ ); }
+		{ return first_; }
 	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<first_argument_type>::type first_, typename trait::make_reference<second_argument_type>::type )
-		{ return ( first_ ); }
+		{ return first_; }
 };
 
 template<typename first_t, typename second_t>
@@ -546,9 +546,9 @@ struct project2nd : public binary_function<second_t, first_t, second_t> {
 	typedef typename base_type::first_argument_type first_argument_type;
 	typedef typename base_type::second_argument_type second_argument_type;
 	typename trait::make_reference<result_type const>::type operator()( typename trait::make_reference<first_argument_type const>::type, typename trait::make_reference<second_argument_type const>::type second_ ) const
-		{ return ( second_ ); }
+		{ return second_; }
 	typename trait::make_reference<result_type>::type operator()( typename trait::make_reference<first_argument_type>::type, typename trait::make_reference<second_argument_type>::type second_ )
-		{ return ( second_ ); }
+		{ return second_; }
 };
 
 /*! \brief Constant that can be used in nullary function contexts.

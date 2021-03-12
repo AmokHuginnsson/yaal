@@ -35,7 +35,7 @@ HWidget::ptr_t HWidgetFactory::create_widget( HWindow* window_, yaal::tools::HXm
 	if ( it != _creators.end() ) {
 		widget = it->second->new_instance( window_, node_ );
 	}
-	return ( widget );
+	return widget;
 	M_EPILOG
 }
 
@@ -54,7 +54,7 @@ HWidgetFactory::creators_t::iterator HWidgetFactory::end( void ) {
 }
 
 int HWidgetFactory::life_time( int lifeTime_ ) {
-	return ( lifeTime_ );
+	return lifeTime_;
 }
 
 void HWidgetFactory::initialize_globals( void ) {
@@ -146,7 +146,7 @@ HWidget::OAttribute make_attr( yaal::hcore::HString const& type_, yaal::tools::H
 		int v( attr._data & 0x0f );
 		attr._data = static_cast<COLOR::color_t>( v | COLOR::fg_to_bg( COLOR::from_string( *a ) ) );
 	}
-	return ( attr );
+	return attr;
 	M_EPILOG
 }
 
@@ -216,7 +216,7 @@ HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::
 			r._label = xml::node_val( n );
 		}
 	}
-	return ( r );
+	return r;
 	M_EPILOG
 }
 

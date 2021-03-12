@@ -85,7 +85,7 @@ HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	for ( HHuginn::value_t const& e : values_ ) {
 		l->push_back( e );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -96,7 +96,7 @@ HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	for ( HHuginn::value_t const& e : values_ ) {
 		d->push_back( e );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -114,7 +114,7 @@ HHuginn::value_t order( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::va
 	for ( HHuginn::value_t const& e : values_ ) {
 		o->insert( thread_, e, position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -132,7 +132,7 @@ HHuginn::value_t set( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	for ( HHuginn::value_t const& e : values_ ) {
 		s->insert( thread_, e, position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -143,7 +143,7 @@ HHuginn::value_t heap( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::val
 	for ( HHuginn::value_t const& e : values_ ) {
 		h->push( thread_, e, position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -252,7 +252,7 @@ HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::valu
 	if ( !v ) {
 		v = thread_->runtime().none_value();
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -275,7 +275,7 @@ HHuginn::value_t square_root( char const* name_, huginn::HThread* thread_, HHugi
 	if ( v == thread_->runtime().none_value() ) {
 		thread_->raise( thread_->object_factory().arithmetic_exception_class(), "bad domain", position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -308,7 +308,7 @@ HHuginn::value_t n_ary_action( char const* name_, n_ary_action_t action_, huginn
 		( accumulator.raw()->*action_ )( thread_, accumulator, v, position_ );
 		it->next( thread_, position_ );
 	}
-	return ( accumulator );
+	return accumulator;
 }
 
 }

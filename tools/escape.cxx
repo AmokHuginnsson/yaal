@@ -124,7 +124,7 @@ EscapeTable const& cxx_escape_table( void ) {
 		raw,  static_cast<int>( sizeof ( raw ) )  - 1,
 		safe, static_cast<int>( sizeof ( safe ) ) - 1
 	);
-	return ( escapes );
+	return escapes;
 }
 
 void escape( yaal::hcore::HString& string_, EscapeTable const& et_, code_point_t escape_ ) {
@@ -276,14 +276,14 @@ void semantic_unescape( yaal::hcore::HString& str_ ) {
 HString escape_copy( yaal::hcore::HString string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
 	escape( string_, et_, escape_ );
-	return ( string_ );
+	return string_;
 	M_EPILOG
 }
 
 HString unescape_copy( yaal::hcore::HString string_, EscapeTable const& et_, code_point_t escape_ ) {
 	M_PROLOG
 	unescape( string_, et_, escape_ );
-	return ( string_ );
+	return string_;
 	M_EPILOG
 }
 
@@ -382,7 +382,7 @@ yaal::hcore::HString make_shroud( yaal::hcore::HString const& pattern_ ) {
 	for ( code_point_t c : pattern_ ) {
 		shroud.push_back( code_point_t( c.get() + unicode::CODE_POINT::SUPPLEMENTARY_PRIVATE_USE_AREA_A ) );
 	}
-	return ( shroud );
+	return shroud;
 	M_EPILOG
 }
 

@@ -25,7 +25,7 @@ DWORD fd_to_handle( int fd_ ) {
 		case ( STDOUT_FILENO ): h = STD_OUTPUT_HANDLE; break;
 		case ( STDERR_FILENO ): h = STD_ERROR_HANDLE;  break;
 	}
-	return ( h );
+	return h;
 }
 
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
@@ -72,7 +72,7 @@ bool IO::schedule_read( int size_ ) {
 		valid = false;
 	}
 	_scheduled = ! _ready && valid;
-	return ( valid );
+	return valid;
 }
 
 bool IO::sync( bool block_ ) {
@@ -104,7 +104,7 @@ int IO::consume( char* dst_, int long& size_ ) {
 	int nRead( 0 );
 	if ( _inBuffer == 0 ) {
 		_ready = false;
-		return ( nRead );
+		return nRead;
 	}
 	nRead = std::min<int>( _inBuffer, size_ );
 	char* src( static_cast<char*>( _buffer.raw() ) );
@@ -113,11 +113,11 @@ int IO::consume( char* dst_, int long& size_ ) {
 	size_ -= nRead;
 	if ( _inBuffer == 0 ) {
 		_ready = false;
-		return ( nRead );
+		return nRead;
 	}
 	M_ASSERT( size_ == 0 );
 	::memmove( src, src + nRead, _inBuffer );
-	return ( nRead );
+	return nRead;
 }
 
 int long IO::read( void* buf_, int long size_ ) {
@@ -129,28 +129,28 @@ int long IO::read( void* buf_, int long size_ ) {
 	char* dst( static_cast<char*>( buf_ ) );
 	int nRead( consume( dst, size_ ) );
 	if ( size_ == 0 ) {
-		return ( nRead );
+		return nRead;
 	}
 	M_ASSERT( _inBuffer == 0 );
 	if ( ! schedule_read( size_ ) ) {
-		return ( nRead );
+		return nRead;
 	}
 	if ( ! sync( ! _nonBlocking ) ) {
-		return ( nRead );
+		return nRead;
 	}
 	if ( _nonBlocking && ( _inBuffer == 0 ) && ( nRead == 0 ) ) {
 		get_socket_errno() = EAGAIN;
 		return ( -1 );
 	}
 	nRead += consume( dst + nRead, size_ );
-	return ( nRead );
+	return nRead;
 }
 
 int long IO::write( void const* buf_, int long size_ ) {
 	M_ASSERT( _connected );
 	DWORD iWritten( 0 );
 	if ( ::WriteFile( _handle, buf_, size_, &iWritten, &_overlapped ) == TRUE ) {
-		return ( iWritten );
+		return iWritten;
 	}
 	if ( ::GetLastError() != ERROR_IO_PENDING ) {
 		log_windows_error( "GetOverlappedResult(WriteFile)" );
@@ -160,7 +160,7 @@ int long IO::write( void const* buf_, int long size_ ) {
 		log_windows_error( "GetOverlappedResult(write)" );
 		return ( -1 );
 	}
-	return ( iWritten );
+	return iWritten;
 }
 
 int IO::close( void ) {
@@ -175,7 +175,7 @@ int IO::close( void ) {
 			M_ASSERT( ! "invalid HANDLE type" );
 		}
 	}
-	return ( ret );
+	return ret;
 }
 
 int IO::fcntl( int cmd_, int arg_ ) {
@@ -185,7 +185,7 @@ int IO::fcntl( int cmd_, int arg_ ) {
 	} else if ( cmd_ == F_GETFL ) {
 		ret = _nonBlocking ? O_NONBLOCK : 0;
 	}
-	return ( ret );
+	return ret;
 }
 
 HANDLE IO::event( void ) const {
@@ -295,7 +295,7 @@ SystemIO::SystemIO( void )
 
 SystemIO& SystemIO::get_instance( void ) {
 	static SystemIO instance;
-	return ( instance );
+	return instance;
 }
 
 SystemIO::io_t& SystemIO::create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_, std::string const& p_ ) {
@@ -325,7 +325,7 @@ int SystemIO::close_io( int id_ ) {
 		ret = -1;
 		errno = EBADF;
 	}
-	return ( ret );
+	return ret;
 }
 
 int SystemIO::dup_io( int id_ ) {
@@ -335,7 +335,7 @@ int SystemIO::dup_io( int id_ ) {
 	fd = _dup( fd );
 /*	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( fd ) ) );
 	 _ioTable.insert( std::make_pair( fd, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) */
-	return ( fd );
+	return fd;
 }
 
 int SystemIO::dup2_io( int id1_, int id2_ ) {
@@ -346,7 +346,7 @@ int SystemIO::dup2_io( int id1_, int id2_ ) {
 	int fd( _dup2( fd1, fd2 ) );
 /*	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( fd ) ) );
 	 _ioTable.insert( std::make_pair( fd, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) */
-	return ( fd );
+	return fd;
 }
 
 } /* namespace msvcxx */

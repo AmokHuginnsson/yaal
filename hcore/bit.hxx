@@ -60,7 +60,7 @@ inline u64_t reverse( u64_t v_ ) {
 	for ( int i( 0 ); i < yaal::size( BIT_MASK64 ); ++ i ) {
 		v_ = ( ( v_ >> SHIFT[i] ) & BIT_MASK64[i] ) | ( ( v_ & BIT_MASK64[i] ) << SHIFT[i] );
 	}
-	return ( v_ );
+	return v_;
 }
 
 inline int count( u32_t v_ ) {
@@ -74,7 +74,7 @@ inline u32_t reverse( u32_t v_ ) {
 	for ( int i( 0 ); i < yaal::size( BIT_MASK32 ); ++ i ) {
 		v_ = ( ( v_ >> SHIFT[i] ) & BIT_MASK32[i] ) | ( ( v_ & BIT_MASK32[i] ) << SHIFT[i] );
 	}
-	return ( v_ );
+	return v_;
 }
 
 inline int count( u16_t v_ ) {
@@ -88,7 +88,7 @@ inline u16_t reverse( u16_t v_ ) {
 	for ( int i( 0 ); i < yaal::size( BIT_MASK16 ); ++ i ) {
 		v_ = static_cast<u16_t>( ( ( v_ >> SHIFT[i] ) & BIT_MASK16[i] ) | ( ( v_ & BIT_MASK16[i] ) << SHIFT[i] ) );
 	}
-	return ( v_ );
+	return v_;
 }
 
 inline int count( u8_t v_ ) {
@@ -102,7 +102,7 @@ inline u8_t reverse( u8_t v_ ) {
 	for ( int i( 0 ); i < yaal::size( BIT_MASK8 ); ++ i ) {
 		v_ = static_cast<u8_t>( ( ( v_ >> SHIFT[i] ) & BIT_MASK8[i] ) | ( ( v_ & BIT_MASK8[i] ) << SHIFT[i] ) );
 	}
-	return ( v_ );
+	return v_;
 }
 
 inline int least_significant( u64_t v_ ) {

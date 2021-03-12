@@ -22,7 +22,7 @@ template<typename type_t>
 struct hashset_helper {
 	typedef type_t key_type;
 	inline static key_type const& key( type_t const& key_ )
-		{	return ( key_ );	}
+		{	return key_;	}
 };
 
 /*! \brief Hash set container implementation.
@@ -67,7 +67,7 @@ public:
 		HIterator const operator ++ ( int ) {
 			HIterator it( _engine );
 			++ _engine;
-			return ( it );
+			return it;
 		}
 		HIterator& operator -- ( void ) {
 			-- _engine;
@@ -76,7 +76,7 @@ public:
 		HIterator const operator -- ( int ) {
 			HIterator it( _engine );
 			-- _engine;
-			return ( it );
+			return it;
 		}
 		key_type const& operator* ( void ) const {
 			return ( _engine.get() );
@@ -258,7 +258,7 @@ public:
 		iterator next( it );
 		++ next;
 		_engine.erase( it._engine );
-		return ( next );
+		return next;
 		M_EPILOG
 	}
 	/*! \brief Remove given key from map.
@@ -280,7 +280,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	size_type count( type_t const& key_ ) const {

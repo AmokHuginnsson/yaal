@@ -256,10 +256,10 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 			if ( _contentBytesLeft == 0 ) {
 				if ( _transferEncoding & TRANSFER_ENCODING::CHUNKED ) {
 					if ( ! getline( *_socket, _lineCache ).good() ) {
-						return ( nRead );
+						return nRead;
 					}
 					if ( _lineCache.is_empty() ) {
-						return ( nRead );
+						return nRead;
 					}
 					_contentBytesLeft = stoi( _lineCache, nullptr, 16 );
 				} else if ( _contentLength == 0 ) {
@@ -277,11 +277,11 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 					_socket->read( waste, 2 );
 				}
 			} else {
-				return ( nRead );
+				return nRead;
 			}
 		}
 		if ( _cachedHTTPBytes == 0 ) {
-			return ( nRead );
+			return nRead;
 		}
 		int toRead( min( _cachedHTTPBytes, safe_int::cast<int>( size_ ) ) );
 		::memcpy( static_cast<char*>( data_ ) + nRead, _httpCache.get<char>() + _offsetInChunk, static_cast<size_t>( toRead ) );
@@ -290,7 +290,7 @@ int long HHTTPStream::do_read( void* data_, int long size_ ) {
 		_offsetInChunk += toRead;
 		nRead += toRead;
 	}
-	return ( nRead );
+	return nRead;
 }
 
 namespace {
@@ -303,7 +303,7 @@ char const* http_type_to_str( HTTP type_ ) {
 		case ( HTTP::PATCH ):  return ( "PATCH" );
 		case ( HTTP::HEAD ):   return ( "HEAD" );
 	}
-	return ( nullptr );
+	return nullptr;
 }
 }
 
@@ -337,7 +337,7 @@ yaal::hcore::HString make_request_string( URL const& url_, HRequest const& reque
 		auth.assign( request_.login() ).append( unicode::CODE_POINT::COLON ).append( request_.password() );
 		requestString.append( "Authorization: Basic " ).append( base64::encode( auth ) ).append( "\r\n" );
 	}
-	return ( requestString );
+	return requestString;
 }
 
 void push_payloads( yaal::hcore::HStreamInterface& socket_, HRequest::payloads_t const& payloads_ ) {
@@ -466,7 +466,7 @@ STATUS get_response_status( yaal::hcore::HString const& responseHeader_ ) {
 	if ( ! status_string( status ) ) {
 		throw HHTTPException( "Unknown HTTP status code: `"_ys.append( responseHeader_ ).append( "`" ) );
 	}
-	return ( status );
+	return status;
 	M_EPILOG
 }
 
@@ -539,7 +539,7 @@ HHTTPStream::transfer_encoding_t parse_transfer_encoding( yaal::hcore::HString c
 			hcore::log( LOG_LEVEL::DEBUG ) << "unsupported transfer encoding: " << method << endl;
 		}
 	}
-	return ( transferEncoding );
+	return transferEncoding;
 	M_EPILOG
 }
 
@@ -553,7 +553,7 @@ yaal::hcore::HTime parse_time( yaal::hcore::HString const& value_, yaal::hcore::
 		hcore::log( LOG_LEVEL::DEBUG ) << context_ << value_ << " - " << e.what() << endl;
 	}
 	time.set_format( _iso8601DateTimeFormat_ );
-	return ( time );
+	return time;
 	M_EPILOG
 }
 
@@ -574,7 +574,7 @@ yaal::hcore::HString parse_content_disposition( yaal::hcore::HString const& valu
 	filename.shift_left( VALUE_NAME_SIZE );
 	filename.trim();
 	filename.trim( "\"" );
-	return ( filename );
+	return filename;
 	M_EPILOG
 }
 
@@ -621,7 +621,7 @@ char const* status_string( STATUS status_ ) {
 		case ( STATUS::VARIANT_ALSO_NEGOTIATES ):         statusString = "Variant Also Negotiates";         break;
 		case ( STATUS::NETWORK_AUTHENTICATION_REQUIRED ): statusString = "Network Authentication Required"; break;
 	}
-	return ( statusString );
+	return statusString;
 }
 
 }

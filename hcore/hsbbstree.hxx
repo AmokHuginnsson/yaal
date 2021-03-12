@@ -190,7 +190,7 @@ public:
 		HNode* node( static_cast<HNode*>( it_._current ) );
 		M_SAFE( node->~HNode() );
 		_allocator.deallocate( node, 1 );
-		return ( it );
+		return it;
 		M_EPILOG
 	}
 	HIterator find( key_type const& key_ ) const {
@@ -333,7 +333,7 @@ private:
 				hint = find_node( key_, &_root );
 			}
 		}
-		return ( hint );
+		return hint;
 	}
 	HNode* copy_node( HNode const* source ) {
 		M_PROLOG
@@ -348,7 +348,7 @@ private:
 			node->_right = copy_node( static_cast<HNode*>( source->_right ) );
 			static_cast<HNode*>( node->_right )->_parent = node;
 		}
-		return ( node );
+		return node;
 		M_EPILOG
 	}
 	void delete_node( HNode* node_ ) {
@@ -483,7 +483,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type
 			}
 		}
 	}
-	return ( it );
+	return it;
 	M_EPILOG
 }
 
@@ -504,7 +504,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type
 			}
 		}
 	}
-	return ( it );
+	return it;
 	M_EPILOG
 }
 

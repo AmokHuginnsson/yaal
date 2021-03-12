@@ -79,7 +79,7 @@ public:
 		HIterator const operator ++ ( int ) {
 			HIterator it( *this );
 			operator ++ ();
-			return ( it );
+			return it;
 		}
 		HIterator& operator -- ( void ) {
 			if ( _index > 0 ) {
@@ -95,7 +95,7 @@ public:
 		HIterator const operator -- ( int ) {
 			HIterator it( *this );
 			operator -- ();
-			return ( it );
+			return it;
 		}
 		key_type const& operator* ( void ) const {
 			return ( _engine.get().first );
@@ -272,7 +272,7 @@ public:
 		iterator next( it );
 		++ next;
 		_engine.erase( it._engine );
-		return ( next );
+		return next;
 		M_EPILOG
 	}
 	/*! \brief Remove given key from map.
@@ -294,7 +294,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	size_type count( value_type const& elem ) const {
@@ -313,7 +313,7 @@ public:
 		size_type sizeAcc( 0 );
 		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it.get().second;
-		return ( sizeAcc );
+		return sizeAcc;
 		M_EPILOG
 	}
 	size_type size( void ) const {

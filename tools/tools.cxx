@@ -31,7 +31,7 @@ double long yaal_strtold( HString const& str_, int* endIdx_ ) {
 	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( str_.get_length() );
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 

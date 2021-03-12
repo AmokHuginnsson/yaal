@@ -79,7 +79,7 @@ path_t current_working_directory( void ) {
 	}
 	path_t p( cwd );
 	::free( cwd );
-	return ( p );
+	return p;
 }
 
 bool is_absolute( path_t const& path_ ) {
@@ -147,7 +147,7 @@ path_t normalize_path( path_t const& path_ ) {
 	} else if ( path == path::CURRENT ) {
 		path.clear();
 	}
-	return ( path );
+	return path;
 	M_EPILOG
 }
 
@@ -178,7 +178,7 @@ FILE_TYPE file_type( path_t const& path_, bool resolve_ ) {
 	} else if ( S_ISBLK( s.st_mode ) ) {
 		ft = FILE_TYPE::BLOCK_DEVICE;
 	}
-	return ( ft );
+	return ft;
 	M_EPILOG
 }
 
@@ -193,7 +193,7 @@ char const* file_type_name( FILE_TYPE fileType_ ) {
 		case ( FILE_TYPE::CHARACTER_DEVICE ): name = "chardev";   break;
 		case ( FILE_TYPE::BLOCK_DEVICE ):     name = "blockdev";  break;
 	}
-	return ( name );
+	return name;
 }
 
 bool is_directory( path_t const& path_ ) {
@@ -258,7 +258,7 @@ path_t dirname( path_t const& path_ ) {
 	if ( degenerated ) {
 		dname.assign( "." );
 	}
-	return ( dname );
+	return dname;
 	M_EPILOG
 }
 
@@ -277,7 +277,7 @@ path_t basename( path_t const& path_ ) {
 			bname.shift_left( delimPos + 1 );
 		}
 	}
-	return ( bname );
+	return bname;
 	M_EPILOG
 }
 
@@ -300,7 +300,7 @@ path_t readlink( path_t const& path_ ) {
 		throw HFileSystemException( "readlink failed: `"_ys.append( path_ ).append( "'" ) );
 	}
 	path.assign( buffer.get<char>(), len );
-	return ( path );
+	return path;
 	M_EPILOG
 }
 
@@ -432,7 +432,7 @@ paths_t find( path_t const& in, yaal::hcore::HRegex const& pattern_,
 			}
 		}
 	}
-	return ( result );
+	return result;
 }
 
 HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
@@ -469,7 +469,7 @@ HString glob_to_re( yaal::hcore::HString const& globStr_ ) {
 		}
 	}
 	globRE.push_back( '$'_ycp );
-	return ( globRE );
+	return globRE;
 }
 
 namespace {
@@ -553,7 +553,7 @@ yaal::tools::filesystem::paths_t glob( path_t const& path_ ) {
 		}
 	}
 	sort( result.begin(), result.end() );
-	return ( result );
+	return result;
 }
 
 void update_times( path_t const& path_, yaal::hcore::HTime const& modTime_, yaal::hcore::HTime const& accessTime_ ) {

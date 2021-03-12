@@ -93,7 +93,7 @@ int HDataEditWidget::do_process_input( int code_ ) {
 			_attributeFocused._data = static_cast<COLOR::color_t>( COLOR::FG_BROWN | COLOR::BG_LIGHTGRAY );
 		}
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -149,7 +149,7 @@ bool HDataEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& 
 	} else {
 		ok = false;
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

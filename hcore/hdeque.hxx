@@ -417,18 +417,18 @@ public:
 	iterator insert( iterator pos_, type_t const& val_ ) {
 		M_ASSERT( pos_._owner == this );
 		new ( space_at( pos_._index ) ) value_type( val_ );
-		return ( pos_ );
+		return pos_;
 	}
 	iterator insert( iterator pos_, type_t&& val_ ) {
 		M_ASSERT( pos_._owner == this );
 		new ( space_at( pos_._index ) ) value_type( yaal::move( val_ ) );
-		return ( pos_ );
+		return pos_;
 	}
 	template<typename... arg_t>
 	iterator emplace( iterator pos_, arg_t&&... arg_ ) {
 		M_ASSERT( pos_._owner == this );
 		new ( space_at( pos_._index ) ) value_type( yaal::forward<arg_t>( arg_ )... );
-		return ( pos_ );
+		return pos_;
 	}
 
 	/*! \brief Replace contents of this deque with contents of given range.
@@ -613,7 +613,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _index;
@@ -622,11 +622,11 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _index + off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( size_type off_ ) {
 		_index += off_;
@@ -634,7 +634,7 @@ public:
 	}
 	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _index - off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( size_type off_ ) {
 		_index -= off_;
@@ -988,7 +988,7 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 	if ( ! _size ) {
 		_start = 0;
 	}
-	return ( first_ );
+	return first_;
 	M_EPILOG
 }
 

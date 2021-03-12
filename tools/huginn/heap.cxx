@@ -186,7 +186,7 @@ HHuginn::value_t HHeap::pop( huginn::HThread* thread_, int position_ ) {
 	skip( thread_, v.raw(), position_ );
 	HAnchorGuard<HHeap> ag( *this, thread_, position_ );
 	_data.pop();
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -242,7 +242,7 @@ HHuginn::value_t HHeap::do_clone( huginn::HThread* thread_, HHuginn::value_t*, i
 		data.push( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 		values.pop();
 	}
-	return ( res );
+	return res;
 }
 
 bool HHeap::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
@@ -258,7 +258,7 @@ bool HHeap::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const
 		data.pop();
 		otherData.pop();
 	}
-	return ( equal );
+	return equal;
 }
 
 void HHeap::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
@@ -286,7 +286,7 @@ hash_value_t HHeap::do_operator_hash( HThread* thread_, HHuginn::value_t const&,
 		hashValue += v->operator_hash( thread_, v, position_ );
 		data.pop();
 	}
-	return ( hashValue );
+	return hashValue;
 }
 
 yaal::hcore::HString HHeap::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -307,7 +307,7 @@ yaal::hcore::HString HHeap::do_code( huginn::HThread* thread_, HHuginn::value_t 
 		values.pop();
 	}
 	str.append( ")" );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HHeap::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -328,7 +328,7 @@ yaal::hcore::HString HHeap::do_to_string( huginn::HThread* thread_, HHuginn::val
 		values.pop();
 	}
 	str.append( ")" );
-	return ( str );
+	return str;
 }
 
 }

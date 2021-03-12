@@ -42,7 +42,7 @@ HHuginn::value_t HFileStat::id( huginn::HThread* thread_, HHuginn::value_t* obje
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -58,7 +58,7 @@ HHuginn::value_t HFileStat::name( huginn::HThread* thread_, HHuginn::value_t* ob
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -73,7 +73,7 @@ HHuginn::value_t HFileStat::size( huginn::HThread* thread_, HHuginn::value_t* ob
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -88,7 +88,7 @@ HHuginn::value_t HFileStat::mode( huginn::HThread* thread_, HHuginn::value_t* ob
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -103,7 +103,7 @@ HHuginn::value_t HFileStat::type( huginn::HThread* thread_, HHuginn::value_t* ob
 	} catch ( HFileSystemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -118,7 +118,7 @@ HHuginn::value_t HFileStat::user( huginn::HThread* thread_, HHuginn::value_t* ob
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -133,7 +133,7 @@ HHuginn::value_t HFileStat::group( huginn::HThread* thread_, HHuginn::value_t* o
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -149,7 +149,7 @@ HHuginn::value_t HFileStat::get_times( char const* name_, time_getter_t timeGett
 	} catch ( HFSItemException const& e ) {
 		thread_->raise( o->_exceptionClass, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -177,7 +177,7 @@ HHuginn::class_t HFileStat::get_class( HRuntime* runtime_, huginn::HClass const*
 	c->redefine( nullptr, fd );
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

@@ -48,7 +48,7 @@ public:
 			v1 = v1->clone( thread_, &v1, position_ );
 		}
 		( v1.raw()->*binaryOperator_ )( thread_, v1, v2, position_ );
-		return ( v1 );
+		return v1;
 		M_EPILOG
 	}
 	static HHuginn::value_t binary_boolean_operator( char const* name_, OPERATOR op_, binary_boolean_operator_t binaryBooleanOperator_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -209,7 +209,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Operators", &operatorsCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

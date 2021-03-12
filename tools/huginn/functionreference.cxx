@@ -89,7 +89,7 @@ yaal::hcore::HString HFunctionReference::do_code( huginn::HThread* thread_, HHug
 		str.assign( *originName ).append( "." );
 	}
 	str.append( r.identifier_name( _identifierId ) );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HFunctionReference::do_to_string( huginn::HThread* thread_, HHuginn::value_t const& self_, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -135,7 +135,7 @@ HHuginn::value_t HPartial::do_operator_call( huginn::HThread* thread_, HHuginn::
 		throw;
 	}
 	_cache.clear();
-	return ( ret );
+	return ret;
 }
 
 HHuginn::value_t HPartial::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {

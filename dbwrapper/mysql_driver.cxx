@@ -200,7 +200,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	::mysql_query( static_cast<MYSQL*>( dbLink_._conn ), query_ );
 	result->_randomAccess = true;
 	result->_result = ::mysql_store_result( static_cast<MYSQL*>( dbLink_._conn ) );
-	return ( result );
+	return result;
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -220,7 +220,7 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	void* result( mysql_db_prepare_query( dbLink_, query_ ) );
 	mysql_query_execute( dbLink_, result );
-	return ( result );
+	return result;
 }
 
 void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
@@ -257,7 +257,7 @@ void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			}
 		}
 	}
-	return ( query );
+	return query;
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
@@ -291,7 +291,7 @@ void* mysql_query_execute( ODBLink&, void* data_ ) {
 		mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
 	}
 	mysql_stmt_execute( pq->_statement );
-	return ( pq );
+	return pq;
 }
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {

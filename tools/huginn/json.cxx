@@ -121,7 +121,7 @@ static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t co
 			);
 		}
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -198,7 +198,7 @@ public:
 			} break;
 			case ( tools::HJSON::HValue::TYPE::UNINITIALIZED ): break;
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t load( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -214,7 +214,7 @@ public:
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HJSON*>( object_->raw() )->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 private:
@@ -252,7 +252,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "JSON", &jsonCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

@@ -93,7 +93,7 @@ double long sigmoid_impl( double long val_ ) {
 	} else if ( v < -1.L ) {
 		v = -1.L;
 	}
-	return ( v );
+	return v;
 }
 
 double long error_function_impl( double long val_ ) {

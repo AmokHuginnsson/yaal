@@ -100,7 +100,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -181,7 +181,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -221,7 +221,7 @@ inline HHuginn::value_t get( huginn::HThread* thread_, HHuginn::value_t* object_
 	} else {
 		v = d->get( thread_, values_[0], position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -335,7 +335,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `dict` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search. The keys stored in given `dict` instance must be of uniform type."
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -405,7 +405,7 @@ bool HDict::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, HHu
 		result_ = it->second;
 		found = true;
 	}
-	return ( found );
+	return found;
 	M_EPILOG
 }
 
@@ -477,7 +477,7 @@ HHuginn::value_t HDict::do_clone( huginn::HThread* thread_, HHuginn::value_t*, i
 			)
 		);
 	}
-	return ( res );
+	return res;
 }
 
 bool HDict::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&, HHuginn::value_t const& other_, int position_ ) const {
@@ -494,7 +494,7 @@ bool HDict::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const
 			&& lf->operator_equals( thread_, lf, rf, position_ )
 			&& ls->operator_equals( thread_, ls, rs, position_ );
 	}
-	return ( equal );
+	return equal;
 	M_EPILOG
 }
 
@@ -533,7 +533,7 @@ hash_value_t HDict::do_operator_hash( HThread* thread_, HHuginn::value_t const&,
 		hashValue *= 3;
 		hashValue += v.second->operator_hash( thread_, v.second, position_ );
 	}
-	return ( hashValue );
+	return hashValue;
 }
 
 yaal::hcore::HString HDict::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -550,7 +550,7 @@ yaal::hcore::HString HDict::do_code( huginn::HThread* thread_, HHuginn::value_t 
 		str.append( v.first->code( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->code( thread_, v.second, cycleTracker_, position_ ) );
 	}
 	str.append( "]" );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HDict::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -567,7 +567,7 @@ yaal::hcore::HString HDict::do_to_string( huginn::HThread* thread_, HHuginn::val
 		str.append( v.first->to_string( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->to_string( thread_, v.second, cycleTracker_, position_ ) );
 	}
 	str.append( "]" );
-	return ( str );
+	return str;
 }
 
 }

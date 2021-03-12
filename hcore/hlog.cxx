@@ -45,7 +45,7 @@ char const* LOG_LEVEL::name( priority_t level_ ) {
 		case ( LOG_LEVEL::ALERT ):     n = "ALERT";     break;
 		case ( LOG_LEVEL::EMERGENCY ): n = "EMERGENCY"; break;
 	}
-	return ( n );
+	return n;
 }
 
 bool HLog::_autoRehash = true;
@@ -243,7 +243,7 @@ int HLog::vformat( char const* format_, va_list ap_ ) {
 	int len( ::vsnprintf( buf, _bufferSize, format_, ap_ ) );
 	int nWritten( static_cast<int>( _file::ref().write( buf, len ) ) );
 	eol_reset( buf, len );
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -253,7 +253,7 @@ int HLog::operator() ( char const * format_, ... ) {
 	va_start( ap, format_ );
 	int len( vformat( format_, ap ) );
 	va_end( ap );
-	return ( len );
+	return len;
 	M_EPILOG
 }
 
@@ -264,7 +264,7 @@ int HLog::operator() ( LOG_LEVEL::priority_t type_, char const* format_, ... ) {
 	va_start( ap, format_ );
 	int len( vformat( format_, ap ) );
 	va_end( ap );
-	return ( len );
+	return len;
 	M_EPILOG
 }
 
@@ -296,7 +296,7 @@ int long HLog::do_write( void const* string_, int long size_ ) {
 	}
 	int len( static_cast<int>( _file::ref().write( str, size_ ) ) );
 	eol_reset( str, size_ );
-	return ( len );
+	return len;
 	M_EPILOG
 }
 

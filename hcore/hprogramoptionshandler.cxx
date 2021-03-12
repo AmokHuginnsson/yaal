@@ -120,7 +120,7 @@ HString make_path( HString const& sysconfDir_, HString const& rcName_, RC_PATHER
 			rcPath.append( "/." ).append( rcName_ ).append( RC );
 		}
 	}
-	return ( rcPath );
+	return rcPath;
 	M_EPILOG
 }
 
@@ -140,7 +140,7 @@ int rc_open( HString const& rcPath_, HFile& file_ ) {
 		message += ", ";
 	}
 	log << message;
-	return ( error );
+	return error;
 	M_EPILOG
 }
 

@@ -61,7 +61,7 @@ inline HHuginn::value_t ensure_virtual_collection(
 		}
 		throw HHuginn::HHuginnRuntimeException( "`For` source is not an iterable.", thread_->file_id(), position_ );
 	} while ( false );
-	return ( v );
+	return v;
 	M_EPILOG
 }
 

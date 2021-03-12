@@ -101,7 +101,7 @@ public:
 		size_type sizeAcc( 0 );
 		for ( typename multimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second->get_size();
-		return ( sizeAcc );
+		return sizeAcc;
 		M_EPILOG
 	}
 	bool empty( void ) const {
@@ -191,7 +191,7 @@ public:
 			erased = it._major->second->get_size();
 			_engine.erase( it._major );
 		}
-		return ( erased );
+		return erased;
 		M_EPILOG
 	}
 	iterator erase( iterator& it ) {
@@ -202,7 +202,7 @@ public:
 		list->erase( it._minor );
 		if ( ! list->size() )
 			_engine.erase( it._major );
-		return ( newIt );
+		return newIt;
 		M_EPILOG
 	}
 	iterator erase( iterator first_, iterator const& last_ ) {
@@ -210,7 +210,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	const_iterator find( key_type const& key ) const {
@@ -329,7 +329,7 @@ public:
 		size_type cnt = 0;
 		if ( major != _engine.end() )
 			cnt = major->second->size();
-		return ( cnt );
+		return cnt;
 		M_EPILOG
 	}
 	void swap( HMultiMap& multimap_ ) {
@@ -357,7 +357,7 @@ private:
 			value_list_ptr_t list = value_list_ptr_t( make_pointer<value_list_t>() );
 			major = _engine.insert( make_pair( key, list ) ).first;
 		}
-		return ( major );
+		return major;
 		M_EPILOG
 	}
 };
@@ -413,7 +413,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		operator++();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		M_PROLOG
@@ -440,7 +440,7 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		operator--();
-		return ( it );
+		return it;
 	}
 	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const {
 		return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );

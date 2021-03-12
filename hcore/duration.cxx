@@ -45,7 +45,7 @@ duration_t duration( yaal::i64_t duration_, UNIT unit_ ) {
 			nanoseconds = duration_t( duration_ );
 		} break;
 	}
-	return ( nanoseconds );
+	return nanoseconds;
 }
 
 template <>
@@ -135,7 +135,7 @@ yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_ ) {
 	if ( s.is_empty() ) {
 		s.assign( "0s" );
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -173,7 +173,7 @@ UNIT scale( duration_t duration_, UNIT minScale_ ) {
 	if ( minScale_ < unit ) {
 		unit = minScale_;
 	}
-	return ( unit );
+	return unit;
 }
 
 }
@@ -249,7 +249,7 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 		pos = unitEnd;
 		d += time::duration( v, unit );
 	}
-	return ( d );
+	return d;
 	M_EPILOG
 }
 

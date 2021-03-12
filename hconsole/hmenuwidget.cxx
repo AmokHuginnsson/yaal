@@ -49,7 +49,7 @@ OMenuItem const* HMenuWidget::get_selected( void ) {
 	M_PROLOG
 	menu_model_t::HAsIsValueTreeModelNode* node( static_cast<menu_model_t::HAsIsValueTreeModelNode*>( (**_selected).data().get() ) );
 	OMenuItem const* menu( &node->get() );
-	return ( menu );
+	return menu;
 	M_EPILOG
 }
 
@@ -66,7 +66,7 @@ int HMenuWidget::do_process_input( int code_ ) {
 		}
 		code_ = 0;
 	}
-	return ( code_ );
+	return code_;
 	M_EPILOG
 }
 
@@ -81,7 +81,7 @@ bool HMenuWidget::do_click( OMouse& mouse_ ) {
 			menu->_call();
 		}
 	}
-	return ( handled );
+	return handled;
 	M_EPILOG
 }
 

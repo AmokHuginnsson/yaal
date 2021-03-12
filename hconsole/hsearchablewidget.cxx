@@ -121,7 +121,7 @@ bool HSearchableWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface
 		attrs.searchable( lexical_cast<bool>( xml::node_val( node_ ) ) );
 		ok = true;
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

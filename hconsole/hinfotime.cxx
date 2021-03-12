@@ -24,7 +24,7 @@ HString const& HInfoTime::do_get_string( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HString const dummy;
-	return ( dummy );
+	return dummy;
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 

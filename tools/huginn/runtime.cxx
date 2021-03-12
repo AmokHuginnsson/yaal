@@ -458,7 +458,7 @@ HHuginn::value_t HRuntime::find_package( identifier_id_t identifier_ ) const {
 			break;
 		}
 	}
-	return ( package );
+	return package;
 	M_EPILOG
 }
 
@@ -571,7 +571,7 @@ HHuginn::class_t HRuntime::create_class(
 			createInstance_
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -593,7 +593,7 @@ HHuginn::class_t HRuntime::create_class(
 HHuginn::class_t HRuntime::create_class( class_constructor_t const& classConstructor_ ) {
 	M_PROLOG
 	class_t c( classConstructor_( new_type_id() ) );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -609,7 +609,7 @@ HRuntime::type_id_t HRuntime::new_type_id( void ) {
 	M_PROLOG
 	type_id_t tid( _idGenerator );
 	++ _idGenerator;
-	return ( tid );
+	return tid;
 	M_EPILOG
 }
 
@@ -623,7 +623,7 @@ HHuginn::identifier_id_t HRuntime::identifier_id( yaal::hcore::HString const& na
 		_identifierNames.emplace_back( name_ );
 	}
 	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
-	return ( id );
+	return id;
 	M_EPILOG
 }
 
@@ -712,7 +712,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		}
 	}
 	cls->redefine( nullptr, fds );
-	return ( cls );
+	return cls;
 	M_EPILOG
 }
 
@@ -768,7 +768,7 @@ HHuginn::value_t HRuntime::call( identifier_id_t identifier_, HHuginn::values_t&
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Function `"_ys.append( identifier_name( identifier_ ) ).append( "(...)` is not defined." ), MAIN_FILE_ID, position_ );
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -1010,7 +1010,7 @@ huginn::classes_t class_list( HRuntime::dependencies_t const& dependencies_ ) {
 		),
 		classes.end()
 	);
-	return ( classes );
+	return classes;
 	M_EPILOG
 }
 
@@ -1109,7 +1109,7 @@ yaal::hcore::HString HRuntime::suggestion( HHuginn::identifier_id_t identifier_ 
 			s = i;
 		}
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -1129,7 +1129,7 @@ yaal::hcore::HString HRuntime::suggestion( HClass const* class_, HHuginn::identi
 		}
 		class_ = class_->super();
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -1168,7 +1168,7 @@ yaal::hcore::HString const* HRuntime::package_name( HClass const* class_ ) const
 			break;
 		}
 	}
-	return ( name );
+	return name;
 	M_EPILOG
 }
 
@@ -1195,7 +1195,7 @@ HHuginn::call_stack_t HRuntime::get_call_stack( huginn::HThread* thread_ ) {
 			}
 		}
 	}
-	return ( callStack );
+	return callStack;
 	M_EPILOG
 }
 
@@ -1229,7 +1229,7 @@ HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_,
 			variableViews.emplace_back( identifier_name( variableIdentifiers[ i ] ), variableValues[ i ] );
 		}
 	}
-	return ( variableViews );
+	return variableViews;
 	M_EPILOG
 }
 

@@ -208,7 +208,7 @@ u64_t HRandomNumberGenerator::operator()( void ) {
 	x ^= ( x << 17 ) & 0x71D67FFFEDA60000ULL;
 	x ^= ( x << 37 ) & 0xFFF7EEE000000000ULL;
 	x ^= ( x >> 43 );
-	return ( x );
+	return x;
 	M_EPILOG
 }
 
@@ -260,7 +260,7 @@ yaal::i64_t HDiscrete::to( void ) const {
 	} else {
 		t = static_cast<yaal::i64_t>( _num - static_cast<yaal::u64_t>( -_base ) - 1 );
 	}
-	return ( t );
+	return t;
 }
 
 yaal::i64_t HDiscrete::operator()( void ) {
@@ -300,7 +300,7 @@ double long HUniform::operator()( void ) {
 	double long x( to_standard_uniform( (*_rng)() ) );
 	x *= _range;
 	x += _base;
-	return ( x );
+	return x;
 }
 
 #pragma GCC diagnostic push
@@ -340,7 +340,7 @@ double long HTriangle::operator()( void ) {
 	} else {
 		x = _supremum - math::square_root( ( 1 - x ) * _upperMod );
 	}
-	return ( x );
+	return x;
 }
 
 #pragma GCC diagnostic push
@@ -472,7 +472,7 @@ double long logarithm_of_factorial( double long k ) {
 	} else {
 		x = PRECOMPUTED_LOG_FACT[static_cast<int>( k )];
 	}
-	return ( x );
+	return x;
 }
 
 double long poisson_rejection( double long lambda, HRandomNumberGenerator& rng_ ) {
@@ -495,7 +495,7 @@ double long poisson_rejection( double long lambda, HRandomNumberGenerator& rng_ 
 			break;
 		}
 	}
-	return ( em );
+	return em;
 }
 
 }
@@ -524,7 +524,7 @@ i64_t HPoisson::operator()( void ) {
 			ret = 0; /* will probably never happen */
 		}
 	}
-	return ( ret );
+	return ret;
 }
 
 yaal::i64_t HPoisson::do_next_discrete( void ) {

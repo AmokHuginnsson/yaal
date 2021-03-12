@@ -132,7 +132,7 @@ public:
 						.append( e.what() )
 				);
 			}
-			return ( s );
+			return s;
 		}
 	};
 	template<typename tType>

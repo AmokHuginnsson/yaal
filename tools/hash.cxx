@@ -68,7 +68,7 @@ md5_hash_t md5( HStreamInterface& stream ) {
 	} while ( last == BLOCK_SIZE );
 	md5_hash_t result;
 	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
-	return ( result );
+	return result;
 	M_EPILOG
 }
 
@@ -132,7 +132,7 @@ sha1_hash_t sha1( HStreamInterface& stream ) {
 	change_endianness( state, STATE_SIZE );
 	sha1_hash_t result;
 	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
-	return ( result );
+	return result;
 	M_EPILOG
 }
 
@@ -391,7 +391,7 @@ sha512_hash_t sha512( HStreamInterface& stream ) {
 	change_endianness( state, STATE_SIZE );
 	sha512_hash_t result;
 	memcpy( result.data(), state, static_cast<size_t>( result.size() ) );
-	return ( result );
+	return result;
 	M_EPILOG
 }
 
@@ -486,7 +486,7 @@ inline yaal::hcore::HString hash_to_string( hash_t const& hash_ ) {
 		snprintf( buf, BUF_SIZE, "%02x", o );
 		s.append( buf );
 	}
-	return ( s );
+	return s;
 }
 
 yaal::hcore::HString to_string( md5_hash_t const& hash_ ) {
@@ -614,7 +614,7 @@ yaal::hcore::HString hmac( FUNCTION function_, yaal::hcore::HString const& key_,
 		case ( FUNCTION::SHA1 ): s = to_string( hmac_sha1( key_, message_ ) ); break;
 		case ( FUNCTION::SHA512 ): s = to_string( hmac_sha512( key_, message_ ) ); break;
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -626,7 +626,7 @@ yaal::hcore::HString string( FUNCTION function_, yaal::hcore::HString const& mes
 		case ( FUNCTION::SHA1 ): s = to_string( sha1( message_ ) ); break;
 		case ( FUNCTION::SHA512 ): s = to_string( sha512( message_ ) ); break;
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -638,7 +638,7 @@ yaal::hcore::HString string( FUNCTION function_, yaal::hcore::HStreamInterface& 
 		case ( FUNCTION::SHA1 ): s = to_string( sha1( stream_ ) ); break;
 		case ( FUNCTION::SHA512 ): s = to_string( sha512( stream_ ) ); break;
 	}
-	return ( s );
+	return s;
 	M_EPILOG
 }
 

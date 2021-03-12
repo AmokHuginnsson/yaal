@@ -99,7 +99,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -180,7 +180,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -220,7 +220,7 @@ inline HHuginn::value_t get( huginn::HThread* thread_, HHuginn::value_t* object_
 	} else {
 		v = l->get( thread_, values_[0], position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -328,7 +328,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			"The `lookup` is a collection providing a sorted key to value map. It supports operations of iteration, key-value insertion, key removal and key search."
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -381,7 +381,7 @@ bool HLookup::try_get( huginn::HThread* thread_, HHuginn::value_t const& key_, H
 		result_ = it->second;
 		found = true;
 	}
-	return ( found );
+	return found;
 	M_EPILOG
 }
 
@@ -455,7 +455,7 @@ HHuginn::value_t HLookup::do_clone( huginn::HThread* thread_, HHuginn::value_t*,
 			)
 		);
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -472,7 +472,7 @@ inline bool HLookup::do_operator_equals( huginn::HThread* thread_, HHuginn::valu
 			&& ( lv->type_id() == otherIt->second->type_id() )
 			&& lv->operator_equals( thread_, lv, otherIt->second, position_ );
 	}
-	return ( equal );
+	return equal;
 	M_EPILOG
 }
 
@@ -498,7 +498,7 @@ hash_value_t HLookup::do_operator_hash( HThread* thread_, HHuginn::value_t const
 		hashValue *= 3;
 		hashValue += v.second->operator_hash( thread_, v.second, position_ );
 	}
-	return ( hashValue );
+	return hashValue;
 	M_EPILOG
 }
 
@@ -516,7 +516,7 @@ yaal::hcore::HString HLookup::do_code( huginn::HThread* thread_, HHuginn::value_
 		str.append( v.first->code( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->code( thread_, v.second, cycleTracker_, position_ ) );
 	}
 	str.append( "}" );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HLookup::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -533,7 +533,7 @@ yaal::hcore::HString HLookup::do_to_string( huginn::HThread* thread_, HHuginn::v
 		str.append( v.first->to_string( thread_, v.first, cycleTracker_, position_ ) ).append( ": " ).append( v.second->to_string( thread_, v.second, cycleTracker_, position_ ) );
 	}
 	str.append( "}" );
-	return ( str );
+	return str;
 }
 
 }

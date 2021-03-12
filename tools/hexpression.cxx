@@ -201,7 +201,7 @@ double long HExpression::count_branch( tree_t::const_node_t node_ ) {
 			value = _constantsPool[ -1 - index ];
 		}
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -302,7 +302,7 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 			M_THROW( _( "unknown function type" ), function );
 		break;
 	}
-	return ( retVal );
+	return retVal;
 	M_EPILOG
 }
 
@@ -328,7 +328,7 @@ double long HExpression::addition( tree_t::const_node_t node_ ) {
 			break;
 		}
 	}
-	return ( leftValue );
+	return leftValue;
 	M_EPILOG
 }
 
@@ -361,7 +361,7 @@ double long HExpression::multiplication( tree_t::const_node_t node_ ) {
 			break;
 		}
 	}
-	return ( leftValue );
+	return leftValue;
 	M_EPILOG
 }
 
@@ -398,7 +398,7 @@ double long HExpression::bracket( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue;
 	leftValue = count_branch( &*node_->begin() );
-	return ( leftValue );
+	return leftValue;
 	M_EPILOG
 }
 
@@ -765,7 +765,7 @@ char const* HExpression::get_error( void ) const {
 			M_THROW ( _( "unknown error code" ), _error );
 		break;
 	}
-	return ( nullptr );
+	return nullptr;
 	M_EPILOG
 }
 

@@ -211,7 +211,7 @@ struct ATTR {
 		} else {
 			attr = encode_bright_by_bold( attr_ );
 		}
-		return ( attr );
+		return attr;
 	}
 	inline static int decode_broken_bright_background( int color_, int attr_ ) {
 		int attr( 0 );
@@ -225,7 +225,7 @@ struct ATTR {
 		} else {
 			attr = decode_bright_by_bold( color_, attr_ );
 		}
-		return ( attr );
+		return attr;
 	}
 };
 
@@ -241,7 +241,7 @@ bool has_broken_bright_background( void ) {
 		|| ( ::getenv( "MRXVT_TABTITLE" ) != nullptr )
 		|| ( ::getenv( "TERMINATOR_UUID" ) != nullptr )
 	);
-	return ( hasBrokenBrightBackground );
+	return hasBrokenBrightBackground;
 }
 
 }
@@ -806,7 +806,7 @@ int HConsole::get_key( void ) const {
 		}
 	}
 	M_ENSURE( echo() != ERR );
-	return ( key );
+	return key;
 	M_EPILOG
 }
 
@@ -902,7 +902,7 @@ int HConsole::wait_for_user_input( int& key_, mouse::OMouse& mouse_, int timeOut
 			eventType |= EVENT::MOUSE, static_cast<void>( mouse::mouse_get( mouse_ ) );
 		}
 	}
-	return ( eventType );
+	return eventType;
 	M_EPILOG
 }
 
@@ -1016,7 +1016,7 @@ int HConsole::on_mouse( int ) {
 	if ( is_enabled() ) {
 		leave_curses();
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 

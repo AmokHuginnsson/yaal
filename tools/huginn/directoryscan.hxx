@@ -45,7 +45,7 @@ public:
 		);
 		c->set_origin( origin_ );
 		runtime_->huginn()->register_class( c );
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:

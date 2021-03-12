@@ -72,7 +72,7 @@ public:
 
 inline SocketErrno& get_socket_errno( void ) {
 	static SocketErrno socketErrno;
-	return ( socketErrno );
+	return socketErrno;
 }
 
 #undef errno

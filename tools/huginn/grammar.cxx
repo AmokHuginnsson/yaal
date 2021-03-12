@@ -41,7 +41,7 @@ flags_t make_heads( void ) {
 		);
 	}
 	common_specific( heads );
-	return ( heads );
+	return heads;
 }
 
 flags_t make_tails( void ) {
@@ -57,7 +57,7 @@ flags_t make_tails( void ) {
 		);
 	}
 	common_specific( tails );
-	return ( tails );
+	return tails;
 }
 
 static flags_t const _heads_( make_heads() );
@@ -159,7 +159,7 @@ hcore::HUTF8String::const_iterator HIdentifierParser::do_parse( HExecutingParser
 		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -189,11 +189,11 @@ protected:
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser* executingParser_, hcore::HUTF8String::const_iterator const& first_, hcore::HUTF8String::const_iterator const& last_ ) const override {
 		M_PROLOG
 		if ( first_ == last_ ) {
-			return ( first_ );
+			return first_;
 		}
 		if ( *first_ != '$' ) {
 			report_error( executingParser_, first_, "expected a number" );
-			return ( first_ );
+			return first_;
 		}
 		hcore::HUTF8String::const_iterator scan( first_ );
 		++ scan;
@@ -784,7 +784,7 @@ executing_parser::HRule HHuginn::make_engine( HRuntime* runtime_, compiler_setup
 		HRuleBase::action_range_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | enumDefinition | importStatement | fromStatement ) );
-	return ( huginnGrammar );
+	return huginnGrammar;
 	M_EPILOG
 }
 

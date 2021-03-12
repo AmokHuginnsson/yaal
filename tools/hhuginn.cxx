@@ -299,7 +299,7 @@ HHuginn::value_t HObjectReference::field( huginn::HThread* thread_, int index_, 
 			_value
 		);
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -484,7 +484,7 @@ bool HHuginn::parse( void ) {
 	} else {
 		_state = STATE::PARSED;
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -625,7 +625,7 @@ bool HHuginn::compile( paths_t const& paths_, compiler_setup_t compilerSetup_, H
 	} catch ( HHuginnRuntimeException const& e ) {
 		consume_error( e, mainStatementCount );
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -657,7 +657,7 @@ bool HHuginn::execute( void ) {
 	}
 	_outputStreamRaw->flush();
 	_errorStreamRaw->flush();
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -674,7 +674,7 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, HHuginn::valu
 	}
 	_outputStreamRaw->flush();
 	_errorStreamRaw->flush();
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -700,7 +700,7 @@ yaal::hcore::HString HHuginn::where( int fileId_, int position_ ) const {
 	hcore::HString w( source_name( fileId_ ) );
 	HHuginn::HCoordinate ec( get_coordinate( fileId_, position_ ) );
 	w.append( ":" ).append( ec.line() ).append( ":" ).append( ec.column() );
-	return ( w );
+	return w;
 	M_EPILOG
 }
 
@@ -749,7 +749,7 @@ yaal::hcore::HString HHuginn::error_message( void ) const {
 	} else {
 		message.append( ": no error" );
 	}
-	return ( message );
+	return message;
 	M_EPILOG
 }
 
@@ -1036,7 +1036,7 @@ HHuginn::value_t HTernaryEvaluator::execute( huginn::HThread* thread_ ) {
 	} else {
 		v = _ifFalse->evaluate( thread_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -1069,7 +1069,7 @@ yaal::hcore::HString string_form(
 	} catch ( hcore::HException const& e ) {
 		s = e.what();
 	}
-	return ( s );
+	return s;
 }
 
 }

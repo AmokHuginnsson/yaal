@@ -298,7 +298,7 @@ bool HWorkFlow::can_join( void ) {
 			}
 		}
 	}
-	return ( canJoin );
+	return canJoin;
 	M_EPILOG
 }
 
@@ -331,7 +331,7 @@ HWorkFlow::task_t HWorkFlow::pop_task( void ) {
 		_tasks.pop_front();
 		++ _busyWorkers;
 	}
-	return ( t );
+	return t;
 	M_EPILOG
 }
 

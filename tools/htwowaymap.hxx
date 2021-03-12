@@ -103,7 +103,7 @@ public:
 	bool is_empty( void ) const {
 		M_PROLOG
 		bool isEmpty( _data.is_empty() );
-		return ( isEmpty );
+		return isEmpty;
 		M_EPILOG
 	}
 	bool empty( void ) const {
@@ -163,7 +163,7 @@ public:
 		for ( ; first != last; ) {
 			first = erase( first );
 		}
-		return ( first );
+		return first;
 		M_EPILOG
 	}
 	bool operator == ( HTwoWayMap const& twm_ ) const {
@@ -294,12 +294,12 @@ public:
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _engine;
-		return ( it );
+		return it;
 	}
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		++ _engine;
-		return ( it );
+		return it;
 	}
 	bool operator != ( HIterator const& it_ ) {
 		M_ASSERT( _owner == it_._owner );
@@ -377,7 +377,7 @@ typename HTwoWayMap<left_type_t, right_type_t>::iterator HTwoWayMap<left_type_t,
 	static_cast<void>( erasedInRight );
 	_data.erase( toErase );
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
-	return ( next );
+	return next;
 	M_EPILOG
 }
 

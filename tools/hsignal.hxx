@@ -31,7 +31,7 @@ public:
 		for ( ; first_ != last_; ++ first_ ) {
 			result = *first_;
 		}
-		return ( result );
+		return result;
 	}
 };
 

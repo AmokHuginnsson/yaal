@@ -149,7 +149,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 			}
 		}
 	}
-	return ( code );
+	return code;
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
@@ -167,7 +167,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 			msg = sqlite3_errmsg( sQLite->_db );
 		}
 	}
-	return ( msg );
+	return msg;
 }
 
 void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
@@ -187,7 +187,7 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 		result->_errorMessage = HUTF8String( errmsg );
 		sqlite3_free( errmsg );
 	}
-	return ( result );
+	return result;
 }
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
@@ -227,7 +227,7 @@ void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	if ( result->_errorCode != SQLITE_OK ) {
 		result->_errorMessage = HUTF8String( sqlite3_errmsg( sQLite->_db ) );
 	}
-	return ( result );
+	return result;
 }
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
@@ -262,7 +262,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
 	result->_errorCode = sqlite3_reset( static_cast<sqlite3_stmt*>( result->_data ) );
 	result->_last = sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW;
 	result->_stepped = true;
-	return ( data_ );
+	return data_;
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );

@@ -69,7 +69,7 @@ HHuginn::class_t add_class_as_member(
 		),
 		memberType_
 	);
-	return ( class_ );
+	return class_;
 	M_EPILOG
 }
 
@@ -95,7 +95,7 @@ enumeration::HEnumerationClass::ptr_t add_enumeration_as_member(
 		),
 		memberType_
 	);
-	return ( class_ );
+	return class_;
 	M_EPILOG
 }
 
@@ -139,7 +139,7 @@ HHuginn::class_t create_class(
 		c->set_origin( origin_ );
 		runtime_->huginn()->register_class( c, visibility_ );
 	}
-	return ( c );
+	return c;
 }
 
 inline char const* parens_for_name( char const* name_ ) {
@@ -211,7 +211,7 @@ yaal::hcore::HString full_class_name( huginn::HRuntime const& runtime_, HClass c
 		cn.append( full_class_name( runtime_, origin, preserveAliases_ ) ).append( "." );
 	}
 	cn.append( class_->name() );
-	return ( cn );
+	return cn;
 	M_EPILOG
 }
 
@@ -226,7 +226,7 @@ yaal::hcore::HString a_type_name( HHuginn::TYPE type_ ) {
 	hcore::HString tn( type_name( type_ ) );
 	hcore::HString atn( article( tn ) );
 	atn.append( " `" ).append( tn ).append( "`" );
-	return ( atn );
+	return atn;
 	M_EPILOG
 }
 
@@ -235,7 +235,7 @@ yaal::hcore::HString a_type_name( HClass const* class_ ) {
 	hcore::HString const& cn( class_ ? class_->name() : "*unknown*" );
 	hcore::HString atn( article( cn ) );
 	atn.append( " `" ).append( cn ).append( "`" );
-	return ( atn );
+	return atn;
 	M_EPILOG
 }
 
@@ -405,7 +405,7 @@ HHuginn::type_id_t verify_arg_type(
 			position_
 		);
 	}
-	return ( realType );
+	return realType;
 	M_EPILOG
 }
 
@@ -432,7 +432,7 @@ HHuginn::type_id_t verify_arg_numeric(
 			position_
 		);
 	}
-	return ( t );
+	return t;
 	M_EPILOG
 }
 
@@ -480,7 +480,7 @@ HHuginn::value_t verify_arg_callable(
 			position_
 		);
 	} while ( false );
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -527,7 +527,7 @@ HHuginn::type_id_t verify_arg_materialized_collection(
 	if ( find( begin( material ), end, type_tag( t ) ) == end ) {
 		not_a_collection( thread_, name_, v->get_class(), no_, argsArity_, " materialized", position_ );
 	}
-	return ( t );
+	return t;
 	M_EPILOG
 }
 
@@ -551,7 +551,7 @@ HHuginn::value_t verify_arg_virtual_collection(
 		}
 		not_a_collection( thread_, name_, v->get_class(), no_, argsArity_, "", position_ );
 	} while ( false );
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -601,7 +601,7 @@ HHuginn::type_id_t verify_arg_collection_value_type_low(
 		}
 		++ pos;
 	}
-	return ( type );
+	return type;
 }
 
 HHuginn::type_id_t verify_arg_collection_value_type(
@@ -651,7 +651,7 @@ HHuginn::type_id_t verify_arg_collection_value_type(
 			M_ASSERT( !"Invalid code path - invalid collection type"[0] );
 		}
 	}
-	return ( type );
+	return type;
 }
 
 void verify_named_parameters( char const* name_, HHuginn::values_t& values_, HParameter* parameters_, huginn::HThread* thread_, int position_ ) {
@@ -821,7 +821,7 @@ bool are_congruous( HClass const* c1_, HClass const* c2_ ) {
 		congruous = ( ( t1 != HHuginn::TYPE::BOOLEAN ) && ( t2 == HHuginn::TYPE::NOT_BOOLEAN ) )
 			|| ( ( t2 != HHuginn::TYPE::BOOLEAN ) && ( t1 == HHuginn::TYPE::NOT_BOOLEAN ) );
 	}
-	return ( congruous );
+	return congruous;
 }
 
 HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
@@ -878,7 +878,7 @@ inline yaal::tools::string::tokens_t get_strings_impl( coll_t const& coll_ ) {
 	for ( HHuginn::value_t const& v : coll_ ) {
 		tokens.push_back( get_string( v ) );
 	}
-	return ( tokens );
+	return tokens;
 }
 
 yaal::tools::string::tokens_t get_strings( HHuginn::value_t const& coll_ ) {
@@ -895,7 +895,7 @@ yaal::tools::string::tokens_t get_strings( HHuginn::value_t const& coll_ ) {
 	} else if ( t == HHuginn::TYPE::SET ) {
 		tokens = get_strings_impl( static_cast<HSet const*>( coll_.raw() )->value() );
 	}
-	return ( tokens );
+	return tokens;
 }
 
 HString::value_type const& get_string( huginn::HValue const* value_ ) {
@@ -1073,7 +1073,7 @@ char const* op_to_symbol_str( OPERATOR o_ ) {
 		case ( OPERATOR::MAKE_PARTIAL ):       str = "f(~)";   break;
 		case ( OPERATOR::NONE ): break;
 	}
-	return ( str );
+	return str;
 }
 
 char const* op_to_str( OPERATOR o_ ) {
@@ -1088,7 +1088,7 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
 		default: str = op_to_symbol_str( o_ );
 	}
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString int_to_str( huginn::HInteger::value_type int_, BASE base_, bool prefix_ ) {
@@ -1118,7 +1118,7 @@ namespace package {
 HHuginn::value_t value( HHuginn::value_t value_, HUTF8String name_, HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( name_.c_str(), values_, 0, 0, thread_, position_ );
-	return ( value_ );
+	return value_;
 	M_EPILOG
 }
 

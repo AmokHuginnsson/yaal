@@ -31,7 +31,7 @@ collection split(
 	for ( yaal::hcore::HString const& s : t ) {
 		coll.emplace_back( s );
 	}
-	return ( coll );
+	return coll;
 }
 
 template<typename collection>
@@ -43,7 +43,7 @@ yaal::hcore::HString join( collection const& container_, yaal::hcore::HString co
 		}
 		value.append( to_string( part ) );
 	}
-	return ( value );
+	return value;
 }
 
 template<typename iterator_t>
@@ -78,7 +78,7 @@ yaal::hcore::HString longest_common_prefix_impl( iterator_t first_, iterator_t l
 		prefix.push_back( character );
 		++ len;
 	}
-	return ( prefix );
+	return prefix;
 }
 
 yaal::hcore::HString::size_type common_prefix_length(

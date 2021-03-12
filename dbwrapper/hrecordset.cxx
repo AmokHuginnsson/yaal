@@ -111,7 +111,7 @@ HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
 	if ( valRaw ) {
 		value = value_t( valRaw );
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -224,7 +224,7 @@ HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int ) {
 	M_ASSERT( _owner );
 	HIterator it( *this );
 	operator ++ ();
-	return ( it );
+	return it;
 	M_EPILOG
 }
 
@@ -233,7 +233,7 @@ HRecordSet::HIterator HRecordSet::HIterator::operator -- ( int ) {
 	M_ASSERT( _owner );
 	HIterator it( *this );
 	operator -- ();
-	return ( it );
+	return it;
 	M_EPILOG
 }
 
@@ -248,7 +248,7 @@ HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const {
 	if ( valRaw ) {
 		value = value_t( valRaw );
 	}
-	return ( value );
+	return value;
 	M_EPILOG
 }
 
@@ -269,7 +269,7 @@ HRecordSet::values_t HRecordSet::HIterator::operator* ( void ) const {
 			}
 		}
 	}
-	return ( values );
+	return values;
 	M_EPILOG
 }
 

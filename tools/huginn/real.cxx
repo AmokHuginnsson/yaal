@@ -40,7 +40,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 			&builtin::real
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

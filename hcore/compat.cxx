@@ -209,7 +209,7 @@ int clock_gettime( clockid_t, struct timespec* time_ ) {
 		time_->tv_sec  = now.tv_sec;
 		time_->tv_nsec = now.tv_usec * 1000;
 	}
-	return ( err );
+	return err;
 }
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
@@ -278,7 +278,7 @@ int timer_create( clockid_t, struct sigevent* event_, timer_t* timer_ ) {
 	} else {
 		errno = EINVAL;
 	}
-	return ( err );
+	return err;
 }
 int timer_settime( timer_t timer_, int flags_, itimerspec const* timerSpec_, itimerspec* ) {
 	int err( 0 );
@@ -288,7 +288,7 @@ int timer_settime( timer_t timer_, int flags_, itimerspec const* timerSpec_, iti
 		err = -1;
 		errno = EINVAL;
 	}
-	return ( err );
+	return err;
 }
 int timer_delete( timer_t timer_ ) {
 	delete timer_;

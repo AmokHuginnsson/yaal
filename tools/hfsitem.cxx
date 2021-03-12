@@ -293,7 +293,7 @@ bool HFSItem::HIterator::operator == ( HIterator const& it ) const {
 			same = ( _inode == it._inode );
 		}
 	}
-	return ( same );
+	return same;
 	M_EPILOG
 }
 

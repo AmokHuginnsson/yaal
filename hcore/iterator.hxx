@@ -80,7 +80,7 @@ inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category:
 	int long dist( 0 );
 	while ( first_ != last_ )
 		++ first_, ++ dist;
-	return ( dist );
+	return dist;
 }
 /*! \endcond */
 /*! \brief Calculate distance between two iterators.
@@ -134,7 +134,7 @@ void advance( iter_t& it, int long dist ) {
 template<typename iter_t>
 iter_t next( iter_t it, int long dist = 1 ) {
 	advance( it, dist );
-	return ( it );
+	return it;
 }
 
 /*! \brief Move iterator backward.
@@ -145,7 +145,7 @@ iter_t next( iter_t it, int long dist = 1 ) {
 template<typename iter_t>
 iter_t prev( iter_t it, int long dist = 1 ) {
 	advance( it, -dist );
-	return ( it );
+	return it;
 }
 
 template<typename T>
@@ -182,12 +182,12 @@ typename T::iterator end( T& cont_ ) {
 template<typename T, int const N>
 T const* begin( T const (&tab_)[N] ) {
 	static_assert( N >= 0, "Invalid array size." );
-	return ( tab_ );
+	return tab_;
 }
 #else
 template<typename T, int /* fuck */ unsigned const N>
 T const* begin( T const (&tab_)[N] ) {
-	return ( tab_ );
+	return tab_;
 }
 #endif
 
@@ -208,12 +208,12 @@ T const* end( T const (&tab_)[N] ) {
 template<typename T, int const N>
 T* begin( T (&tab_)[N] ) {
 	static_assert( N >= 0, "Invalid array size." );
-	return ( tab_ );
+	return tab_;
 }
 #else
 template<typename T, int /* fuck */ unsigned const N>
 T* begin( T (&tab_)[N] ) {
-	return ( tab_ );
+	return tab_;
 }
 #endif
 
@@ -234,12 +234,12 @@ T* end( T (&tab_)[N] ) {
 template<typename T, int const N>
 T const* cbegin( T (&tab_)[N] ) {
 	static_assert( N >= 0, "Invalid array size." );
-	return ( tab_ );
+	return tab_;
 }
 #else
 template<typename T, int /* fuck */ unsigned const N>
 T const* cbegin( T (&tab_)[N] ) {
-	return ( tab_ );
+	return tab_;
 }
 #endif
 
@@ -298,7 +298,7 @@ public:
 	HReverseIterator operator ++ ( int ) {
 		HReverseIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	HReverseIterator& operator -- ( void ) {
 		++ _iterator;
@@ -307,7 +307,7 @@ public:
 	HReverseIterator operator -- ( int ) {
 		HReverseIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HReverseIterator& operator += ( int long offset_ ) {
 		_iterator -= offset_;
@@ -316,7 +316,7 @@ public:
 	HReverseIterator operator + ( int long offset_ ) const {
 		HReverseIterator it( *this );
 		it += offset_;
-		return ( it );
+		return it;
 	}
 	HReverseIterator& operator -= ( int long offset_ ) {
 		_iterator += offset_;
@@ -325,7 +325,7 @@ public:
 	HReverseIterator operator - ( int long offset_ ) const {
 		HReverseIterator it( *this );
 		it -= offset_;
-		return ( it );
+		return it;
 	}
 	int long operator - ( HReverseIterator const& iterator_ ) const {
 		return ( iterator_._iterator - _iterator ); /* reversed */
@@ -333,7 +333,7 @@ public:
 	iterator_t base( void ) const {
 		iterator_t it( _iterator );
 		++ it;
-		return ( it );
+		return it;
 	}
 	iterator_t const& raw( void ) const {
 		return ( _iterator );
@@ -464,7 +464,7 @@ public:
 	HMoveIterator operator ++ ( int ) {
 		HMoveIterator it( *this );
 		++ _iterator;
-		return ( it );
+		return it;
 	}
 	HMoveIterator& operator -- ( void ) {
 		-- _iterator;
@@ -473,7 +473,7 @@ public:
 	HMoveIterator operator -- ( int ) {
 		HMoveIterator it( *this );
 		-- _iterator;
-		return ( it );
+		return it;
 	}
 	HMoveIterator& operator += ( int long offset_ ) {
 		_iterator += offset_;
@@ -482,7 +482,7 @@ public:
 	HMoveIterator operator + ( int long offset_ ) const {
 		HMoveIterator it( *this );
 		it += offset_;
-		return ( it );
+		return it;
 	}
 	HMoveIterator& operator -= ( int long offset_ ) {
 		_iterator -= offset_;
@@ -491,7 +491,7 @@ public:
 	HMoveIterator operator - ( int long offset_ ) const {
 		HMoveIterator it( *this );
 		it -= offset_;
-		return ( it );
+		return it;
 	}
 	int long operator - ( HMoveIterator const& it_ ) const {
 		return ( _iterator - it_._iterator );
@@ -588,7 +588,7 @@ public:
 	HCyclicIterator operator ++ ( int ) {
 		HCyclicIterator it( *this );
 		++ _it;
-		return ( it );
+		return it;
 	}
 	HCyclicIterator& operator -- ( void ) {
 		if ( _it == begin( *_owner ) ) {
@@ -600,7 +600,7 @@ public:
 	HCyclicIterator operator -- ( int ) {
 		HCyclicIterator it( *this );
 		-- _it;
-		return ( it );
+		return it;
 	}
 	value_type& operator* ( void ) const {
 		return ( *_it );
@@ -732,7 +732,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _impl;
@@ -741,11 +741,11 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	HIterator operator + ( size_type off_ ) const {
 		HIterator it( _owner, _impl + off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator += ( size_type off_ ) {
 		_impl += off_;
@@ -753,7 +753,7 @@ public:
 	}
 	HIterator operator - ( size_type off_ ) const {
 		HIterator it( _owner, _impl - off_ );
-		return ( it );
+		return it;
 	}
 	HIterator& operator -= ( size_type off_ ) {
 		_impl -= off_;
@@ -862,7 +862,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
-		return ( it );
+		return it;
 	}
 	HIterator& operator -- ( void ) {
 		-- _impl;
@@ -871,7 +871,7 @@ public:
 	HIterator const operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
-		return ( it );
+		return it;
 	}
 	const_qual_t& operator* ( void ) {
 		M_ASSERT( _owner );

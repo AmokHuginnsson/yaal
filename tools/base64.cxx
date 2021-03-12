@@ -133,7 +133,7 @@ int long base64_raw_decode( char const* input, int long inputSize, char* output,
 		do_buf_4_to_3( output + size, coder, static_cast<int>( ( bufSize - size - 1 ) ) );
 		size += ( ( i * 3 ) / 4 );
 	}
-	return ( size );
+	return size;
 	M_EPILOG
 }
 

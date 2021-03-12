@@ -109,7 +109,7 @@ HHuginn::value_t HObject::do_field( HHuginn::value_t const& object_, int index_ 
 			)
 		);
 	}
-	return ( f );
+	return f;
 	M_EPILOG
 }
 
@@ -212,7 +212,7 @@ HHuginn::value_t HObject::do_clone( huginn::HThread* thread_, HHuginn::value_t* 
 		}
 		copy = thread_->runtime().object_factory()->create_object( get_class(), fields );
 	}
-	return ( copy );
+	return copy;
 	M_EPILOG
 }
 

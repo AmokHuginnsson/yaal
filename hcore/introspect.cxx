@@ -54,7 +54,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 	memory::free( strings );
 	memory::free( pointer );
 #endif /* _EXECINFO_H */
-	return ( frames );
+	return frames;
 }
 
 void dump_call_stack( HStreamInterface& stream, int no ) {

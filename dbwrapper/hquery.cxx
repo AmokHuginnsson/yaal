@@ -63,7 +63,7 @@ HRecordSet::ptr_t HQuery::execute( void ) {
 	}
 	rs = make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD );
 	_resultObserver = rs;
-	return ( rs );
+	return rs;
 	M_EPILOG
 }
 

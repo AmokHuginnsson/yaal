@@ -53,7 +53,7 @@ bool HRecursionDetector::visit( HRuleBase const* rule_ ) {
 		vis.push_back( rule_ );
 		firstTime = true;
 	}
-	return ( firstTime );
+	return firstTime;
 	M_EPILOG
 }
 
@@ -423,9 +423,9 @@ yaal::hcore::HUTF8String::const_iterator HRuleBase::parse( HExecutingParser* exe
 		if ( ! always_matches() && is_optional() ) {
 			HExecutingParser::HProxy::drop_execution_steps( executingParser_, stepCount );
 		}
-		return ( first_ );
+		return first_;
 	}
-	return ( it );
+	return it;
 	M_EPILOG
 }
 
@@ -502,7 +502,7 @@ yaal::hcore::HUTF8String::const_iterator& HRuleBase::skip_space( yaal::hcore::HU
 	while ( ( first_ != last_ ) && is_whitespace( *first_ ) ) {
 		++ first_;
 	}
-	return ( first_ );
+	return first_;
 	M_EPILOG
 }
 
@@ -557,7 +557,7 @@ HRuleBase const* HRuleBase::find( yaal::hcore::HString const& name_ ) const {
 }
 
 HRuleBase const* HRuleBase::do_find( yaal::hcore::HString const& ) const {
-	return ( nullptr );
+	return nullptr;
 }
 
 HNamedRule::HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
@@ -824,7 +824,7 @@ HRule::ptr_t HRule::do_clone( void ) const {
 			rule = pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule.name(), _rule.rule(), _actionPosition ) );
 		}
 	}
-	return ( rule );
+	return rule;
 	M_EPILOG
 }
 
@@ -840,7 +840,7 @@ yaal::hcore::HUTF8String::const_iterator HRule::do_parse( HExecutingParser* exec
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -869,7 +869,7 @@ bool HRule::do_detect_recursion( HRecursionDetector& recursionDetector_, bool sk
 	if ( !! r ) {
 		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -984,7 +984,7 @@ bool HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_
 	if ( !! _rule ) {
 		reset = _rule->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -1081,7 +1081,7 @@ void HRuleRef::do_find_recursions( HRuleAggregator& recursions_ ) {
 HRuleBase::ptr_t HRuleRef::get_rule( void ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
-	return ( r );
+	return r;
 	M_EPILOG
 }
 
@@ -1233,7 +1233,7 @@ yaal::hcore::HUTF8String::const_iterator HFollows::do_parse( HExecutingParser* e
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -1273,7 +1273,7 @@ bool HFollows::do_detect_recursion( HRecursionDetector& recursionDetector_, bool
 			}
 		}
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -1292,7 +1292,7 @@ HRuleBase const* HFollows::do_find( yaal::hcore::HString const& name_ ) const {
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); ! rule && ( it != end ); ++ it ) {
 		rule = it->rule()->find( name_ );
 	}
-	return ( rule );
+	return rule;
 	M_EPILOG
 }
 
@@ -1342,7 +1342,7 @@ yaal::hcore::HUTF8String::const_iterator HKleeneBase::do_parse( HExecutingParser
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -1508,7 +1508,7 @@ bool HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_, b
 	if ( !! r ) {
 		reset = r->detect_recursion( recursionDetector_, skipVisit_ );
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -1629,7 +1629,7 @@ yaal::hcore::HUTF8String::const_iterator HAlternative::do_parse( HExecutingParse
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 }
 
 void HAlternative::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
@@ -1718,7 +1718,7 @@ HRuleBase const* HAlternative::do_find( yaal::hcore::HString const& name_ ) cons
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); ! rule && ( it != end ); ++ it ) {
 		rule = it->rule()->find( name_ );
 	}
-	return ( rule );
+	return rule;
 	M_EPILOG
 }
 
@@ -1778,7 +1778,7 @@ yaal::hcore::HUTF8String::const_iterator HOptional::do_parse( HExecutingParser* 
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -1912,7 +1912,7 @@ yaal::hcore::HUTF8String::const_iterator HAnd::do_parse( HExecutingParser* execu
 	} else {
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -1975,7 +1975,7 @@ bool HAnd::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ski
 		r->detect_recursion( recursionDetector_, skipVisit_ );
 		recursionDetector_.checkpoints_pop();
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -2057,7 +2057,7 @@ yaal::hcore::HUTF8String::const_iterator HNot::do_parse( HExecutingParser* execu
 		}
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -2120,7 +2120,7 @@ bool HNot::do_detect_recursion( HRecursionDetector& recursionDetector_, bool ski
 		r->detect_recursion( recursionDetector_, skipVisit_ );
 		recursionDetector_.checkpoints_pop();
 	}
-	return ( reset );
+	return reset;
 	M_EPILOG
 }
 
@@ -2664,7 +2664,7 @@ yaal::hcore::HUTF8String::const_iterator HReal::do_parse( HExecutingParser* exec
 		report_error( executingParser_, scan, "expected real number" );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -2703,7 +2703,7 @@ void HReal::do_find_recursions( HRuleAggregator& ) {
 HReal const& get_real_instance( void ) {
 	M_PROLOG
 	static HReal realInstance;
-	return ( realInstance );
+	return realInstance;
 	M_EPILOG
 }
 
@@ -3111,7 +3111,7 @@ yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* e
 		report_error( executingParser_, scan, "expected integral number" );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -3150,7 +3150,7 @@ void HInteger::do_find_recursions( HRuleAggregator& ) {
 HInteger const& get_integer_instance( void ) {
 	M_PROLOG
 	static HInteger integerInstance;
-	return ( integerInstance );
+	return integerInstance;
 	M_EPILOG
 }
 
@@ -3339,7 +3339,7 @@ yaal::hcore::HUTF8String::const_iterator HStringLiteral::do_parse( HExecutingPar
 		report_error( executingParser_, scan, "expected literal string" );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -3378,7 +3378,7 @@ void HStringLiteral::do_find_recursions( HRuleAggregator& ) {
 HStringLiteral const& get_string_literal_instance( void ) {
 	M_PROLOG
 	static HStringLiteral stringLiteralInstance( HRuleBase::SEMANTIC::EVALUATE );
-	return ( stringLiteralInstance );
+	return stringLiteralInstance;
 	M_EPILOG
 }
 
@@ -3565,7 +3565,7 @@ yaal::hcore::HUTF8String::const_iterator HCharacterLiteral::do_parse( HExecuting
 		report_error( executingParser_, scan, errMsg );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -3604,7 +3604,7 @@ void HCharacterLiteral::do_find_recursions( HRuleAggregator& ) {
 HCharacterLiteral const& get_character_literal_instance( void ) {
 	M_PROLOG
 	static HCharacterLiteral characterLiteralInstance( HRuleBase::SEMANTIC::EVALUATE );
-	return ( characterLiteralInstance );
+	return characterLiteralInstance;
 	M_EPILOG
 }
 
@@ -3724,7 +3724,7 @@ bool character_skip_ws( yaal::hcore::HString const& characters_, HRuleBase::WHIT
 			}
 		}
 	}
-	return ( skipWS );
+	return skipWS;
 	M_EPILOG
 }
 
@@ -3769,7 +3769,7 @@ yaal::hcore::HUTF8String::const_iterator HCharacter::do_parse( HExecutingParser*
 		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -3817,7 +3817,7 @@ void HCharacter::do_find_recursions( HRuleAggregator& ) {
 HCharacter const& get_character_instance( void ) {
 	M_PROLOG
 	static HCharacter characterInstance( true );
-	return ( characterInstance );
+	return characterInstance;
 	M_EPILOG
 }
 
@@ -4051,7 +4051,7 @@ hcore::HUTF8String::const_iterator HString::do_parse( HExecutingParser* executin
 		report_error( executingParser_, scan, _errorMessage );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -4076,7 +4076,7 @@ yaal::hcore::HString HString::desc( void ) const {
 	} else {
 		d.append( "\"" ).append( _dictionary.front() ).append( "\"" );
 	}
-	return ( d );
+	return d;
 	M_EPILOG
 }
 
@@ -4231,7 +4231,7 @@ inline bool skip_ws( HString::dictionary_t const& strings_, HRuleBase::WHITE_SPA
 			}
 		}
 	}
-	return ( skipWS );
+	return skipWS;
 }
 
 inline HString::WORD_BOUNDARY word_boundary( HString::dictionary_t const& strings_, HString::WORD_BOUNDARY wordBoundary_ ) {
@@ -4245,7 +4245,7 @@ inline HString::WORD_BOUNDARY word_boundary( HString::dictionary_t const& string
 			}
 		}
 	}
-	return ( wordBoundary );
+	return wordBoundary;
 }
 
 }
@@ -4464,7 +4464,7 @@ hcore::HUTF8String::const_iterator HRegex::do_parse( HExecutingParser* executing
 		report_error( executingParser_, scan, "expected character sequence matching regular expression: " + _regex->pattern() );
 		scan = first_;
 	}
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -4860,7 +4860,7 @@ yaal::hcore::HUTF8String::const_iterator HAction::do_parse( HExecutingParser* ex
 	} else if ( !! _actionPosition ) {
 		add_execution_step( executingParser_, call( _actionPosition, range( executingParser_, first_, first_ ) ) );
 	}
-	return ( first_ );
+	return first_;
 	M_EPILOG
 }
 
@@ -4944,7 +4944,7 @@ yaal::hcore::HUTF8String::const_iterator HSkip::do_parse( HExecutingParser* exec
 	int stepCount( execution_step_count( executingParser_ ) );
 	yaal::hcore::HUTF8String::const_iterator scan( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
 	drop_execution_steps( executingParser_, stepCount );
-	return ( scan );
+	return scan;
 	M_EPILOG
 }
 
@@ -5013,7 +5013,7 @@ HRuleBase const* HSkip::do_find( yaal::hcore::HString const& name_ ) const {
 }
 
 HSkip skip( HRuleBase const& rule_ ) {
-	return ( rule_ );
+	return rule_;
 }
 
 HRuleDescription::HRuleDescription( void )

@@ -40,7 +40,7 @@ HHuginn::value_t HIntroFunction::execute(
 	note_parameters( thread_ );
 	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
 	thread_->pop_frame();
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -55,7 +55,7 @@ HHuginn::value_t HIntroFunction::execute_incremental_main(
 	note_parameters( thread_ );
 	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();
-	return ( res );
+	return res;
 	M_EPILOG
 }
 

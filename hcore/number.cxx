@@ -120,7 +120,7 @@ struct HNumber::ElementaryFunctions {
 			}
 		} while ( false );
 		n.set_precision( value_.get_precision() );
-		return ( n );
+		return n;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber natural_exponential( yaal::hcore::HNumber const& value_ ) {
@@ -169,7 +169,7 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
@@ -208,7 +208,7 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber power( yaal::hcore::HNumber const& base_, yaal::hcore::HNumber const& exponent_ ) {
@@ -228,7 +228,7 @@ struct HNumber::ElementaryFunctions {
 		} else {
 			n = natural_exponential( exponent_ * natural_logarithm( base_ ) );
 		}
-		return ( n );
+		return n;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
@@ -278,7 +278,7 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& value_ ) {
@@ -298,7 +298,7 @@ struct HNumber::ElementaryFunctions {
 		value /= denominator;
 		value.round( value_.get_precision() );
 		value.set_precision( value_.get_precision() );
-		return ( value );
+		return value;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
@@ -312,7 +312,7 @@ struct HNumber::ElementaryFunctions {
 		value /= denominator;
 		value.round( value_.get_precision() );
 		value.set_precision( value_.get_precision() );
-		return ( value );
+		return value;
 		M_EPILOG
 	}
 	/*
@@ -339,7 +339,7 @@ struct HNumber::ElementaryFunctions {
 
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber arcus_cosinus( yaal::hcore::HNumber const& value_ ) {
@@ -362,7 +362,7 @@ struct HNumber::ElementaryFunctions {
 
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
@@ -407,7 +407,7 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber arcus_cotangens( yaal::hcore::HNumber const& value_ ) {
@@ -418,7 +418,7 @@ struct HNumber::ElementaryFunctions {
 		v -= arcus_tangens( input );
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber hyperbolic_sinus( yaal::hcore::HNumber const& value_ ) {
@@ -427,7 +427,7 @@ struct HNumber::ElementaryFunctions {
 		v = natural_exponential( v ) - natural_exponential( -v );
 		v /= number::N2;
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber hyperbolic_cosinus( yaal::hcore::HNumber const& value_ ) {
@@ -437,7 +437,7 @@ struct HNumber::ElementaryFunctions {
 		v /= number::N2;
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber hyperbolic_tangens( yaal::hcore::HNumber const& value_ ) {
@@ -449,7 +449,7 @@ struct HNumber::ElementaryFunctions {
 		v /= ( p + n );
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber hyperbolic_cotangens( yaal::hcore::HNumber const& value_ ) {
@@ -461,7 +461,7 @@ struct HNumber::ElementaryFunctions {
 		v /= ( p - n );
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber sigmoid( yaal::hcore::HNumber const& value_ ) {
@@ -485,7 +485,7 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static yaal::hcore::HNumber error_function( yaal::hcore::HNumber const& value_ ) {
@@ -507,7 +507,7 @@ struct HNumber::ElementaryFunctions {
 		h = h ^ static_cast<hash_value_t>( value_._leafCount );
 		h = h ^ static_cast<hash_value_t>( value_._integralPartSize );
 		h += ( value_._negative ? 1 : 0 );
-		return ( h );
+		return h;
 	}
 };
 
@@ -543,7 +543,7 @@ public:
 				n *= from_;
 			}
 		}
-		return ( n );
+		return n;
 		M_EPILOG
 	}
 	yaal::hcore::HNumber const& factorial( int long long value_ ) {
@@ -706,7 +706,7 @@ yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
 	v /= e;
 	v.round( precision_ );
 	v.set_precision( precision_ );
-	return ( v );
+	return v;
 }
 }
 HNumericConstantCache PiCache(

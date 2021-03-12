@@ -65,7 +65,7 @@ int HFunction::upcast( HHuginn::value_t* object_ ) const {
 			upCast = 0;
 		}
 	}
-	return ( upCast );
+	return upCast;
 	M_EPILOG
 }
 
@@ -79,7 +79,7 @@ HHuginn::value_t HFunction::execute(
 	thread_->create_frame( this, object_, upcast( object_ ) );
 	HHuginn::value_t res( execute_impl( thread_, values_, position_ ) );
 	thread_->pop_frame();
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -99,7 +99,7 @@ HHuginn::value_t HFunction::execute_destructor(
 	if ( thread_->state() != HThread::STATE::RUNTIME_EXCEPTION ) {
 		thread_->state_set( state );
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -113,7 +113,7 @@ HHuginn::value_t HFunction::execute_incremental_main(
 	thread_->create_incremental_frame( this, object_, upcast( object_ ) );
 	HHuginn::value_t res( execute_incremental_main_impl( thread_ ) );
 	thread_->pop_incremental_frame();
-	return ( res );
+	return res;
 	M_EPILOG
 }
 

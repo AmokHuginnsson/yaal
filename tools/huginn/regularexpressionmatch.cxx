@@ -99,7 +99,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HRuntime* runtime_, huginn:
 	c->redefine( nullptr, fd );
 	c->set_origin( origin_ );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

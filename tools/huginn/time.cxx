@@ -279,7 +279,7 @@ HHuginn::class_t HTime::get_class( HRuntime* runtime_ ) {
 		c->redefine( nullptr, fd );
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

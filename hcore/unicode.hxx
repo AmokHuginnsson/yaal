@@ -56,7 +56,7 @@ inline int utf8_declared_length( yaal::u8_t head_ ) {
 	} else {
 		M_ASSERT( !"Invalid UTF-8 head sequence."[0] );
 	}
-	return ( length );
+	return length;
 }
 
 inline int utf8_declared_length( char head_ ) {
@@ -68,7 +68,7 @@ inline int count_characters( char const* str_, int size_ ) {
 	for ( char const* end( str_ + size_ ); str_ < end; ++ cc ) {
 		str_ += utf8_declared_length( *str_ );
 	}
-	return ( cc );
+	return cc;
 }
 
 inline int rank( code_point_t value_ ) {
@@ -82,7 +82,7 @@ inline int rank( code_point_t value_ ) {
 	} else {
 		throw yaal::hcore::HOutOfRangeException( yaal::hcore::to_string( "Unicode code point is out of range: " ).append( value_.get() ) );
 	}
-	return ( r );
+	return r;
 }
 
 inline int utf8_length( code_point_t value_ ) {
@@ -98,7 +98,7 @@ inline int utf8_length( code_point_t value_ ) {
 	} else {
 		throw yaal::hcore::HOutOfRangeException( yaal::hcore::to_string( "Unicode code point is out of range: " ).append( value_.get() ) );
 	}
-	return ( l );
+	return l;
 }
 
 namespace CODE_POINT {

@@ -59,7 +59,7 @@ public:
 	template<typename real_t>
 	operator HExclusiveAccessor<real_t>( void ) {
 		HExclusiveAccessor<real_t> ea( _lock, _object );
-		return ( ea );
+		return ea;
 	}
 private:
 	HExclusiveAccessor( HExclusiveAccessor const& ) = delete;

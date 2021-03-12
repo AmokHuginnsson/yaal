@@ -42,7 +42,7 @@ hcore::HString use_name( HHuginn::SYMBOL_KIND symbolKind_ ) {
 		case ( HHuginn::SYMBOL_KIND::VARIABLE ): name = "Variable"; break;
 		case ( HHuginn::SYMBOL_KIND::PACKAGE ):  name = "Package";  break;
 	}
-	return ( name );
+	return name;
 }
 }
 
@@ -146,7 +146,7 @@ HClass const* OCompiler::guess_type( HHuginn::identifier_id_t identifierId_ ) co
 			c = type_to_class( HHuginn::TYPE::FUNCTION_REFERENCE );
 		}
 	}
-	return ( c );
+	return c;
 }
 
 HClass const* OCompiler::type_to_class( HHuginn::TYPE type_ ) const {
@@ -186,7 +186,7 @@ HClass const* OCompiler::type_id_to_class( HHuginn::type_id_t typeId_ ) const {
 		case ( HHuginn::TYPE::NOT_BOOLEAN ):
 		case ( HHuginn::TYPE::UNKNOWN ):             c = nullptr;            break;
 	}
-	return ( c );
+	return c;
 }
 
 void OCompiler::note_type( HHuginn::identifier_id_t identifierId_, HClass const* class_ ) {
@@ -237,7 +237,7 @@ HClass const* OCompiler::congruent( HClass const* c1_, HClass const* c2_ ) const
 			c = c1_;
 		}
 	}
-	return ( c );
+	return c;
 }
 
 }

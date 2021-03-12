@@ -137,7 +137,7 @@ bool HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags 
 	if ( ok && _extended ) {
 		ok = parse_re( _pattern );
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -180,7 +180,7 @@ bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags 
 			break;
 		}
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 
@@ -218,7 +218,7 @@ int HPattern::matches( yaal::hcore::HString const& string_, int& matchLength_ ) 
 			}
 		}
 	}
-	return ( start );
+	return start;
 	M_EPILOG
 }
 
@@ -227,7 +227,7 @@ HPattern::HMatchIterator HPattern::find( HString const& str_ ) const {
 	int len( 0 );
 	int start( matches( str_, len ) );
 	HMatchIterator it( this, start, len );
-	return ( it );
+	return it;
 }
 
 HPattern::HMatchIterator HPattern::end( void ) const {

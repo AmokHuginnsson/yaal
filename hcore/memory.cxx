@@ -26,13 +26,13 @@ void* alloc( int long size_ ) {
 		} else
 			throw HMemoryAllocationException( msg );
 	}
-	return ( newPtr );
+	return newPtr;
 }
 
 void* calloc( int long size_ ) {
 	void* newPtr( alloc( size_ ) );
 	::memset( newPtr, 0, static_cast<size_t>( size_ ) );
-	return ( newPtr );
+	return newPtr;
 }
 
 void* realloc( void* ptr_, int long size_ ) {
@@ -46,7 +46,7 @@ void* realloc( void* ptr_, int long size_ ) {
 		} else
 			throw HMemoryAllocationException( msg );
 	}
-	return ( newPtr );
+	return newPtr;
 }
 
 void free0( void* ptr_ ) throw() {
@@ -70,7 +70,7 @@ void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) {
 		} else
 			throw yaal::memory::HMemoryAllocationException( msg );
 	}
-	return ( newPtr );
+	return newPtr;
 }
 
 void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) {
@@ -84,6 +84,6 @@ void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) {
 		} else
 			throw yaal::memory::HMemoryAllocationException( msg );
 	}
-	return ( newPtr );
+	return newPtr;
 }
 

@@ -23,11 +23,11 @@ HLifeTimeTracker::~HLifeTimeTracker( void ) {
 
 HLifeTimeTracker& HLifeTimeTracker::get_instance( void ) {
 	static HLifeTimeTracker lifeTimeTracker;
-	return ( lifeTimeTracker );
+	return lifeTimeTracker;
 }
 
 int HSingletonInterface::life_time( int lifeTime_ ) {
-	return ( lifeTime_ );
+	return lifeTime_;
 }
 
 void HLifeTimeTracker::do_destruct( void ) {

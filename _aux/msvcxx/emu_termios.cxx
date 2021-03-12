@@ -62,7 +62,7 @@ int tcgetattr( int fd_, struct termios* term_ ) {
 	} else {
 		errno = ENOSYS;
 	}
-	return ( ret );
+	return ret;
 }
 
 int tcsetattr( int fd_, int, struct termios const* term_ ) {
@@ -93,7 +93,7 @@ int tcsetattr( int fd_, int, struct termios const* term_ ) {
 	} else {
 		errno = ENOSYS;
 	}
-	return ( ret );
+	return ret;
 }
 
 int cfsetospeed( struct termios*, speed_t ) {

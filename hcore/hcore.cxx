@@ -49,7 +49,7 @@ yaal::hcore::HString HOpenSSL::_sslCert;
 HProgramOptionsHandler& yaal_options( void ) {
 	M_PROLOG
 	static HProgramOptionsHandler yaalOptions;
-	return ( yaalOptions );
+	return yaalOptions;
 	M_EPILOG
 }
 
@@ -253,7 +253,7 @@ HString bytes_to_string( char const* bytes_, HString::size_type size_ ) {
 	HString str;
 	HPermissiveUTF8Decoder permissiveUtf8Decoder;
 	permissiveUtf8Decoder.decode_bytes( str, bytes_, size_ != HString::npos ? size_ : static_cast<HString::size_type>( ::strlen( bytes_ ) ) );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -299,7 +299,7 @@ bytes_t string_to_bytes( HString const& str_ ) {
 		bytes[idx] = from_hex( hi, lo );
 		++ p;
 	}
-	return ( bytes );
+	return bytes;
 	M_EPILOG
 }
 
@@ -398,7 +398,7 @@ bool escaped_environment_substitution( yaal::hcore::HString& string_, code_point
 			didSubstitute = true;
 		}
 	}
-	return ( didSubstitute );
+	return didSubstitute;
 	M_EPILOG
 }
 
@@ -430,7 +430,7 @@ yaal::hcore::HString substitute_environment( yaal::hcore::HString const& str_ ) 
 	M_PROLOG
 	HString str( str_ );
 	substitute_environment( str, ENV_SUBST_MODE::RECURSIVE );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -447,7 +447,7 @@ int copy_digits( HString const& str_, char* buf_, int size_ ) {
 	HString::const_iterator end( str_.end() );
 	int skip( static_cast<int>( it - str_.begin() ) );
 	copy_ascii( it, end, buf_, size_ );
-	return ( skip );
+	return skip;
 }
 
 double long std_strtold( HString const&, int* );
@@ -460,7 +460,7 @@ double long std_strtold( HString const& str_, int* endIdx_ ) {
 	if ( endIdx_ ) {
 		*endIdx_ = static_cast<int>( endPtr - buf ) + skip;
 	}
-	return ( value );
+	return value;
 }
 
 }

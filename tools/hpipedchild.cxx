@@ -580,7 +580,7 @@ HPipedChild::process_group_t::iterator HPipedChild::wait_for_process_group( proc
 	for ( process_group_t::iterator it( processGroup_.begin() ), end( processGroup_.end() ); it != end; ++ it ) {
 		if ( (*it)->_pid == pid ) {
 			(*it)->update_status( status );
-			return ( it );
+			return it;
 		}
 	}
 	return ( processGroup_.end() );

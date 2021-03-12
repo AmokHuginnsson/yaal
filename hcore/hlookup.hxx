@@ -120,7 +120,7 @@ public:
 	iterator_type remove( iterator_type const& it_ ) {
 		M_PROLOG
 		_data.erase( it_ );
-		return ( it_ );
+		return it_;
 		M_EPILOG
 	}
 	iterator_type find( key_type const& key_ ) const {
@@ -136,7 +136,7 @@ public:
 		if ( ( it != _data.end() ) && ( key_get_type::key( *it ) != key_ ) ) {
 			it = const_cast<data_type&>( _data ).end();
 		}
-		return ( it );
+		return it;
 		M_EPILOG
 	}
 	iterator_type lower_bound( key_type const& key_ ) const {
@@ -199,7 +199,7 @@ public:
 	}
 	allocator_type const& get_allocator( void ) const {
 		static allocator_type allocator;
-		return ( allocator );
+		return allocator;
 	}
 };
 

@@ -66,7 +66,7 @@ void* HPlugin::resolve( HString const& symbolName_ ) {
 	M_ASSERT( _handle );
 	void* sym( nullptr );
 	M_ENSURE( ( sym = try_resolve( symbolName_ ) ) != nullptr, symbolName_ );
-	return ( sym );
+	return sym;
 	M_EPILOG
 }
 

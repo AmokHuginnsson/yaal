@@ -54,7 +54,7 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, HNumber::integer_
 	i32_t cmp( 0 );
 	for ( HNumber::integer_t i( 0 ); ! cmp && ( i < len_ ); ++ i )
 		cmp = left_[ i ] - right_[ i ];
-	return ( cmp );
+	return cmp;
 }
 
 inline int leading_zeros( i32_t leaf_ ) {
@@ -65,7 +65,7 @@ inline int leading_zeros( i32_t leaf_ ) {
 		}
 		++ zeros;
 	}
-	return ( zeros );
+	return zeros;
 }
 
 inline int trailing_zeros( i32_t leaf_ ) {
@@ -76,7 +76,7 @@ inline int trailing_zeros( i32_t leaf_ ) {
 		}
 		++ zeros;
 	}
-	return ( zeros );
+	return zeros;
 }
 
 }
@@ -615,7 +615,7 @@ HString HNumber::to_string( void ) const {
 	*ptr = 0;
 	char const* s( _cache.get<char>() );
 	HString str( s, ptr - s );
-	return ( str );
+	return str;
 	M_EPILOG
 }
 
@@ -679,7 +679,7 @@ HNumber::integer_t HNumber::fractional_decimal_digits( void ) const {
 	if ( fractionalDecimalDigits > 0 ) {
 		fractionalDecimalDigits -= trailing_zeros( _canonical.get<i32_t>()[ _leafCount - 1 ] );
 	}
-	return ( fractionalDecimalDigits );
+	return fractionalDecimalDigits;
 }
 
 bool HNumber::is_exact( void ) const {
@@ -690,7 +690,7 @@ bool HNumber::is_exact( void ) const {
 		M_ASSERT( fractionalDecimalDigits <= _precision );
 		exact = fractionalDecimalDigits < _precision;
 	}
-	return ( exact );
+	return exact;
 	M_EPILOG
 }
 
@@ -712,7 +712,7 @@ HNumber::integer_t HNumber::absolute_lower( HNumber const& other ) const {
 			cmp = _leafCount - other._leafCount;
 		}
 	}
-	return ( cmp );
+	return cmp;
 	M_EPILOG
 }
 
@@ -742,7 +742,7 @@ bool HNumber::operator < ( HNumber const& other ) const {
 			lower = ! lower;
 		}
 	}
-	return ( lower );
+	return lower;
 }
 
 bool HNumber::operator > ( HNumber const& other ) const {
@@ -872,7 +872,7 @@ HNumber HNumber::operator + ( HNumber const& addend_ ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n += addend_;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -925,7 +925,7 @@ HNumber HNumber::operator - ( HNumber const& subtrahend_ ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n -= subtrahend_;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -948,7 +948,7 @@ HNumber HNumber::operator * ( HNumber const& factor_ ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n *= factor_;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -985,7 +985,7 @@ HNumber HNumber::operator / ( HNumber const& divisor_ ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n /= divisor_;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -993,7 +993,7 @@ HNumber HNumber::operator % ( HNumber const& divisor_ ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n %= divisor_;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -1010,7 +1010,7 @@ i32_t HNumber::multiply_by_leaf_low( i32_t* data_, integer_t leafCount_, i32_t l
 		}
 		data_[ i ] = static_cast<i32_t>( x );
 	}
-	return ( carrier );
+	return carrier;
 }
 
 void HNumber::multiply_by_leaf( i32_t leaf_ ) {
@@ -1086,7 +1086,7 @@ inline HNumber::integer_t leading_zeros( int32_t const* data_, HNumber::integer_
 	while ( ( leadingZeros < size_ ) && ( data_[leadingZeros] == 0 ) ) {
 		++ leadingZeros;
 	}
-	return ( leadingZeros );
+	return leadingZeros;
 }
 
 HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
@@ -1380,7 +1380,7 @@ HNumber HNumber::operator - ( void ) const {
 	if ( _leafCount > 0 ) {
 		n._negative = ! n._negative;
 	}
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -1388,7 +1388,7 @@ HNumber HNumber::operator ^ ( int long long exp ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n ^= exp;
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -1440,7 +1440,7 @@ HNumber HNumber::operator ++ ( int ) {
 	M_PROLOG
 	HNumber n( *this );
 	operator ++ ();
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -1455,7 +1455,7 @@ HNumber HNumber::operator -- ( int ) {
 	M_PROLOG
 	HNumber n( *this );
 	operator -- ();
-	return ( n );
+	return n;
 	M_EPILOG
 }
 
@@ -1645,7 +1645,7 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 			}
 		}
 	}
-	return ( leafCount );
+	return leafCount;
 }
 
 HNumber& HNumber::abs( void ) {
@@ -1791,7 +1791,7 @@ HNumber::integer_t differs_at( HNumber n1_, HNumber const& n2_ ) {
 	} else {
 		pos = leading_zeros( n[0] ) - n1_._integralPartSize * DECIMAL_DIGITS_IN_LEAF_CONST;
 	}
-	return ( pos );
+	return pos;
 	M_EPILOG
 }
 
@@ -1802,11 +1802,11 @@ HNumber operator "" _yn ( char const* str_, size_t len_ ) {
 }
 
 HNumber operator "" _yn ( double long val_ ) {
-	return ( val_ );
+	return val_;
 }
 
 HNumber operator "" _yn ( int long long unsigned val_ ) {
-	return ( val_ );
+	return val_;
 }
 
 }

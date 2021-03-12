@@ -581,7 +581,7 @@ int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv ) {
 	);
 	int idx = _positionIndex;
 	++ _positionIndex;
-	return ( idx );
+	return idx;
 	M_EPILOG
 }
 
@@ -611,7 +611,7 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_conversion( HString cons
 	if ( t._conversion == CONVERSION::CONSTANT ) {
 		t._const = "%";
 	}
-	return ( t );
+	return t;
 	M_EPILOG
 }
 
@@ -628,7 +628,7 @@ HFormat::HFormatImpl::OToken HFormat::HFormatImpl::next_constant( HString const&
 	t._const = s.mid( i, token > 0 ? token - i : meta::max_signed<int>::value );
 	i += static_cast<int>( t._const.get_length() );
 	t._conversion = CONVERSION::CONSTANT;
-	return ( t );
+	return t;
 	M_EPILOG
 }
 
@@ -658,7 +658,7 @@ bool HFormat::HFormatImpl::has_position( HString const& s, int i ) {
 			hasPosition = true;
 		}
 	}
-	return ( hasPosition );
+	return hasPosition;
 	M_EPILOG
 }
 
@@ -676,7 +676,7 @@ int HFormat::HFormatImpl::get_position( HString const& s, int& i ) {
 		++ i;
 	}
 	++ i; /* for '$' character. */
-	return ( position );
+	return position;
 	M_EPILOG
 }
 
@@ -694,7 +694,7 @@ int HFormat::HFormatImpl::get_width( HString const& s, int& i ) {
 		width = get_position( s, i );
 		-- i; /* width is in place, no '$' character at the end of width. */
 	}
-	return ( width );
+	return width;
 	M_EPILOG
 }
 
@@ -810,7 +810,7 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		}
 	}
 	++ i;
-	return ( conversion );
+	return conversion;
 	M_EPILOG
 }
 
@@ -832,7 +832,7 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 		}
 	}
 	-- i;
-	return ( flag );
+	return flag;
 	M_EPILOG
 }
 

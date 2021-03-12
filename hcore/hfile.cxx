@@ -124,7 +124,7 @@ int HFile::do_open( HString const& path_, open_t open_ ) {
 		_ownership = OWNERSHIP::ACQUIRED;
 	}
 	errno = saveErrno;
-	return ( error );
+	return error;
 	M_EPILOG
 }
 
@@ -157,7 +157,7 @@ int HFile::do_close( void ) {
 		_ownership = OWNERSHIP::NONE;
 	}
 	reset();
-	return ( error );
+	return error;
 	M_EPILOG
 }
 
@@ -178,7 +178,7 @@ void* HFile::release( void ) {
 	using yaal::swap;
 	swap( _handle, handle );
 	_ownership = OWNERSHIP::NONE;
-	return ( handle );
+	return handle;
 	M_EPILOG
 }
 
@@ -187,7 +187,7 @@ int long HFile::tell( void ) const {
 	M_ASSERT( _handle );
 	int long pos( 0 );
 	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( _handle ) ) ) >= 0 );
-	return ( pos );
+	return pos;
 	M_EPILOG
 }
 
@@ -304,7 +304,7 @@ int HFile::get_file_descriptor( void ) const {
 	if ( is_opened() ) {
 		M_ENSURE( ( fd = fileno( static_cast<FILE*>( _handle ) ) ) >= 0 );
 	}
-	return ( fd );
+	return fd;
 	M_EPILOG
 }
 

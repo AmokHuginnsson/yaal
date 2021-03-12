@@ -107,7 +107,7 @@ private:
 		for ( HHuginn::HCallSite const& cs : traceData ) {
 			traceList.push_back( of.create<HStackFrameInfo>( of.stack_frame_info_class(), cs ) );
 		}
-		return ( traceValue );
+		return traceValue;
 		M_EPILOG
 	}
 	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -143,7 +143,7 @@ HHuginn::class_t get_class( HRuntime* runtime_ ) {
 			)
 		)
 	);
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -169,7 +169,7 @@ HHuginn::class_t create_class( HRuntime* runtime_, yaal::hcore::HString const& n
 		);
 		runtime_->huginn()->register_class( c, visibility_ );
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -217,7 +217,7 @@ yaal::hcore::HString HStackFrameInfo::do_to_string( huginn::HThread*, HHuginn::v
 		.append( ":" ).append( _callSite.line() )
 		.append( ":" ).append( _callSite.column() )
 		.append( ":" ).append( _callSite.context() );
-	return ( s );
+	return s;
 	M_EPILOG
 }
 
@@ -242,7 +242,7 @@ HHuginn::class_t HStackFrameInfo::get_class( HRuntime* runtime_ ) {
 	};
 	c->redefine( nullptr, fd );
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -277,7 +277,7 @@ HHuginn::call_stack_t const& HException::trace( void ) const {
 
 HHuginn::value_t HException::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int ) const {
 	HHuginn::value_t e( thread_->object_factory().create<HException>( get_class(), _message, _callStack ) );
-	return ( e );
+	return e;
 }
 
 }

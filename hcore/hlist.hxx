@@ -639,7 +639,7 @@ public:
 		if ( _size == 0 ) {
 			_hook = nullptr;
 		}
-		return ( it );
+		return it;
 		M_EPILOG
 	}
 	iterator erase( iterator first_, iterator const& last_ ) {
@@ -647,7 +647,7 @@ public:
 		while ( first_ != last_ ) {
 			first_ = erase( first_ );
 		}
-		return ( first_ );
+		return first_;
 		M_EPILOG
 	}
 	type_t& front( void ) {
@@ -1148,7 +1148,7 @@ public:
 		M_PROLOG
 		HIterator iterator( *this );
 		operator ++ ();
-		return ( iterator );
+		return iterator;
 		M_EPILOG
 	}
 	HIterator& operator -- ( void ) {
@@ -1169,7 +1169,7 @@ public:
 		M_PROLOG
 		HIterator iterator( *this );
 		operator -- ();
-		return ( iterator );
+		return iterator;
 		M_EPILOG
 	}
 	HIterator& operator = ( HIterator const& iterator_ ) {

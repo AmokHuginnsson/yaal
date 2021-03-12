@@ -109,7 +109,7 @@ HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId
 	M_PROLOG
 	ptr_t p( make_pointer<HDataBase>() );
 	M_ENSURE( p->_connector = load_driver( driverId_ ) );
-	return ( p );
+	return p;
 	M_EPILOG
 }
 
@@ -121,7 +121,7 @@ HDataBase::table_list_t HDataBase::get_tables( void ) const {
 	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it ) {
 		tl.push_back( *it[0] );
 	}
-	return ( tl );
+	return tl;
 	M_EPILOG
 }
 
@@ -134,7 +134,7 @@ HDataBase::column_list_t HDataBase::get_columns( yaal::hcore::HString const& tab
 	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it ) {
 		cl.push_back( *it[_connector->_columnNameIndex] );
 	}
-	return ( cl );
+	return cl;
 	M_EPILOG
 }
 

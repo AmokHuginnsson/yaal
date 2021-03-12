@@ -112,7 +112,7 @@ public:
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t set_working_directory( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -185,7 +185,7 @@ public:
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t chmod( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -214,7 +214,7 @@ public:
 		} catch ( HFSItemException const& e ) {
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t stat( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -278,7 +278,7 @@ public:
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t glob( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -297,7 +297,7 @@ public:
 			HFileSystem* fsc( static_cast<HFileSystem*>( object_->raw() ) );
 			thread_->raise( fsc->exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 private:
@@ -323,7 +323,7 @@ private:
 		} else {
 			thread_->raise( exception_class(), f->get_error(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 };
@@ -375,7 +375,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "FileSystem", &filesystemCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

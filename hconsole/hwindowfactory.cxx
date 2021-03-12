@@ -39,7 +39,7 @@ HWindowCreatorInterface::window_ptr_t HWindowFactory::create_window( HTUIProcess
 	} else {
 		M_THROW( "no window creator for: " + node_.get_name() + ", at: ", node_.get_line() );
 	}
-	return ( window );
+	return window;
 	M_EPILOG
 }
 
@@ -58,7 +58,7 @@ HWindowFactory::creators_t::iterator HWindowFactory::end( void ) {
 }
 
 int HWindowFactory::life_time( int lifeTime_ ) {
-	return ( lifeTime_ );
+	return lifeTime_;
 }
 
 void HWindowFactory::initialize_globals( void ) {

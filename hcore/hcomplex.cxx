@@ -88,7 +88,7 @@ HComplex::value_type HComplex::modulus( void ) const {
 	}	else {
 		mod = square_root( _real * _real + _imaginary * _imaginary );
 	}
-	return ( mod );
+	return mod;
 	M_EPILOG
 }
 
@@ -113,7 +113,7 @@ HComplex::value_type HComplex::argument( void ) const {
 	} else {
 		M_ASSERT( 0 && "bad code path" );
 	}
-	return ( arg );
+	return arg;
 	M_EPILOG
 }
 
@@ -202,7 +202,7 @@ HComplex HComplex::operator + ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c += complex_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -210,14 +210,14 @@ HComplex HComplex::operator - ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c -= complex_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
 HComplex HComplex::operator - ( void ) const {
 	M_PROLOG
 	HComplex c( -_real, -_imaginary );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -225,7 +225,7 @@ HComplex HComplex::operator * ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c *= complex_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -233,7 +233,7 @@ HComplex HComplex::operator * ( value_type value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c *= value_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -241,7 +241,7 @@ HComplex HComplex::operator / ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c /= complex_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -249,7 +249,7 @@ HComplex HComplex::operator / ( value_type value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c /= value_;
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

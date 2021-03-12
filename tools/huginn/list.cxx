@@ -91,7 +91,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -438,7 +438,7 @@ bool HList::do_operator_equals( HThread* thread_, HHuginn::value_t const&, HHugi
 		HHuginn::value_t const& rv( other[i] );
 		equal = ( lv->type_id() == rv->type_id() ) && lv->operator_equals( thread_, lv, rv, position_ );
 	}
-	return ( equal );
+	return equal;
 	M_EPILOG
 }
 
@@ -490,7 +490,7 @@ hash_value_t HList::do_operator_hash( HThread* thread_, HHuginn::value_t const&,
 		hashValue *= 3;
 		hashValue += v->operator_hash( thread_, v, position_ );
 	}
-	return ( hashValue );
+	return hashValue;
 	M_EPILOG
 }
 
@@ -505,7 +505,7 @@ yaal::hcore::HString HList::do_code( huginn::HThread* thread_, HHuginn::value_t 
 		str.append( v->code( thread_, v, cycleTracker_, position_ ) );
 	}
 	str.append( "]" );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HList::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -519,7 +519,7 @@ yaal::hcore::HString HList::do_to_string( huginn::HThread* thread_, HHuginn::val
 		str.append( v->to_string( thread_, v, cycleTracker_, position_ ) );
 	}
 	str.append( "]" );
-	return ( str );
+	return str;
 }
 
 }

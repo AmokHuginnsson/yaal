@@ -42,7 +42,7 @@ ODBConnector::DRIVER::enum_t db_driver_from_string( HString const& dbType_ ) {
 	} else {
 		throw HDataBaseException( "unsupported database type: " + dbType_ );
 	}
-	return ( driver );
+	return driver;
 	M_EPILOG
 }
 
@@ -87,7 +87,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	}
 	HDataBase::ptr_t db( HDataBase::get_connector( driver ) );
 	db->connect( database, userName, password, hostSpec );
-	return ( db );
+	return db;
 	M_EPILOG
 }
 

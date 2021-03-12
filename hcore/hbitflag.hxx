@@ -46,7 +46,7 @@ YAAL_DEFINE_OPER( ^= )
 	HBitFlag operator OP ( HBitFlag const& bf_ ) const { \
 		HBitFlag bf( *this ); \
 		bf OP##= bf_; \
-		return ( bf ); \
+		return bf; \
 	}
 YAAL_DEFINE_OPER( | )
 YAAL_DEFINE_OPER( & )
@@ -55,7 +55,7 @@ YAAL_DEFINE_OPER( ^ )
 	HBitFlag operator ~ ( void ) const {
 		HBitFlag bf( *this );
 		bf._flag = ~bf._flag;
-		return ( bf );
+		return bf;
 	}
 	bool operator == ( HBitFlag const& bf_ ) const {
 		return ( _flag == bf_._flag );

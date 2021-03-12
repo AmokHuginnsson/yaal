@@ -220,7 +220,7 @@ public:
 	pointer release( void ) {
 		pointer val( _holder._resource );
 		_holder._resource = nullptr;
-		return ( val );
+		return val;
 	}
 	explicit operator bool ( void ) const {
 		return ( _holder._resource != nullptr );

@@ -26,7 +26,7 @@ int ioctl( int fd_, int request_, void* param_ ) {
 			val = ioctl_TIOCGWINSZ( fd_, param_ );
 		} break;
 	}
-	return ( val );
+	return val;
 }
 
 }

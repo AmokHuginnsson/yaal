@@ -90,7 +90,7 @@ public:
 			}
 			normalized = true;
 		}
-		return ( normalized );
+		return normalized;
 		M_EPILOG
 	}
 	int long dim( void ) const {
@@ -143,7 +143,7 @@ public:
 		check_dimensions( vector_._data.size() );
 		HVector vector ( *this );
 		vector += vector_;
-		return ( vector );
+		return vector;
 		M_EPILOG
 	}
 	HVector operator - ( HVector const& vector_ ) const {
@@ -151,7 +151,7 @@ public:
 		check_dimensions( vector_._data.size() );
 		HVector vector( *this );
 		vector -= vector_;
-		return ( vector );
+		return vector;
 		M_EPILOG
 	}
 	HVector operator - ( void ) const {
@@ -159,21 +159,21 @@ public:
 		HVector vector( _data.size() );
 		vector = 0;
 		vector -= ( *this );
-		return ( vector );
+		return vector;
 		M_EPILOG
 	}
 	HVector operator * ( value_type const& scalar_ ) const {
 		M_PROLOG
 		HVector vector( *this );
 		vector *= scalar_;
-		return ( vector );
+		return vector;
 		M_EPILOG
 	}
 	HVector operator / ( value_type const& scalar_ ) const {
 		M_PROLOG
 		HVector vector ( * this );
 		vector /= scalar_;
-		return ( vector );
+		return vector;
 		M_EPILOG
 	}
 	HVector& operator += ( HVector const& vector_ ) {
@@ -215,7 +215,7 @@ public:
 		for ( int long i = 0; i < size; i ++ ) {
 			scalar += ( _data[ i ] * vector_._data[ i ] );
 		}
-		return ( scalar );
+		return scalar;
 		M_EPILOG
 	}
 	value_type operator ! ( void ) const {
@@ -279,7 +279,7 @@ HVector<value_t> operator * ( value_t const scalar_,
 	M_PROLOG
 	HVector<value_t> vector( vector_ );
 	vector *= scalar_;
-	return ( vector );
+	return vector;
 	M_EPILOG
 }
 

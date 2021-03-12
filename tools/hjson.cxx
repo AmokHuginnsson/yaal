@@ -463,7 +463,7 @@ executing_parser::HRule HJSONParser::make_engine( void ) {
 	);
 	element %= ( object | array | stringLiteral | realLiteral | integerLiteral | literalTrue | literalFalse | literalNull );
 	e_p::HRule json( "JSON", element );
-	return ( json );
+	return json;
 	M_EPILOG
 }
 

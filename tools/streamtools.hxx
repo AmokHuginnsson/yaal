@@ -90,7 +90,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& os, yaal::h
 	} else {
 		os << p.first << p.second;
 	}
-	return ( os );
+	return os;
 	M_EPILOG
 }
 
@@ -102,7 +102,7 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& is, yaal::hc
 	} else {
 		is >> p.first >> p.second;
 	}
-	return ( is );
+	return is;
 	M_EPILOG
 }
 
@@ -133,7 +133,7 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 			write( out, e );
 		}
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -197,7 +197,7 @@ yaal::hcore::HStreamInterface& container_scan(
 		}
 		container_ = yaal::move( container );
 	} while ( false );
-	return ( in );
+	return in;
 	M_EPILOG
 }
 
@@ -260,7 +260,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			write( out, e );
 		}
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -293,7 +293,7 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hc
 		}
 		sa_ = yaal::move( container );
 	} while ( false );
-	return ( in );
+	return in;
 	M_EPILOG
 }
 
@@ -415,7 +415,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	} else {
 		out << t_.template get<0>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -427,7 +427,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	} else {
 		out << t_.template get<0>() << t_.template get<1>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -439,7 +439,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	} else {
 		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -452,7 +452,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	} else {
 		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>() << t_.template get<3>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -466,7 +466,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 	} else {
 		out << t_.template get<0>() << t_.template get<1>() << t_.template get<2>() << t_.template get<3>() << t_.template get<4>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -482,7 +482,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			<< t_.template get<2>() << t_.template get<3>()
 			<< t_.template get<4>() << t_.template get<5>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -500,7 +500,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			<< t_.template get<4>() << t_.template get<5>()
 			<< t_.template get<6>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -518,7 +518,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			<< t_.template get<4>() << t_.template get<5>()
 			<< t_.template get<6>() << t_.template get<7>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -538,7 +538,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			<< t_.template get<6>() << t_.template get<7>()
 			<< t_.template get<8>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -558,7 +558,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::
 			<< t_.template get<6>() << t_.template get<7>()
 			<< t_.template get<8>() << t_.template get<9>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -583,7 +583,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out,
 			<< t_.template get<8>() << t_.template get<9>()
 			<< t_.template get<10>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -608,7 +608,7 @@ yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out,
 			<< t_.template get<8>() << t_.template get<9>()
 			<< t_.template get<10>() << t_.template get<11>();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -616,7 +616,7 @@ template<int const SIZE>
 yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HBitset<SIZE> const& bs_ ) {
 	M_PROLOG
 	out << "bitset<" << bs_.to_string() << ">" << yaal::hcore::flush;
-	return ( out );
+	return out;
 	M_EPILOG
 }
 

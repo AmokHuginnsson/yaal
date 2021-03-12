@@ -112,7 +112,7 @@ bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 		process_command();
 		consumed = _command.is_empty();
 	}
-	return ( consumed );
+	return consumed;
 	M_EPILOG
 }
 
@@ -176,7 +176,7 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 			_tuiProcess->schedule_repaint();
 		}
 	}
-	return ( consumed );
+	return consumed;
 	M_EPILOG
 }
 
@@ -216,7 +216,7 @@ bool HWindow::handler_search( HEvent const& event_ ) {
 		_statusBar->set_prompt ( prompt, HStatusBarWidget::PROMPT::SEARCH );
 		consumed = true;
 	}
-	return ( consumed );
+	return consumed;
 	M_EPILOG
 }
 
@@ -230,7 +230,7 @@ int HWindow::click( mouse::OMouse& mouse_ ) {
 	} else {
 		_widgets.hit_test_all( mouse_ );
 	}
-	return ( ret );
+	return ret;
 	M_EPILOG
 }
 
@@ -239,7 +239,7 @@ HString HWindow::get_command( void ) {
 	HString command;
 	command = _command;
 	_command = "";
-	return ( command );
+	return command;
 	M_EPILOG
 }
 
@@ -292,7 +292,7 @@ HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess*, yaal::tools::HXml:
 	M_PROLOG
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HWindow>( name ) );
-	return ( window );
+	return window;
 	M_EPILOG
 }
 

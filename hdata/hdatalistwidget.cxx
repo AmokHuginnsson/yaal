@@ -276,7 +276,7 @@ bool HDataListWidgetCreator::do_apply_resources( hconsole::HWidget::ptr_t widget
 		xml::value_t sort( xml::try_attr_val( node_, "sort" ) );
 		dl->set_record_descriptor( table, columns, filterColumn ? *filterColumn : "", idColumn, sort ? *sort : "" );
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

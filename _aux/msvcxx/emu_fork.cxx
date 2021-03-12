@@ -71,7 +71,7 @@ public:
 	bool is_known_pid( int pid_ ) const {
 		CLock l( _mutex );
 		bool isKnownPid( _processes.find( pid_ ) != _processes.end() );
-		return ( isKnownPid );
+		return isKnownPid;
 	}
 } _processTable_;
 
@@ -85,16 +85,16 @@ char* xstrdup( char const* str_ ) {
 	}
 	str = memory::calloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
 	::strcpy( str, str_ );
-	return ( str );
+	return str;
 }
 
 HString quoted( HString const& s_ ) {
 	if ( s_.find( ' '_ycp ) == HString::npos ) {
-		return ( s_ );
+		return s_;
 	}
 	HString s;
 	s.assign( s_ ).replace( "\"", "\\\"" ).shift_right( 1, '"'_ycp ).push_back( '"'_ycp );
-	return ( s );
+	return s;
 }
 
 inline bool is_in_range( int val_, int start_, int end_ ) {
@@ -209,7 +209,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 		_processTable_.insert( pid, pgid );
 	}
 	M_ENSURE( msvcxx::write( _message[1], "\0", 1 ) == 1 );
-	return ( pid );
+	return pid;
 }
 
 #undef waitpid

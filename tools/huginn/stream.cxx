@@ -78,7 +78,7 @@ struct HNumber::ElementaryFunctions {
 			}
 		} while ( false );
 		context_->post_io( thread_, toRead, nRead, HStream::IO::READ, position_ );
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 };
@@ -259,7 +259,7 @@ HHuginn::value_t HStream::read_fwd( char const* name_, reader_t reader_, huginn:
 		HStream* s( static_cast<HStream*>( object_->raw() ) );
 		s->raise( thread_, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -315,7 +315,7 @@ HHuginn::value_t HStream::deserialize( huginn::HThread* thread_, HHuginn::value_
 	} catch ( hcore::HException const& e ) {
 		s->raise( thread_, e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -832,7 +832,7 @@ int long HStream::read_len( HThread* thread_, int position_ ) {
 		raise( thread_, "Malformed Huginn data stream.", position_, exception_class() );
 		len = -1;
 	}
-	return ( len );
+	return len;
 }
 
 HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
@@ -1033,7 +1033,7 @@ HHuginn::value_t HStream::deserialize_impl( HThread* thread_, int position_ ) {
 		}
 	}
 	post_io( thread_, toRead, nRead, IO::READ, position_ );
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -1107,7 +1107,7 @@ HHuginn::class_t HStream::get_class( HRuntime* runtime_ ) {
 		);
 		runtime_->huginn()->register_class( c, HHuginn::VISIBILITY::GLOBAL );
 	}
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

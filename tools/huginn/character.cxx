@@ -80,7 +80,7 @@ HHuginn::class_t get_class( HRuntime* runtime_, HObjectFactory* objectFactory_ )
 		{ "is_alnum",  objectFactory_->create_method( &character::is_of_a_kind, "character.is_alnum",  hcore::is_alnum ),      "tell if this character represents any alphanumeric character" }
 	};
 	c->redefine( nullptr, fd );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 
@@ -137,7 +137,7 @@ yaal::hcore::HString HCharacter::do_code( huginn::HThread*, HHuginn::value_t con
 	}
 	s.push_back( escaped );
 	s.push_back( '\''_ycp );
-	return ( s );
+	return s;
 }
 
 yaal::hcore::HString HCharacter::do_to_string( huginn::HThread*, HHuginn::value_t const&, HCycleTracker&, int ) const {

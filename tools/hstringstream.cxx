@@ -64,7 +64,7 @@ int long HStringStream::do_write( void const* buffer_, int long size_ ) {
 		_used = false;
 	}
 	_buffer.append( static_cast<char const*>( buffer_ ), size_ );
-	return ( size_ );
+	return size_;
 	M_EPILOG
 }
 
@@ -90,7 +90,7 @@ int long HStringStream::do_read( void* buffer_, int long size_ ) {
 		_utf8.reset();
 		_used = true;
 	}
-	return ( toCopy );
+	return toCopy;
 	M_EPILOG
 }
 

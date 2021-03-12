@@ -400,7 +400,7 @@ inline number_t factorial( number_t number_ ) {
 	for ( number_t i = 2; i <= number_; ++ i ) {
 		n *= i;
 	}
-	return ( n );
+	return n;
 }
 
 template<typename number_t>

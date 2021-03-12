@@ -523,7 +523,7 @@ int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char c
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read_until( store, delim, strip );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -536,7 +536,7 @@ int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int 
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read_until_n( store, maxcount, delim, strip );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -549,7 +549,7 @@ int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char c
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read_while( store, acquire_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -562,7 +562,7 @@ int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int 
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read_while_n( store, maxcount, acquire_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -599,7 +599,7 @@ int HSynchronizedStream::do_peek( void ) {
 	} else if ( _streamRef ) {
 		code = _streamRef->peek();
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -612,7 +612,7 @@ int HSynchronizedStream::do_immediate_read_size( void ) const {
 	} else if ( _streamRef ) {
 		code = _streamRef->immediate_read_size();
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -625,7 +625,7 @@ int HSynchronizedStream::do_pending_write_size( void ) const {
 	} else if ( _streamRef ) {
 		code = _streamRef->pending_write_size();
 	}
-	return ( code );
+	return code;
 	M_EPILOG
 }
 
@@ -847,7 +847,7 @@ int long HSynchronizedStream::do_write( void const* buf_, int long size_ ) {
 	} else if ( _streamRef ) {
 		nWritten = _streamRef->write( buf_, size_ );
 	}
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -860,7 +860,7 @@ int long HSynchronizedStream::do_read( void* buf_, int long size_ ) {
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read( buf_, size_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -873,7 +873,7 @@ int long HSynchronizedStream::do_read_some( void* buf_, int long size_ ) {
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read_some( buf_, size_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
@@ -910,7 +910,7 @@ bool HSynchronizedStream::do_is_valid( void ) const {
 	} else if ( _streamRef ) {
 		valid = _streamRef->is_valid();
 	}
-	return ( valid );
+	return valid;
 	M_EPILOG
 }
 
@@ -923,7 +923,7 @@ HStreamInterface::POLL_TYPE HSynchronizedStream::do_poll_type( void ) const {
 	} else if ( _streamRef ) {
 		pollType = _streamRef->poll_type();
 	}
-	return ( pollType );
+	return pollType;
 	M_EPILOG
 }
 
@@ -936,7 +936,7 @@ void const* HSynchronizedStream::do_data( void ) const {
 	} else if ( _streamRef ) {
 		handle = _streamRef->data();
 	}
-	return ( handle );
+	return handle;
 	M_EPILOG
 }
 
@@ -949,7 +949,7 @@ bool HSynchronizedStream::do_good( void ) const {
 	} else if ( _streamRef )  {
 		isGood = _streamRef->good();
 	}
-	return ( isGood );
+	return isGood;
 	M_EPILOG
 }
 
@@ -962,7 +962,7 @@ bool HSynchronizedStream::do_fail( void ) const {
 	} else if ( _streamRef )  {
 		failed = _streamRef->fail();
 	}
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 
@@ -975,7 +975,7 @@ bool HSynchronizedStream::do_bad( void ) const {
 	} else if ( _streamRef )  {
 		isBad = _streamRef->good();
 	}
-	return ( isBad );
+	return isBad;
 	M_EPILOG
 }
 

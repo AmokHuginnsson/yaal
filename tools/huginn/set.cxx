@@ -122,7 +122,7 @@ public:
 				origin_
 			)
 		);
-		return ( c );
+		return c;
 		M_EPILOG
 	}
 protected:
@@ -299,7 +299,7 @@ HHuginn::value_t HSet::do_clone( huginn::HThread* thread_, HHuginn::value_t*, in
 	for ( values_t::value_type const& v : _data ) {
 		data.insert( v->clone( thread_, const_cast<HHuginn::value_t*>( &v ), position_ ) );
 	}
-	return ( res );
+	return res;
 	M_EPILOG
 }
 
@@ -312,7 +312,7 @@ bool HSet::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t const&
 		huginn::HSet::values_t::const_iterator otherIt( otherData.find( *it ) );
 		equal = otherIt != otherData.end();
 	}
-	return ( equal );
+	return equal;
 }
 
 void HSet::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
@@ -370,7 +370,7 @@ hash_value_t HSet::do_operator_hash( HThread* thread_, HHuginn::value_t const&, 
 		hashValue *= 3;
 		hashValue += v->operator_hash( thread_, v, position_ );
 	}
-	return ( hashValue );
+	return hashValue;
 }
 
 yaal::hcore::HString HSet::do_code( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -387,7 +387,7 @@ yaal::hcore::HString HSet::do_code( huginn::HThread* thread_, HHuginn::value_t c
 		str.append( v->code( thread_, v, cycleTracker_, position_ ) );
 	}
 	str.append( "}" );
-	return ( str );
+	return str;
 }
 
 yaal::hcore::HString HSet::do_to_string( huginn::HThread* thread_, HHuginn::value_t const&, HCycleTracker& cycleTracker_, int position_ ) const {
@@ -404,7 +404,7 @@ yaal::hcore::HString HSet::do_to_string( huginn::HThread* thread_, HHuginn::valu
 		str.append( v->to_string( thread_, v, cycleTracker_, position_ ) );
 	}
 	str.append( "}" );
-	return ( str );
+	return str;
 }
 
 }

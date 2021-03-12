@@ -59,7 +59,7 @@ private:
 			void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free );
 			_free = *static_cast<u8_t*>( p );
 			++ _used;
-			return ( p );
+			return p;
 		}
 		bool free( void* ptr_ ) {
 			int freed( *( static_cast<u8_t*>( ptr_ ) + OBJECT_SPACE - 1 ) );
@@ -125,7 +125,7 @@ public:
 				_free = -1;
 			}
 		}
-		return ( p );
+		return p;
 	}
 	void free( void* p ) {
 		/* Find HPoolBlock that holds this object memory. */
@@ -200,14 +200,14 @@ public:
 			throw;
 		}
 		delete [] used;
-		return ( freed );
+		return freed;
 	}
 	int use_count( void ) const {
 		int useCount( 0 );
 		for ( int i( 0 ); i < _poolBlockCount; ++ i ) {
 			useCount += _poolBlocks[i]->_used;
 		}
-		return ( useCount );
+		return useCount;
 	}
 private:
 	void get_free_block( void ) {

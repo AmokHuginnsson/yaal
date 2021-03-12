@@ -70,7 +70,7 @@ i64_t HClock::get_time_elapsed( yaal::hcore::time::UNIT unit_ ) const {
 		case ( time::UNIT::MILLISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MILLI_IN_WHOLE + time.tv_nsec / si::NANO_IN_MILLI; break;
 		default: M_ASSERT( 0 && "bad HClock::UNIT!" ); break;
 	}
-	return ( elapsed );
+	return elapsed;
 	M_EPILOG
 }
 

@@ -165,7 +165,7 @@ bool SignalDispatcher::is_console_event_enabled( DWORD controlType_ ) const {
 		case ( CTRL_LOGOFF_EVENT ):   enabled = _acceptedConsoleEvents._logoff;   break;
 		case ( CTRL_SHUTDOWN_EVENT ): enabled = _acceptedConsoleEvents._shutdown; break;
 	}
-	return ( enabled );
+	return enabled;
 }
 
 bool SignalDispatcher::is_console_event_enabled( void ) const {
@@ -203,7 +203,7 @@ int kill( int pid_, int sigNo_ ) {
 			::CloseHandle( process );
 		}
 	}
-	return ( err );
+	return err;
 }
 
 int sigwait( sigset_t* set_, int* signo ) {
@@ -277,7 +277,7 @@ DWORD signo_to_console_control( int signo_ ) {
 		case ( SIGTERM ): consoleControl = CTRL_LOGOFF_EVENT; break;
 		case ( SIGPWR ): consoleControl = CTRL_SHUTDOWN_EVENT; break;
 	}
-	return ( consoleControl );
+	return consoleControl;
 }
 
 int sigaction( int signo, struct sigaction* sa_, void* ) {
@@ -353,7 +353,7 @@ char const* strsignal( int signum_ ) {
 		case ( SIGTSTP ): name = "suspended";            break;
 		case ( SIGCONT ): name = "continued";            break;
 	}
-	return ( name );
+	return name;
 }
 
 namespace msvcxx {

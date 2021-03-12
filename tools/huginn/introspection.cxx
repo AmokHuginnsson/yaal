@@ -128,7 +128,7 @@ public:
 		if ( pv ) {
 			v = *pv;
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t attribute( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -159,7 +159,7 @@ public:
 				}
 			}
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t list_attributes( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -277,7 +277,7 @@ public:
 		if ( ! v ) {
 			v = r.none_value();
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t list_imports( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -360,7 +360,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Introspection", &introspectionCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

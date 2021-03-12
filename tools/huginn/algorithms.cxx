@@ -113,7 +113,7 @@ public:
 			accumulator = callable->operator_call( thread_, callable, HArguments( thread_, it->value( thread_, position_ ), accumulator ), position_ );
 			it->next( thread_, position_ );
 		}
-		return ( accumulator );
+		return accumulator;
 	}
 	static HHuginn::value_t materialize( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
 		char const name[] = "Algorithms.materialize";
@@ -309,7 +309,7 @@ public:
 				position_
 			);
 		}
-		return ( v );
+		return v;
 	}
 	static HHuginn::value_t range( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( thread_, values_, position_ ) );
@@ -359,7 +359,7 @@ public:
 				s.pop();
 			}
 			reverse( dest.begin(), dest.end() );
-			return ( v );
+			return v;
 		} else if ( t == HHuginn::TYPE::STRING ) {
 			hcore::HString const& s( get_string( src ) );
 			for ( code_point_t c : s ) {
@@ -378,7 +378,7 @@ public:
 		} else {
 			list::sort( thread_, &v, HArguments( thread_ ), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	typedef bool ( *compare_t )( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
@@ -448,7 +448,7 @@ public:
 				position_
 			);
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 	static HHuginn::value_t min( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t& values_, int position_ ) {
@@ -496,7 +496,7 @@ public:
 				M_ASSERT( !"Invalid code path!"[0] );
 			}
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 private:
@@ -735,7 +735,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Algorithms", &algorithmsCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

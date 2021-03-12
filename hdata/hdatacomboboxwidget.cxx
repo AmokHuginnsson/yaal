@@ -149,7 +149,7 @@ bool HDataComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterfa
 			attrs.dict_name( xml::node_val( node_ ) );
 		}
 	}
-	return ( ok );
+	return ok;
 	M_EPILOG
 }
 

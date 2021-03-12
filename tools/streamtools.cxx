@@ -179,20 +179,20 @@ HString get_stream_id( HStreamInterface* stream ) {
 	} else {
 		name = "*anonymous stream*";
 	}
-	return ( name );
+	return name;
 }
 
 HStreamInterface& ensure( HStreamInterface& stream_ ) {
 	M_PROLOG
 	M_ENSURE( stream_.is_valid(), get_stream_id( &stream_ ) );
-	return ( stream_ );
+	return stream_;
 	M_EPILOG
 }
 
 HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ ) {
 	M_PROLOG
 	M_ENSURE( stream_->is_valid(), get_stream_id( stream_.raw() ) );
-	return ( stream_ );
+	return stream_;
 	M_EPILOG
 }
 
@@ -232,7 +232,7 @@ int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInter
 		}
 	}
 	sink_.flush();
-	return ( nWrittenTotal );
+	return nWrittenTotal;
 	M_EPILOG
 }
 
@@ -352,7 +352,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stre
 	M_PROLOG
 	for ( HBitmap::const_iterator it( bitmap_.begin() ), end( bitmap_.end() ); it != end; ++ it )
 		stream_ << ( *it ? 1 : 0 );
-	return ( stream_ );
+	return stream_;
 	M_EPILOG
 }
 
@@ -423,7 +423,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	} else {
 		HNumber::ElementaryFunctions::serialize( out, number_ );
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -436,7 +436,7 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 	} else {
 		HNumber::ElementaryFunctions::deserialize( in, number_ );
 	}
-	return ( in );
+	return in;
 	M_EPILOG
 }
 
@@ -447,7 +447,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	} else {
 		out << t_.raw();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -464,7 +464,7 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 			t_.set( v );
 		}
 	}
-	return ( in );
+	return in;
 	M_EPILOG
 }
 
@@ -475,7 +475,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	} else {
 		out << c_.re() << c_.im();
 	}
-	return ( out );
+	return out;
 	M_EPILOG
 }
 
@@ -511,7 +511,7 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 			c_.set( re, im );
 		} while ( false );
 	}
-	return ( in );
+	return in;
 	M_EPILOG
 }
 
