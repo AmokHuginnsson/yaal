@@ -475,7 +475,7 @@ void set_limit( RESOURCE_LIMIT_TYPE resourceLimitType_, HResourceLimit const& re
 void exec( yaal::hcore::HString const& image_, argv_t const& args_ ) {
 	M_PROLOG
 	int argc( static_cast<int>( args_.get_size() ) );
-	HResource<char*[]> argvHolder( new char*[argc + 1] );
+	HResource<char*[]> argvHolder( new char*[ static_cast<int long long unsigned>( argc + 1 ) ] );
 	char** argv( argvHolder.get() );
 	argv[argc] = nullptr;
 	typedef yaal::hcore::HArray<bytes_t> utf8ish_strings_t;

@@ -26,6 +26,7 @@ DIR_MAN        = $(DESTDIR)@mandir@
 LIB_PREFIX     = @LIB_PREFIX@
 LIB_EXT        = @LIB_EXT@
 CXX            = @CXX@
+CXX_STANDARD   = @CXX_STANDARD@
 MKDIR_P        = @MKDIR_P@
 INSTALL        = @INSTALL@
 RANLIB         = @RANLIB@

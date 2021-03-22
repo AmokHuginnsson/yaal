@@ -31,8 +31,8 @@ int distance( yaal::hcore::HString const& one_, yaal::hcore::HString const& two_
 	++ lengthOne;
 	++ lengthTwo;
 	int** distanceMatrix = nullptr;
-	HResource<int*[]> distanceMatrixHolder( new ( memory::yaal ) int*[ lengthOne ] );
-	HResource<int[]> distanceMatrixBuffer( new ( memory::yaal ) int[ lengthOne * lengthTwo ] );
+	HResource<int*[]> distanceMatrixHolder( new ( memory::yaal ) int*[ static_cast<int long long unsigned>( lengthOne ) ] );
+	HResource<int[]> distanceMatrixBuffer( new ( memory::yaal ) int[ static_cast<int long long unsigned>( lengthOne * lengthTwo ) ] );
 	distanceMatrix = distanceMatrixHolder.raw();
 	for ( int indexOne( 0 ); indexOne < lengthOne; ++ indexOne ) {
 		distanceMatrix[ indexOne ] = distanceMatrixBuffer.raw() + indexOne * lengthTwo;

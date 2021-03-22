@@ -651,7 +651,7 @@ void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& p
 	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const*>( _xml->_utf8[0].c_str() ) ) );
 	M_ENSURE( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
 	style_resource_t style( pstyle, xsltFreeStylesheet );
-	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[parameters_.get_size() * 2 + 1] : nullptr );
+	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[ static_cast<int long long unsigned>( parameters_.get_size() * 2 + 1 ) ] : nullptr );
 	char const** parameters( parametersHolder.get() );
 	int parIdx( 0 );
 	typedef yaal::hcore::HPair<yaal::hcore::HUTF8String, yaal::hcore::HUTF8String> utf8_parameter_t;

@@ -179,7 +179,7 @@ public:
 		if ( ! useCount ) {
 			return ( 0 );
 		}
-		void** used = new ( memory::yaal ) void*[useCount];
+		void** used = new ( memory::yaal ) void*[ static_cast<int long long unsigned>( useCount ) ];
 		int usedIdx( 0 );
 		for ( int bi( 0 ); bi < _poolBlockCount; ++ bi ) {
 			HPoolBlock* pb( _poolBlocks[bi] );
@@ -214,7 +214,7 @@ private:
 		if ( _poolBlockCount == _poolBlockCapacity ) {
 			int newCapacity( ( _poolBlockCapacity > 0 ? _poolBlockCapacity * 2 : 8 ) );
 			/* msvcxx does not allow `T v( i );', it must be `T v = i;'. */
-			HPoolBlock** poolBlocks = new ( memory::yaal ) HPoolBlock*[ newCapacity ];
+			HPoolBlock** poolBlocks = new ( memory::yaal ) HPoolBlock*[ static_cast<int long long unsigned>( newCapacity ) ];
 			if ( _poolBlockCapacity ) {
 				yaal::copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
 			}

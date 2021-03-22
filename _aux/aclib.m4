@@ -57,8 +57,14 @@ dnl Handle user choice regarding C++ standard.
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_CXX_STANDARD_CHECK], [
 	AC_REQUIRE([YAAL_CHECK_COMPILER_VERSION])
-	YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
-	if test ["x$CXX_STANDARD"] = ["x"] ; then
+	for version in 17 14 11 ; do
+		YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++${version}], [C++])
+		if test ["x${CXX_STANDARD}"] != ["x"] ; then
+			AC_SUBST([CXX_STANDARD],["${CXX_STANDARD}"])
+			break
+		fi
+	done
+	if test ["x${CXX_STANDARD}"] = ["x"] ; then
 		AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
 	fi
 ])
