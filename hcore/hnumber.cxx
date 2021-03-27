@@ -472,108 +472,110 @@ void HNumber::from_string( HString const& number_ ) {
 	_integralPartSize = 0;
 	_leafCount = 0;
 	int exponent( 0 );
-	if ( idx != HString::npos ) {
-		do { /* "!!![-][.1-9]???" or "000." */
-			integer_t firstValid( start );
-			start = idx;
-			integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
-			idx = static_cast<integer_t>( number_.find_other_than( DIGITS_AND_DOT, start ) );
-			if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
-				dot = HString::npos;
-			}
-			integer_t digit( static_cast<integer_t>( number_.find_one_of( DIGITS, start ) ) );
-			if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
-				break;
-			}
-			if ( digit == HString::npos ) {
-				throw HNumberException( NO_DIGITS ); /* must have digit */
-			}
-			if ( ( digit - start ) > 1 ) {
-				throw HNumberException( "Invalid argument: malformed point notation" ); /* exclude "-..!!" and "..!!" */
-			}
-			integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
-			( end != HString::npos ) || ( end = len );
-			int denormalizedEnd( end );
-			if ( dot != HString::npos ) {
-				idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
-				end = ( idx != HString::npos ) ? len - idx : start + 1;
-			}
-			M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
-			_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-			integer_t fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
-			_leafCount = _integralPartSize + fractionalPart;
-			if ( _leafCount > 0 ) {
-				_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
-			}
-			i32_t* dst( _canonical.get<i32_t>() );
-			i32_t leaf( 0 );
-			int digitInLeaf( 0 );
-			if ( dot != HString::npos ) { /* scan fractional part */
-				idx = _integralPartSize;
-				for ( HString::const_iterator it( number_.begin() + dot + 1 ), endIt( number_.begin() + end ); it != endIt; ++ it, ++ digitInLeaf ) {
-					M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
-					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
-						dst[idx ++] = leaf;
-						digitInLeaf = 0;
-						leaf = 0;
-					}
-					leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
-				}
-				if ( idx < _leafCount ) {
-					dst[idx] = leaf;
-				}
-			}
-			if ( _integralPartSize > 0 ) {
-				idx = _integralPartSize - 1;
-				leaf = 0;
-				digitInLeaf = 0;
-				integer_t lastIntDigIdx( ( dot != HString::npos ? dot : end ) - 1 );
-				HString::const_iterator it( number_.begin() + lastIntDigIdx );
-				for ( integer_t i( lastIntDigIdx ); i >= start; -- i, -- it, ++ digitInLeaf ) {
-					M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
-					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
-						M_ASSERT( idx >= 0 );
-						dst[idx --] = leaf;
-						digitInLeaf = 0;
-						leaf = 0;
-					}
-					leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
-				}
-				if ( idx >= 0 ) {
-					dst[idx] = leaf;
-				}
-			}
-			if ( dot == HString::npos ) {
-				_integralPartSize = _leafCount;
-			} else if ( ( end - dot - 1 ) >= _precision ) {
-				_precision = end - dot;
-			}
-			if ( denormalizedEnd >= len ) {
-				break;
-			}
-			code_point_t afterDenormalizedForm( number_[denormalizedEnd] );
-			if ( ( afterDenormalizedForm != 'e'_ycp ) && ( afterDenormalizedForm != 'E'_ycp ) ) {
-				break;
-			}
-			int exponentStartIdx( denormalizedEnd + 1 );
-			char const ERR_EXPON[] = "Invalid argument: malformed exponential notation";
-			if ( exponentStartIdx >= len ) {
-				throw HNumberException( ERR_EXPON );
-			}
-			int exponentIdx( exponentStartIdx );
-			code_point_t exponentStartChar( number_[exponentIdx] );
-			if ( ( exponentStartChar == '-'_ycp ) || ( exponentStartChar == '+'_ycp ) ) {
-				++ exponentIdx;
-			}
-			if ( ( exponentIdx >= len ) || ( DIGITS.find( number_[exponentIdx] ) == HString::npos ) ) {
-				throw HNumberException( ERR_EXPON );
-			}
-			if ( exponentStartChar == '+'_ycp ) {
-				++ exponentStartIdx;
-			}
-			exponent = lexical_cast<int>( number_.substr( exponentStartIdx ) );
-		} while ( false );
+	if ( idx == HString::npos ) {
+		_negative = false;
+		return;
 	}
+	do { /* "!!![-][.1-9]???" or "000." */
+		integer_t firstValid( start );
+		start = idx;
+		integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
+		idx = static_cast<integer_t>( number_.find_other_than( DIGITS_AND_DOT, start ) );
+		if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
+			dot = HString::npos;
+		}
+		integer_t digit( static_cast<integer_t>( number_.find_one_of( DIGITS, start ) ) );
+		if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
+			break;
+		}
+		if ( digit == HString::npos ) {
+			throw HNumberException( NO_DIGITS ); /* must have digit */
+		}
+		if ( ( digit - start ) > 1 ) {
+			throw HNumberException( "Invalid argument: malformed point notation" ); /* exclude "-..!!" and "..!!" */
+		}
+		integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
+		( end != HString::npos ) || ( end = len );
+		int denormalizedEnd( end );
+		if ( dot != HString::npos ) {
+			idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
+			end = ( idx != HString::npos ) ? len - idx : start + 1;
+		}
+		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
+		_integralPartSize = ( ( dot != HString::npos ? dot - start : end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST;
+		integer_t fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
+		_leafCount = _integralPartSize + fractionalPart;
+		if ( _leafCount > 0 ) {
+			_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+		}
+		i32_t* dst( _canonical.get<i32_t>() );
+		i32_t leaf( 0 );
+		int digitInLeaf( 0 );
+		if ( dot != HString::npos ) { /* scan fractional part */
+			idx = _integralPartSize;
+			for ( HString::const_iterator it( number_.begin() + dot + 1 ), endIt( number_.begin() + end ); it != endIt; ++ it, ++ digitInLeaf ) {
+				M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
+					dst[idx ++] = leaf;
+					digitInLeaf = 0;
+					leaf = 0;
+				}
+				leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+			}
+			if ( idx < _leafCount ) {
+				dst[idx] = leaf;
+			}
+		}
+		if ( _integralPartSize > 0 ) {
+			idx = _integralPartSize - 1;
+			leaf = 0;
+			digitInLeaf = 0;
+			integer_t lastIntDigIdx( ( dot != HString::npos ? dot : end ) - 1 );
+			HString::const_iterator it( number_.begin() + lastIntDigIdx );
+			for ( integer_t i( lastIntDigIdx ); i >= start; -- i, -- it, ++ digitInLeaf ) {
+				M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
+					M_ASSERT( idx >= 0 );
+					dst[idx --] = leaf;
+					digitInLeaf = 0;
+					leaf = 0;
+				}
+				leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+			}
+			if ( idx >= 0 ) {
+				dst[idx] = leaf;
+			}
+		}
+		if ( dot == HString::npos ) {
+			_integralPartSize = _leafCount;
+		} else if ( ( end - dot - 1 ) >= _precision ) {
+			_precision = end - dot;
+		}
+		if ( denormalizedEnd >= len ) {
+			break;
+		}
+		code_point_t afterDenormalizedForm( number_[denormalizedEnd] );
+		if ( ( afterDenormalizedForm != 'e'_ycp ) && ( afterDenormalizedForm != 'E'_ycp ) ) {
+			break;
+		}
+		int exponentStartIdx( denormalizedEnd + 1 );
+		char const ERR_EXPON[] = "Invalid argument: malformed exponential notation";
+		if ( exponentStartIdx >= len ) {
+			throw HNumberException( ERR_EXPON );
+		}
+		int exponentIdx( exponentStartIdx );
+		code_point_t exponentStartChar( number_[exponentIdx] );
+		if ( ( exponentStartChar == '-'_ycp ) || ( exponentStartChar == '+'_ycp ) ) {
+			++ exponentIdx;
+		}
+		if ( ( exponentIdx >= len ) || ( DIGITS.find( number_[exponentIdx] ) == HString::npos ) ) {
+			throw HNumberException( ERR_EXPON );
+		}
+		if ( exponentStartChar == '+'_ycp ) {
+			++ exponentStartIdx;
+		}
+		exponent = lexical_cast<int>( number_.substr( exponentStartIdx ) );
+	} while ( false );
 	if ( _leafCount == 0 ) {
 		_negative = false;
 	} else if ( exponent ) {
