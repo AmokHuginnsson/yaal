@@ -25,9 +25,21 @@ namespace hcore {
 
 namespace number {
 
-HString const VALID_CHARACTERS( "-.0123456789" );
-HString const DIGITS_AND_DOT( VALID_CHARACTERS.substr( A_DOT ) );
-HString const DIGITS( VALID_CHARACTERS.substr( A_ZERO ) );
+#define M_MINUS "-"
+#define M_DOT "."
+#define M_DIGITS "0123456789"
+#define M_SPACER "_"
+
+HString const VALID_CHARACTERS( M_MINUS M_DOT M_DIGITS );
+HString const DIGITS_AND_DOT( M_DOT M_DIGITS );
+HString const DIGITS_AND_SPACER( M_DIGITS M_SPACER );
+HString const DIGITS_SPACER_AND_DOT( M_DIGITS M_DOT M_SPACER );
+HString const DIGITS( M_DIGITS );
+
+#undef M_SPACER
+#undef M_DIGITS
+#undef M_DOT
+#undef M_MINUS
 
 i32_t const DECIMAL_SHIFT[] = {
 	/* 0 */ 1l,
@@ -65,7 +77,7 @@ struct HNumber::ElementaryFunctions {
 			integer_t digits( 0 );
 			bool aboveOne( value_ >= number::N1 );
 			if ( aboveOne ) {
-				digits = static_cast<integer_t>( s.find( VALID_CHARACTERS[A_DOT] ) );
+				digits = static_cast<integer_t>( s.find( A_DOT ) );
 				if ( digits == HString::npos ) {
 					digits = static_cast<integer_t>( s.get_length() );
 				}

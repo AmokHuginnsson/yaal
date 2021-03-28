@@ -457,7 +457,7 @@ void HNumber::from_string( HString const& number_ ) {
 	if ( start == HString::npos ) {
 		throw HNumberException( NO_DIGITS ); /* exclude "!!!!" */
 	}
-	_negative = ( number_[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
+	_negative = ( number_[ start ] == A_MINUS ); /* "!!!-???" */
 	if ( _negative ) {
 		++ start;
 	}
@@ -468,7 +468,7 @@ void HNumber::from_string( HString const& number_ ) {
 	if ( number_.find_one_of( DIGITS_AND_DOT, start ) != start ) {
 		throw HNumberException( NO_DIGITS ); /* exclude "--" and "-!!" */
 	}
-	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
+	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0_", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
 	int exponent( 0 );
@@ -479,8 +479,8 @@ void HNumber::from_string( HString const& number_ ) {
 	do { /* "!!![-][.1-9]???" or "000." */
 		integer_t firstValid( start );
 		start = idx;
-		integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
-		idx = static_cast<integer_t>( number_.find_other_than( DIGITS_AND_DOT, start ) );
+		integer_t dot( static_cast<integer_t>( number_.find( A_DOT, start ) ) );
+		idx = static_cast<integer_t>( number_.find_other_than( DIGITS_SPACER_AND_DOT, start ) );
 		if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
 			dot = HString::npos;
 		}
@@ -494,7 +494,7 @@ void HNumber::from_string( HString const& number_ ) {
 		if ( ( digit - start ) > 1 ) {
 			throw HNumberException( "Invalid argument: malformed point notation" ); /* exclude "-..!!" and "..!!" */
 		}
-		integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS : DIGITS_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
+		integer_t end( static_cast<integer_t>( number_.find_other_than( dot >= 0 ? DIGITS_AND_SPACER : DIGITS_SPACER_AND_DOT, dot >= 0 ? dot + 1 : start ) ) );
 		( end != HString::npos ) || ( end = len );
 		int denormalizedEnd( end );
 		if ( dot != HString::npos ) {
@@ -511,16 +511,29 @@ void HNumber::from_string( HString const& number_ ) {
 		i32_t* dst( _canonical.get<i32_t>() );
 		i32_t leaf( 0 );
 		int digitInLeaf( 0 );
+		bool spacer( false );
 		if ( dot != HString::npos ) { /* scan fractional part */
 			idx = _integralPartSize;
-			for ( HString::const_iterator it( number_.begin() + dot + 1 ), endIt( number_.begin() + end ); it != endIt; ++ it, ++ digitInLeaf ) {
-				M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
+			for ( HString::const_iterator it( number_.begin() + dot + 1 ), endIt( number_.begin() + end ); it != endIt; ++ it ) {
+				M_ASSERT( ( *it >= A_ZERO ) || ( *it == A_SPACER ) );
+				if ( *it == A_SPACER ) {
+					if ( spacer ) {
+						throw HNumberException( "Invalid argument: doubled spacers" );
+					}
+					if ( ( idx == _integralPartSize ) && ( digitInLeaf == 0 ) ) {
+						throw HNumberException( "Invalid argument: leading spacer" );
+					}
+					spacer = true;
+					continue;
+				}
+				spacer = false;
 				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 					dst[idx ++] = leaf;
 					digitInLeaf = 0;
 					leaf = 0;
 				}
-				leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+				leaf += ( static_cast<int>( ( *it - A_ZERO ).get() ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+				++ digitInLeaf;
 			}
 			if ( idx < _leafCount ) {
 				dst[idx] = leaf;
@@ -532,15 +545,27 @@ void HNumber::from_string( HString const& number_ ) {
 			digitInLeaf = 0;
 			integer_t lastIntDigIdx( ( dot != HString::npos ? dot : end ) - 1 );
 			HString::const_iterator it( number_.begin() + lastIntDigIdx );
-			for ( integer_t i( lastIntDigIdx ); i >= start; -- i, -- it, ++ digitInLeaf ) {
-				M_ASSERT( *it >= VALID_CHARACTERS[ A_ZERO ] );
+			for ( integer_t i( lastIntDigIdx ); i >= start; -- i, -- it ) {
+				M_ASSERT( ( *it >= A_ZERO ) || ( *it == A_SPACER ) );
+				if ( *it == A_SPACER ) {
+					if ( spacer ) {
+						throw HNumberException( "Invalid argument: doubled spacers" );
+					}
+					if ( i == lastIntDigIdx ) {
+						throw HNumberException( "Invalid argument: trailing spacer" );
+					}
+					spacer = true;
+					continue;
+				}
+				spacer = false;
 				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 					M_ASSERT( idx >= 0 );
 					dst[idx --] = leaf;
 					digitInLeaf = 0;
 					leaf = 0;
 				}
-				leaf += ( static_cast<int>( ( *it - VALID_CHARACTERS[ A_ZERO ] ).get() ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+				leaf += ( static_cast<int>( ( *it - A_ZERO ).get() ) * DECIMAL_SHIFT[ digitInLeaf ] ); /* *TODO* Remove static_cast if code point is i32_t instead of u32_t. */
+				++ digitInLeaf;
 			}
 			if ( idx >= 0 ) {
 				dst[idx] = leaf;
@@ -592,7 +617,7 @@ HString HNumber::to_string( void ) const {
 	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF_CONST + static_cast<int>( sizeof ( "-0." ) ) );
 	char* ptr( _cache.get<char>() );
 	if ( _negative ) {
-		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_MINUS ].get() );
+		*ptr ++ = static_cast<char>( A_MINUS.get() );
 	}
 	integer_t leaf( 0 );
 	for ( ; leaf < _integralPartSize; ++ leaf ) {
@@ -600,9 +625,9 @@ HString HNumber::to_string( void ) const {
 	}
 	if ( _leafCount > _integralPartSize ) {
 		if ( ! _integralPartSize ) {
-			*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_ZERO ].get() );
+			*ptr ++ = static_cast<char>( A_ZERO.get() );
 		}
-		*ptr ++ = static_cast<char>( VALID_CHARACTERS[ A_DOT ].get() );
+		*ptr ++ = static_cast<char>( A_DOT.get() );
 	}
 	for ( ; leaf < _leafCount; ++ leaf ) {
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, ZFORMAT, src[ leaf ] );
