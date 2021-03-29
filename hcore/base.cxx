@@ -132,11 +132,29 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 			M_ASSERT( !"invalid code path"[0] );
 		}
 	}
-	for ( int i( 0 ); ( i < len ) && cc->has( *it ); ++ i, ++ it, ++ alternate_ ) {
+	bool spacer( false );
+	for ( int i( 0 ); i < len; ++ it ) {
+		if ( *it == '_'_ycp ) {
+			if ( spacer ) {
+				M_THROW( "double spacer", i );
+			}
+			spacer = true;
+			++ i;
+			continue;
+		}
+		spacer = false;
+		if ( ! cc->has( *it ) ) {
+			break;
+		}
 		if ( i > maxDigits ) {
 			M_THROW( "too many "_ys.append( name ).append( " digits: " ).append( str_ ), len );
 		}
 		*alternate_ = static_cast<char>( (*it).get() );
+		++ i;
+		++ alternate_;
+	}
+	if ( spacer ) {
+		M_THROW( "trailing spacer", len );
 	}
 	*alternate_ = 0;
 	return base;
