@@ -3037,7 +3037,7 @@ void copy_ascii( HString const& string_, char* buffer_, int size_ ) {
 
 void copy_ascii( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_ ) {
 	M_PROLOG
-	copy_ascii_impl( it_, end_, buffer_, size_, true );
+	copy_ascii_impl( it_, end_, buffer_, size_, false );
 	return;
 	M_EPILOG
 }
@@ -3051,7 +3051,7 @@ void copy_all_to_ascii( HString const& string_, char* buffer_, int size_ ) {
 
 void copy_all_to_ascii( HString::const_iterator it_, HString::const_iterator end_, char* buffer_, int size_ ) {
 	M_PROLOG
-	copy_ascii_impl( it_, end_, buffer_, size_, false );
+	copy_ascii_impl( it_, end_, buffer_, size_, true );
 	return;
 	M_EPILOG
 }
