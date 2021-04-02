@@ -110,7 +110,7 @@ int _functionMnemonicsLength_[ 16 ] = {
 HExpression::HExpression( void )
 	: _index( 0 )
 	, _length( 0 )
-	, _error( OK )
+	, _error( ERROR_CODE::OK )
 	, _variables()
 	, _constantsPool()
 	, _terminalIndexes()
@@ -125,7 +125,7 @@ HExpression::HExpression( void )
 HExpression::HExpression( HString const& formula )
 	: _index( 0 )
 	, _length( 0 )
-	, _error( OK )
+	, _error( ERROR_CODE::OK )
 	, _variables()
 	, _constantsPool()
 	, _terminalIndexes()
@@ -427,7 +427,7 @@ bool HExpression::translate( HString const& formula_ ) {
 				}
 			}
 			if ( ! isFunc ) {
-				_error = UNKNOWN_MNEMONIC;
+				_error = ERROR_CODE::UNKNOWN_MNEMONIC;
 				_index = realIndex;
 				return ( false );
 			}
@@ -436,7 +436,7 @@ bool HExpression::translate( HString const& formula_ ) {
 			++ index;
 			++ realIndex;
 		} else {
-			_error = UNEXPECTED_TOKEN;
+			_error = ERROR_CODE::UNEXPECTED_TOKEN;
 			_index = realIndex;
 			return ( false );
 		}
@@ -455,7 +455,7 @@ bool HExpression::addition_production( tree_t::node_t node_ ) {
 		return ( false );
 	}
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	}
 	(**node_).METHOD = &HExpression::addition;
@@ -481,7 +481,7 @@ bool HExpression::multiplication_production( tree_t::node_t node_ ) {
 		return ( false );
 	}
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	}
 	(**node_).METHOD = &HExpression::multiplication;
@@ -526,7 +526,7 @@ bool HExpression::power_production( tree_t::node_t node_ ) {
 		return ( false );
 	}
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	}
 	(**node_).METHOD = &HExpression::bracket;
@@ -546,7 +546,7 @@ bool HExpression::power_production( tree_t::node_t node_ ) {
 bool HExpression::signum_production( tree_t::node_t node_ ) {
 	M_PROLOG
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	}
 	if ( _formula[ _index ] == '-' ) {
@@ -567,7 +567,7 @@ bool HExpression::factorial_production( tree_t::node_t node_ ) {
 	if ( ! terminal_production( &*node_->add_node() ) )
 		return ( false );
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	} else if ( ( _index < _length ) && ( _formula[ _index ] == OPERATOR::FACTORIAL ) ) {
 		++ _index;
@@ -581,8 +581,10 @@ bool HExpression::factorial_production( tree_t::node_t node_ ) {
 
 bool HExpression::terminal_production( tree_t::node_t node_ ) {
 	M_PROLOG
+	static int const MAX_FLOAT_DIGIT_COUNT( 8192 );
+	char numberBuffer[MAX_FLOAT_DIGIT_COUNT];
 	if ( _index > _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 		return ( false );
 	}
 	switch ( _formula[ _index ] ) {
@@ -592,7 +594,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 				return ( false );
 			}
 			if ( _formula [ _index ] != ')' ) {
-				_error = CLOSING_BRACKET_EXPECTED;
+				_error = ERROR_CODE::CLOSING_BRACKET_EXPECTED;
 				return ( false );
 			} else {
 				++ _index;
@@ -607,7 +609,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 			(**node_).METHOD = &HExpression::functions;
 			(**node_)._variables.push_back( FUNCTION::ABS );
 			if ( _formula[ _index ] != '|' ) {
-				_error = CLOSING_ABSOLUTE_EXPECTED;
+				_error = ERROR_CODE::CLOSING_ABSOLUTE_EXPECTED;
 				return ( false );
 			} else {
 				++ _index;
@@ -631,32 +633,83 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 				return ( false );
 			}
 			if ( _formula[ _index ] != ')' ) {
-				_error = CLOSING_FUNCTION_BRACKET_EXPECTED;
+				_error = ERROR_CODE::CLOSING_FUNCTION_BRACKET_EXPECTED;
 				return ( false );
 			} else {
 				++ _index;
 			}
 		} else {
-			_error = OPENING_FUNCTION_BRACKET_EXPECTED;
+			_error = ERROR_CODE::OPENING_FUNCTION_BRACKET_EXPECTED;
 			return ( false );
 		}
 		return ( true );
 	}
 	int digits( 0 );
-	int offset( _index );
-	while ( ( _index < _length ) && ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+	bool spacer( false );
+	while ( _index < _length ) {
+		char ch( _formula[ _index ] );
+		if ( ch == '_' ) {
+			if ( digits == 0 ) {
+				_error = ERROR_CODE::LEADING_SPACER;
+				return ( false );
+			}
+			if ( spacer ) {
+				_error = ERROR_CODE::DOUBLE_SPACER;
+				return ( false );
+			}
+			spacer = true;
+			++ _index;
+			continue;
+		}
+		if ( ( ch < '0' ) || ( ch > '9' ) ) {
+			break;
+		}
+		spacer = false;
+		numberBuffer[digits] = ch;
 		++ _index;
 		++ digits;
 	}
+	if ( spacer ) {
+		_error = ERROR_CODE::TRAILING_SPACER;
+		return ( false );
+	}
+	int dot( 0 );
 	if ( ( _index < _length ) && ( _formula[ _index ] == '.' ) ) {
 		++ _index;
+		numberBuffer[digits] = '.';
+		dot = 1;
 	}
-	while ( ( _index < _length ) && ( _formula[ _index ] >= '0' ) && ( _formula[ _index ] <= '9' ) ) {
+	int fracDigits( 0 );
+	while ( _index < _length ) {
+		char ch( _formula[ _index ] );
+		if ( ch == '_' ) {
+			if ( fracDigits == 0 ) {
+				_error = ERROR_CODE::LEADING_SPACER;
+				return ( false );
+			}
+			if ( spacer ) {
+				_error = ERROR_CODE::DOUBLE_SPACER;
+				return ( false );
+			}
+			spacer = true;
+			++ _index;
+			continue;
+		}
+		if ( ( ch < '0' ) || ( ch > '9' ) ) {
+			break;
+		}
+		spacer = false;
+		numberBuffer[digits + dot + fracDigits] = ch;
 		++ _index;
-		++ digits;
+		++ fracDigits;
 	}
+	if ( spacer ) {
+		_error = ERROR_CODE::TRAILING_SPACER;
+		return ( false );
+	}
+	numberBuffer[digits + dot + fracDigits] = 0;
 	if ( digits > 0 ) {
-		double long value( ::strtold( _formula + offset, nullptr ) );
+		double long value( ::strtold( numberBuffer, nullptr ) );
 		_constantsPool.push_back( value );
 		/* We save variables as positive indexes and constants as negative
 		 * indexes, positive and negative 0 index would conflict so
@@ -666,12 +719,12 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		 * so to get index of lately added value we need to decrement size by 1. */
 		(**node_)._variables.push_back( static_cast<int>( - ( _constantsPool.size() - 1 ) - 1 ) );
 		return ( true );
-	} else if ( _index != offset ) {
+	} else if ( dot > 0 ) {
 		/* Just one alone dot found. */
-		_error = DIGIT_EXPECTED;
+		_error = ERROR_CODE::DIGIT_EXPECTED;
 		return ( false );
 	}
-	_error = UNEXPECTED_TOKEN;
+	_error = ERROR_CODE::UNEXPECTED_TOKEN;
 	return ( false );
 	M_EPILOG
 }
@@ -679,9 +732,9 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 double long* HExpression::compile( HString const& formula_ ) {
 	M_PROLOG
 	_index = 0;
-	_error = OK;
+	_error = ERROR_CODE::OK;
 	if ( formula_.is_empty() ) {
-		_error = PREMATURE_TERMINATION;
+		_error = ERROR_CODE::PREMATURE_TERMINATION;
 		throw HExpressionException( _syntaxError_ );
 	}
 	if ( ! translate( formula_ ) ) {
@@ -690,13 +743,13 @@ double long* HExpression::compile( HString const& formula_ ) {
 	_constantsPool.clear();
 	tree_t::node_t root( _equationTree.create_new_root() );
 	if ( addition_production( root ) ) {
-		if ( ( _index < _length ) && ( _error == OK ) ) {
-			_error = UNEXPECTED_TOKEN;
+		if ( ( _index < _length ) && ( _error == ERROR_CODE::OK ) ) {
+			_error = ERROR_CODE::UNEXPECTED_TOKEN;
 		}
 	} else if ( _index >= _length ) {
-		_error = UNEXPECTED_TERMINATION;
+		_error = ERROR_CODE::UNEXPECTED_TERMINATION;
 	}
-	if ( _error != OK ) {
+	if ( _error != ERROR_CODE::OK ) {
 		_equationTree.clear();
 		_constantsPool.clear();
 		throw HExpressionException( _syntaxError_ );
@@ -707,7 +760,7 @@ double long* HExpression::compile( HString const& formula_ ) {
 
 double long* HExpression::variables( void ) {
 	M_PROLOG
-	M_ASSERT( _error == OK );
+	M_ASSERT( _error == ERROR_CODE::OK );
 	return ( _variables );
 	M_EPILOG
 }
@@ -741,25 +794,31 @@ double long HExpression::evaluate( void ) {
 char const* HExpression::get_error( void ) const {
 	M_PROLOG
 	switch ( _error ) {
-		case ( OK ):
+		case ( ERROR_CODE::OK ):
 			return ( _( "successful" ) );
-		case ( UNKNOWN_MNEMONIC ):
+		case ( ERROR_CODE::UNKNOWN_MNEMONIC ):
 			return ( _( "unknown mnemonic" ) );
-		case ( UNEXPECTED_TERMINATION ):
+		case ( ERROR_CODE::UNEXPECTED_TERMINATION ):
 			return ( _( "unexpected termination" ) );
-		case ( CLOSING_BRACKET_EXPECTED ):
+		case ( ERROR_CODE::CLOSING_BRACKET_EXPECTED ):
 			return ( _( "closing bracket expected" ) );
-		case ( CLOSING_ABSOLUTE_EXPECTED ):
+		case ( ERROR_CODE::CLOSING_ABSOLUTE_EXPECTED ):
 			return ( _( "closing absolute bracket expected" ) );
-		case ( CLOSING_FUNCTION_BRACKET_EXPECTED ):
+		case ( ERROR_CODE::CLOSING_FUNCTION_BRACKET_EXPECTED ):
 			return ( _( "closing function bracket expected" ) );
-		case ( OPENING_FUNCTION_BRACKET_EXPECTED ):
+		case ( ERROR_CODE::OPENING_FUNCTION_BRACKET_EXPECTED ):
 			return ( _( "opening function bracket expected" ) );
-		case ( DIGIT_EXPECTED ):
+		case ( ERROR_CODE::DIGIT_EXPECTED ):
 			return ( _( "digit expected" ) );
-		case ( UNEXPECTED_TOKEN ):
+		case ( ERROR_CODE::UNEXPECTED_TOKEN ):
 			return ( _( "unexpected token" ) );
-		case ( PREMATURE_TERMINATION ):
+		case ( ERROR_CODE::DOUBLE_SPACER ):
+			return ( _( "double spacer" ) );
+		case ( ERROR_CODE::TRAILING_SPACER ):
+			return ( _( "trailing spacer" ) );
+		case ( ERROR_CODE::LEADING_SPACER ):
+			return ( _( "leading spacer" ) );
+		case ( ERROR_CODE::PREMATURE_TERMINATION ):
 			return ( _( "premature termination" ) );
 		default :
 			M_THROW ( _( "unknown error code" ), _error );
@@ -771,8 +830,8 @@ char const* HExpression::get_error( void ) const {
 
 int HExpression::get_error_token( void ) const {
 	M_PROLOG
-	if ( _length > _index ) {
-		return ( _terminalIndexes [ _index ] );
+	if ( _index < _length ) {
+		return ( _terminalIndexes[ _index ] );
 	} else if ( _index >= 0 ) {
 		return ( _length );
 	}

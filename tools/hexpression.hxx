@@ -18,18 +18,21 @@ class HExpression final {
 public:
 	static int const MAX_VARIABLE_COUNT = 26;
 	typedef HExpression this_type;
-	typedef enum {
-		OK = 0,
-		UNKNOWN_MNEMONIC = 1,
-		UNEXPECTED_TERMINATION = 2,
-		CLOSING_BRACKET_EXPECTED = 3,
-		CLOSING_ABSOLUTE_EXPECTED = 4,
-		CLOSING_FUNCTION_BRACKET_EXPECTED = 5,
-		OPENING_FUNCTION_BRACKET_EXPECTED = 6,
-		DIGIT_EXPECTED = 7,
-		UNEXPECTED_TOKEN = 8,
-		PREMATURE_TERMINATION = 9
-	} syntax_error_t;
+	enum class ERROR_CODE {
+		OK,
+		UNKNOWN_MNEMONIC,
+		UNEXPECTED_TERMINATION,
+		CLOSING_BRACKET_EXPECTED,
+		CLOSING_ABSOLUTE_EXPECTED,
+		CLOSING_FUNCTION_BRACKET_EXPECTED,
+		OPENING_FUNCTION_BRACKET_EXPECTED,
+		DIGIT_EXPECTED,
+		UNEXPECTED_TOKEN,
+		DOUBLE_SPACER,
+		TRAILING_SPACER,
+		LEADING_SPACER,
+		PREMATURE_TERMINATION
+	};
 private:
 	typedef hcore::HList<int> int_list_t;
 	struct OEquationElement;
@@ -42,7 +45,7 @@ private:
 	};
 	int _index;
 	int _length;
-	syntax_error_t _error;
+	ERROR_CODE _error;
 	double long _variables[ MAX_VARIABLE_COUNT ];
 	typedef hcore::HArray<double long> constants_t;
 	constants_t _constantsPool;
