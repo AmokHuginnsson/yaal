@@ -12,6 +12,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/htree.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/unicode.hxx"
 #include "hcore/math.hxx"
 #include "hexpression.hxx"
 #include "xmath.hxx"
@@ -411,9 +412,11 @@ bool HExpression::translate( HString const& formula_ ) {
 	char* formula( _formulaCache.get<char>() );
 	_formula = formula;
 	_terminalIndexes.resize( length + 1 );
+	code_point_t prevChar( unicode::CODE_POINT::INVALID );
 	while ( index < length ) {
 		_terminalIndexes[ realIndex ] = index;
-		if ( ( formula_[ index ] >= 'a' ) && ( formula_[ index ] <= 'z' ) ) {
+		code_point_t cp( formula_[index] );
+		if ( is_lower( cp ) && ! is_digit( prevChar ) ) {
 			bool isFunc( false );
 			for ( int funcIdx( 0 ); funcIdx < yaal::size( _functionsMnemonics_ ); ++ funcIdx ) {
 				if (
@@ -431,8 +434,8 @@ bool HExpression::translate( HString const& formula_ ) {
 				_index = realIndex;
 				return ( false );
 			}
-		} else if ( is_ascii( formula_[ index ] ) ) {
-			formula[ realIndex ] = static_cast<char>( formula_[ index ].get() );
+		} else if ( is_ascii( cp ) ) {
+			formula[ realIndex ] = static_cast<char>( cp.get() );
 			++ index;
 			++ realIndex;
 		} else {
@@ -441,6 +444,7 @@ bool HExpression::translate( HString const& formula_ ) {
 			return ( false );
 		}
 		_length = realIndex;
+		prevChar = cp;
 	}
 	formula[_length] = 0;
 	_terminalIndexes[ realIndex ] = index;
@@ -675,8 +679,8 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 	}
 	int dot( 0 );
 	if ( ( _index < _length ) && ( _formula[ _index ] == '.' ) ) {
-		++ _index;
 		numberBuffer[digits] = '.';
+		++ _index;
 		dot = 1;
 	}
 	int fracDigits( 0 );
@@ -707,7 +711,45 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		_error = ERROR_CODE::TRAILING_SPACER;
 		return ( false );
 	}
-	numberBuffer[digits + dot + fracDigits] = 0;
+	int expChars( 0 );
+	do {
+		if ( _index >= _length ) {
+			break;
+		}
+		char ch( _formula[ _index ] );
+		if ( ( ch != 'e' ) && ( ch != 'E' ) ) {
+			break;
+		}
+		numberBuffer[digits + dot + fracDigits] = ch;
+		++ _index;
+		++ expChars;
+		if ( _index >= _length ) {
+			_error = ERROR_CODE::DIGIT_EXPECTED;
+			return ( false );
+		}
+		ch = _formula[ _index ];
+		if ( ( ch == '-' ) || ( ch == '+' ) ) {
+			numberBuffer[digits + dot + fracDigits + expChars] = ch;
+			++ _index;
+			++ expChars;
+		}
+		bool hasExpDigit( false );
+		while ( _index < _length ) {
+			ch = _formula[ _index ];
+			if ( ( ch < '0' ) || ( ch > '9' ) ) {
+				break;
+			}
+			numberBuffer[digits + dot + fracDigits + expChars] = ch;
+			hasExpDigit = true;
+			++ _index;
+			++ expChars;
+		}
+		if ( ! hasExpDigit ) {
+			_error = ERROR_CODE::DIGIT_EXPECTED;
+			return ( false );
+		}
+	} while ( false );
+	numberBuffer[digits + dot + fracDigits + expChars] = 0;
 	if ( digits > 0 ) {
 		double long value( ::strtold( numberBuffer, nullptr ) );
 		_constantsPool.push_back( value );
