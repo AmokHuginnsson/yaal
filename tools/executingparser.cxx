@@ -3056,8 +3056,34 @@ yaal::hcore::HUTF8String::const_iterator HInteger::do_parse( HExecutingParser* e
 			is_digit_test = &is_bin_digit;
 		}
 		scan += skip;
-		while ( ( scan != last_ ) && is_digit_test( *scan ) ) {
+		bool spacer( false );
+		bool hasDigit( false );
+		while ( scan != last_ ) {
+			if ( *scan == '_' ) {
+				if ( ! hasDigit ) {
+					break;
+				}
+				if ( spacer ) {
+					break;
+				}
+				spacer = true;
+				++ scan;
+				continue;
+			}
+			spacer = false;
+			if ( ! is_digit_test( *scan ) ) {
+				break;
+			}
+			hasDigit = true;
 			++ scan;
+		}
+		if ( ! hasDigit ) {
+			valid = false;
+			break;
+		}
+		if ( spacer ) {
+			valid = false;
+			break;
 		}
 		if ( scan == ( first_ + skip ) ) {
 			valid = false;
