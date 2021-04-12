@@ -46,6 +46,8 @@ struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
 	}
 };
 
+extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
+
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 class HHashContainer final {
 public:
@@ -281,7 +283,22 @@ public:
 	equal_key_type const& equal_key( void ) const {
 		return ( _equals );
 	}
-	HIterator find( key_type const& ) const;
+	HIterator find( key_type const& key_ ) const {
+		M_PROLOG
+		size_type idx( 0 );
+		HAtom* atom( nullptr );
+		if ( _prime ) {
+			idx = static_cast<size_type>(
+				static_cast<hash_value_t>( _hasher( key_ ) ) % static_cast<hash_value_t>( _prime )
+			);
+			atom = _buckets.get<HAtom*>()[ idx ];
+			while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
+				atom = atom->_next;
+			}
+		}
+		return ( atom ? HIterator( this, idx, atom ) : end() );
+		M_EPILOG
+	}
 	HPair<HIterator, bool> insert( value_type const& val_ ) {
 		return ( insert_impl( constructor_copy( val_ ) ) );
 	}
@@ -299,7 +316,41 @@ public:
 		return ( HIterator( this, _prime, nullptr ) );
 		M_EPILOG
 	}
-	void resize( size_type );
+	void resize( size_type size_ ) {
+		M_PROLOG
+		if ( size_ < 1 )
+			M_THROW( "bad new container size", size_ );
+		if ( size_ > _size ) {
+			int n = 0;
+			while ( size_ ) {
+				size_ >>= 1;
+				n ++;
+			}
+			size_type prime( _primes_[ n - 1 ] );
+			HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+			M_ASSERT( ( buckets.size() / static_cast<size_type>( sizeof ( HAtom* ) ) ) >= prime );
+			HAtom** oldBuckets = _buckets.get<HAtom*>();
+			HAtom** newBuckets = buckets.get<HAtom*>();
+			for ( size_type i( 0 ); i < _prime; ++ i ) {
+				HAtom* a( oldBuckets[ i ] );
+				while ( a ) {
+					HAtom* atom( a );
+					a = a->_next;
+					size_type newHash(
+						static_cast<size_type>(
+							static_cast<hash_value_t>( _hasher( get_key_type::key( atom->_value ) ) ) % static_cast<hash_value_t>( prime )
+						)
+					);
+					atom->_next = newBuckets[ newHash ];
+					newBuckets[ newHash ] = atom;
+				}
+			}
+			_buckets.swap( buckets );
+			_prime = prime;
+		}
+		return;
+		M_EPILOG
+	}
 	void erase( HIterator const& it ) {
 		M_PROLOG
 		HAtom** buckets = _buckets.get<HAtom*>();
@@ -364,103 +415,40 @@ private:
 	HHashContainer( HHashContainer const& ) = delete;
 	HHashContainer& operator = ( HHashContainer const& ) = delete;
 	template<typename constructor_t>
-	HPair<HIterator, bool> insert_impl( constructor_t&& );
-};
-
-template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
-typename HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::HIterator
-HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::find( key_type const& key_ ) const {
-	M_PROLOG
-	size_type idx( 0 );
-	HAtom* atom( nullptr );
-	if ( _prime ) {
-		idx = static_cast<size_type>(
-			static_cast<hash_value_t>( _hasher( key_ ) ) % static_cast<hash_value_t>( _prime )
-		);
-		atom = _buckets.get<HAtom*>()[ idx ];
-		while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
-			atom = atom->_next;
-		}
-	}
-	return ( atom ? HIterator( this, idx, atom ) : end() );
-	M_EPILOG
-}
-
-template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
-template<typename constructor_t>
-HPair<typename HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::HIterator, bool>
-HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::insert_impl( constructor_t&& constructor_ ) {
-	M_PROLOG
-	HIterator it( _prime ? find( get_key_type::key( constructor_._value ) ) : end() );
-	bool inserted( false );
-	if ( ! ( it != end() ) ) {
-		if ( ( _size + 1 ) > _prime ) {
-			resize( ( _size + 1 ) * 2 );
-		}
-
-		size_type newHash(
-			static_cast<size_type>(
-				static_cast<hash_value_t>( _hasher( get_key_type::key( constructor_._value ) ) ) % static_cast<hash_value_t>( _prime )
-			)
-		);
-
-		HAtom* atom( _allocator.allocate( 1 ) );
-		try {
-			constructor_.construct( atom );
-		} catch ( ... ) {
-			_allocator.deallocate( atom, 1 );
-			throw;
-		}
-
-		HAtom** buckets = _buckets.get<HAtom*>();
-		atom->_next = buckets[ newHash ];
-		buckets[ newHash ] = atom;
-		++ _size;
-		it = HIterator( this, newHash, atom );
-		inserted = true;
-	}
-	return ( make_pair( it, inserted ) );
-	M_EPILOG
-}
-
-extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
-
-template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
-void HHashContainer<value_t, hasher_t, equal_key_t, get_key_t, allocator_t>::resize( size_type size_ ) {
-	M_PROLOG
-	if ( size_ < 1 )
-		M_THROW( "bad new container size", size_ );
-	if ( size_ > _size ) {
-		int n = 0;
-		while ( size_ ) {
-			size_ >>= 1;
-			n ++;
-		}
-		size_type prime( _primes_[ n - 1 ] );
-		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
-		M_ASSERT( ( buckets.size() / static_cast<size_type>( sizeof ( HAtom* ) ) ) >= prime );
-		HAtom** oldBuckets = _buckets.get<HAtom*>();
-		HAtom** newBuckets = buckets.get<HAtom*>();
-		for ( size_type i( 0 ); i < _prime; ++ i ) {
-			HAtom* a( oldBuckets[ i ] );
-			while ( a ) {
-				HAtom* atom( a );
-				a = a->_next;
-				size_type newHash(
-					static_cast<size_type>(
-						static_cast<hash_value_t>( _hasher( get_key_type::key( atom->_value ) ) ) % static_cast<hash_value_t>( prime )
-					)
-				);
-				atom->_next = newBuckets[ newHash ];
-				newBuckets[ newHash ] = atom;
+	HPair<HIterator, bool> insert_impl( constructor_t&& constructor_ ) {
+		M_PROLOG
+		HIterator it( _prime ? find( get_key_type::key( constructor_._value ) ) : end() );
+		bool inserted( false );
+		if ( ! ( it != end() ) ) {
+			if ( ( _size + 1 ) > _prime ) {
+				resize( ( _size + 1 ) * 2 );
 			}
+
+			size_type newHash(
+				static_cast<size_type>(
+					static_cast<hash_value_t>( _hasher( get_key_type::key( constructor_._value ) ) ) % static_cast<hash_value_t>( _prime )
+				)
+			);
+
+			HAtom* atom( _allocator.allocate( 1 ) );
+			try {
+				constructor_.construct( atom );
+			} catch ( ... ) {
+				_allocator.deallocate( atom, 1 );
+				throw;
+			}
+
+			HAtom** buckets = _buckets.get<HAtom*>();
+			atom->_next = buckets[ newHash ];
+			buckets[ newHash ] = atom;
+			++ _size;
+			it = HIterator( this, newHash, atom );
+			inserted = true;
 		}
-		_buckets.swap( buckets );
-		_prime = prime;
+		return ( make_pair( it, inserted ) );
+		M_EPILOG
 	}
-	return;
-	M_EPILOG
-}
+};
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 inline void swap(
