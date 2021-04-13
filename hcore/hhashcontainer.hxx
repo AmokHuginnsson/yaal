@@ -285,18 +285,11 @@ public:
 	}
 	HIterator find( key_type const& key_ ) const {
 		M_PROLOG
-		size_type idx( 0 );
-		HAtom* atom( nullptr );
-		if ( _prime ) {
-			idx = static_cast<size_type>(
-				static_cast<hash_value_t>( _hasher( key_ ) ) % static_cast<hash_value_t>( _prime )
-			);
-			atom = _buckets.get<HAtom*>()[ idx ];
-			while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
-				atom = atom->_next;
-			}
-		}
-		return ( atom ? HIterator( this, idx, atom ) : end() );
+		return (
+			_prime
+				? find_impl( key_, static_cast<hash_value_t>( _hasher( key_ ) ) )
+				: end()
+		);
 		M_EPILOG
 	}
 	HPair<HIterator, bool> insert( value_type const& val_ ) {
@@ -417,18 +410,20 @@ private:
 	template<typename constructor_t>
 	HPair<HIterator, bool> insert_impl( constructor_t&& constructor_ ) {
 		M_PROLOG
-		HIterator it( _prime ? find( get_key_type::key( constructor_._value ) ) : end() );
+		key_type const& key( get_key_type::key( constructor_._value ) );
+		hash_value_t hashValue( static_cast<hash_value_t>( _hasher( key ) ) );
+		HIterator it(
+			_prime
+				? find_impl( key, hashValue )
+				: end()
+		);
 		bool inserted( false );
 		if ( ! ( it != end() ) ) {
 			if ( ( _size + 1 ) > _prime ) {
 				resize( ( _size + 1 ) * 2 );
 			}
 
-			size_type newHash(
-				static_cast<size_type>(
-					static_cast<hash_value_t>( _hasher( get_key_type::key( constructor_._value ) ) ) % static_cast<hash_value_t>( _prime )
-				)
-			);
+			size_type newHash( static_cast<size_type>( hashValue % static_cast<hash_value_t>( _prime ) ) );
 
 			HAtom* atom( _allocator.allocate( 1 ) );
 			try {
@@ -446,6 +441,16 @@ private:
 			inserted = true;
 		}
 		return ( make_pair( it, inserted ) );
+		M_EPILOG
+	}
+	HIterator find_impl( key_type const& key_, hash_value_t hashValue_ ) const {
+		M_PROLOG
+		size_type idx( static_cast<size_type>( hashValue_ % static_cast<hash_value_t>( _prime ) ) );
+		HAtom* atom( _buckets.get<HAtom*>()[ idx ] );
+		while ( atom && ! _equals( get_key_type::key( atom->_value ), key_ ) ) {
+			atom = atom->_next;
+		}
+		return ( atom ? HIterator( this, idx, atom ) : end() );
 		M_EPILOG
 	}
 };
