@@ -539,8 +539,7 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 	int longestLongLength( 0 );
 	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info.opt().get_options() );
-	for ( HProgramOptionsHandler::options_t::const_iterator it( opts.begin() ), end( opts.end() );
-			it != end; ++ it ) {
+	for ( HProgramOptionsHandler::options_t::const_iterator it( opts.begin() ), end( opts.end() ); it != end; ++ it ) {
 		HProgramOptionsHandler::HOption const& o = *it;
 		/* + 2 for --, + 1 for =, 2 for [] */
 		int tmp(
@@ -677,8 +676,10 @@ void show_help( HOptionInfo const& info, HStreamInterface& out_ ) {
 				desc.insert( 0, "    ", info.markdown() ? 4 : 2 );
 				if ( i < ( COUNT - 1 ) ) {
 					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
-					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
-							|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) ) ) {
+					if (
+						( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
+						|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) )
+					) {
 						description = desc;
 						break;
 					}
@@ -750,14 +751,20 @@ void dump_configuration( HOptionInfo const& info, HStreamInterface& out_ ) {
 		}
 		if ( i > 0 ) { /* subsequent options */
 			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
-			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
-					&& ( o.long_form() == p.long_form() )
-					&& ( o.description() == description ) ) {
+			if (
+				! o.long_form().is_empty()
+				&& ! p.long_form().is_empty()
+				&& ( o.long_form() == p.long_form() )
+				&& ( o.description() == description )
+			) {
 				description = "";
 			}
-			if ( is_byte( o.short_form() ) && is_byte( p.short_form() )
-					&& ( o.short_form() == p.short_form() )
-					&& ( o.description() == description ) ) {
+			if (
+				is_byte( o.short_form() )
+				&& is_byte( p.short_form() )
+				&& ( o.short_form() == p.short_form() )
+				&& ( o.description() == description )
+			) {
 				description = "";
 			}
 		}

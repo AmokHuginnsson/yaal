@@ -707,7 +707,7 @@ HHuginn::class_t HRuntime::make_package( yaal::hcore::HString const& name_, HRun
 		}
 	}
 	for ( classes_t::value_type& m : _classes ) {
-		if ( ! m.second->origin() && ( context_._classes.find( m.first ) == context_._classes.end() )) {
+		if ( ! m.second->origin() && ( context_._classes.find( m.first ) == context_._classes.end() ) ) {
 			m.second->set_origin( cls.raw() );
 		}
 	}
@@ -1050,10 +1050,10 @@ void HRuntime::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) const {
 		stream_ << "function: " << name;
 		if ( _debugLevel_ >= DEBUG_LEVEL::VERBOSE_MESSAGES ) {
 			if ( _builtin_.count( name ) > 0 ) {
-				stream_ <<" (builtin)";
+				stream_ << " (builtin)";
 			}
 			if ( _standardLibrary_.count( name ) > 0 ) {
-				stream_ <<" (standard library)";
+				stream_ << " (standard library)";
 			}
 		}
 		stream_ << endl;

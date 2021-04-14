@@ -1835,8 +1835,10 @@ HString::size_type HString::find( HString const& pattern_, size_type after_ ) co
 		after_ = 0;
 	}
 	size_type patternLength( EXT_GET_SIZE( pattern_ ) );
-	if ( ( ! patternLength )
-			|| ( ( after_ + patternLength ) > GET_SIZE ) ) {
+	if (
+		( ! patternLength )
+		|| ( ( after_ + patternLength ) > GET_SIZE )
+	) {
 		return npos;
 	}
 	return (

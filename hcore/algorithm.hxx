@@ -1095,8 +1095,10 @@ inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t l
 	return;
 }
 template<typename iterator_t, typename compare_t>
-inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_,
-	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+inline void inplace_merge_impl(
+	iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_,
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_
+) {
 	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type> aux_t;
 	if ( aux_.get_size() > 0 ) {
 		if ( aux_.get_size() == aux_.get_requested_size() ) {
@@ -1496,8 +1498,7 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operato
  * \return Inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
  */
 template<typename iter_left_t, typename iter_right_t, typename return_t>
-inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
-	iter_right_t itRight, return_t ret ) {
+inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft, iter_right_t itRight, return_t ret ) {
 	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret += ( ( *itLeft ) * ( *itRight ) );
 	}
@@ -1521,9 +1522,10 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
  */
 template<typename iter_left_t, typename iter_right_t, typename return_t,
 	typename summator_t, typename multiplicator_t>
-inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
-	iter_right_t itRight, return_t ret,
-	summator_t summator, multiplicator_t multiplicator ) {
+inline return_t inner_product(
+	iter_left_t itLeft, iter_left_t endLeft, iter_right_t itRight, return_t ret,
+	summator_t summator, multiplicator_t multiplicator
+) {
 	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight ) {
 		ret = summator( ret, multiplicator( *itLeft, *itRight ) );
 	}
@@ -1906,8 +1908,10 @@ static int const YAAL_QUICK_SORT_ALGO_THRESHOLD = 8;
 
 /*! \cond */
 template<typename iterator_t, typename compare_t>
-inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t comp_,
-	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+inline void stable_sort_impl(
+	iterator_t first_, iterator_t last_, compare_t comp_,
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_
+) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD ) {
@@ -2133,8 +2137,10 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
  * 5. Repeat steps 2, 3, 4 until whole range has been processed.
  */
 template<typename iterator_t, typename predicate_t>
-inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
-	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+inline iterator_t stable_partition_impl(
+	iterator_t first_, iterator_t last_, predicate_t predicate_,
+	hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_
+) {
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	value_t* aux( aux_.begin() );
 	value_t* auxEnd( aux_.end() );

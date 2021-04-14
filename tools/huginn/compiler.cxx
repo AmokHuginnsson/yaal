@@ -559,9 +559,8 @@ void OCompiler::resolve_symbols( void ) {
 
 void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executing_parser::range_t range_ ) {
 	M_PROLOG
-	submitted_imports_t::const_iterator it;
-	if (
-		( it = find_if(
+	submitted_imports_t::const_iterator it(
+		find_if(
 			_submittedImports.begin(),
 			_submittedImports.end(),
 			[&identifier_]( OImportInfo const& info_ ) {
@@ -571,8 +570,9 @@ void OCompiler::check_name_import( HHuginn::identifier_id_t identifier_, executi
 					|| ( find( info_._importedSymbols.begin(), info_._importedSymbols.end(), identifier_ ) != info_._importedSymbols.end() )
 				);
 			}
-		) ) != _submittedImports.end()
-	) {
+		)
+	);
+	if ( it != _submittedImports.end() ) {
 		hcore::HString const& name( _runtime->identifier_name( identifier_ ) );
 		throw HHuginn::HHuginnRuntimeException(
 			identifier_ == it->_package
@@ -608,18 +608,17 @@ void OCompiler::check_name_class( HHuginn::identifier_id_t identifier_, bool tes
 
 void OCompiler::check_name_enum( HHuginn::identifier_id_t identifier_, bool testRuntime_, executing_parser::range_t range_ ) {
 	M_PROLOG
-	submitted_enums_t::const_iterator it;
 	HHuginn::value_t const* v( _runtime->get_global( identifier_ ) );
 	if (
 		( testRuntime_ && v && is_enum_class( v ) )
 		|| (
-			( it = find_if(
+			find_if(
 				_submittedEnums.begin(),
 				_submittedEnums.end(),
 				[&identifier_]( HHuginn::value_t const& enum_ ) {
 					return ( identifier_ == enum_->get_class()->identifier_id() );
 				}
-			) ) != _submittedEnums.end()
+			) != _submittedEnums.end()
 		)
 	) {
 		throw HHuginn::HHuginnRuntimeException(
