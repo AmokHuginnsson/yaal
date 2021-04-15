@@ -47,13 +47,13 @@ public:
 		swap( _value, tp_._value );
 		return;
 	}
-	pod_t const& raw( void ) const {
+	constexpr pod_t const& raw( void ) const {
 		return ( _value );
 	}
-	pod_t const& get( void ) const {
+	constexpr pod_t const& get( void ) const {
 		return ( _value );
 	}
-	pod_t& ref( void ) {
+	constexpr pod_t& ref( void ) {
 		return ( _value );
 	}
 #define YAAL_DEFINE_OPER( OP ) \
