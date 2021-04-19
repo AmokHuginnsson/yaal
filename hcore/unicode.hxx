@@ -284,16 +284,16 @@ M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_CAPITAL_LETTER_W,                   0x1d4
 /* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_CAPITAL_LETTER_Y,                   0x????, U"?" ); */
 /* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_CAPITAL_LETTER_Z,                   0x????, U"?" ); */
 
-static code_point_t constexpr LATIN_SUPERSCRIPT_ZERO                = code_point_t( 0x2070 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_ONE                 = code_point_t( 0x00b9 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_TWO                 = code_point_t( 0x00b2 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_THREE               = code_point_t( 0x00b3 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_FOUR                = code_point_t( 0x2074 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_FIVE                = code_point_t( 0x2075 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_SIX                 = code_point_t( 0x2076 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_SEVEN               = code_point_t( 0x2077 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_EIGHT               = code_point_t( 0x2078 );
-static code_point_t constexpr LATIN_SUPERSCRIPT_NINE                = code_point_t( 0x2079 );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_ZERO,                               0x2070, U"⁰" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_ONE,                                0x00b9, U"¹" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_TWO,                                0x00b2, U"²" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_THREE,                              0x00b3, U"³" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_FOUR,                               0x2074, U"⁴" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_FIVE,                               0x2075, U"⁵" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_SIX,                                0x2076, U"⁶" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_SEVEN,                              0x2077, U"⁷" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_EIGHT,                              0x2078, U"⁸" );
+M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_NINE,                               0x2079, U"⁹" );
 
 static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_A        = code_point_t( 0x2090 );
 /* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_B = code_point_t( 0x ); */
