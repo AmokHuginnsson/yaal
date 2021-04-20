@@ -295,32 +295,32 @@ M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_SEVEN,                              0x207
 M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_EIGHT,                              0x2078, U"⁸" );
 M_DEFINE_CODE_POINT( LATIN_SUPERSCRIPT_NINE,                               0x2079, U"⁹" );
 
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_A        = code_point_t( 0x2090 );
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_B = code_point_t( 0x ); */
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_C = code_point_t( 0x ); */
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_D = code_point_t( 0x ); */
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_E        = code_point_t( 0x2091 );
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_F = code_point_t( 0x ); */
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_G = code_point_t( 0x ); */
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_H        = code_point_t( 0x2095 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_I        = code_point_t( 0x1d62 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_J        = code_point_t( 0x2c7c );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_K        = code_point_t( 0x2096 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_L        = code_point_t( 0x2097 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_M        = code_point_t( 0x2098 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_N        = code_point_t( 0x2099 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_O        = code_point_t( 0x2092 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_P        = code_point_t( 0x209a );
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_Q = code_point_t( 0x ); */
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_R        = code_point_t( 0x1d63 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_S        = code_point_t( 0x209b );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_T        = code_point_t( 0x209c );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_U        = code_point_t( 0x1d64 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_V        = code_point_t( 0x1d65 );
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_W = code_point_t( 0x ); */
-static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_X        = code_point_t( 0x2093 );
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_Y = code_point_t( 0x ); */
-/* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_SMALL_LETTER_Z = code_point_t( 0x ); */
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_A,                       0x2090, U"ₐ" );
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_B,                       0x????, U"?" ); */
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_C,                       0x????, U"?" ); */
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_D,                       0x????, U"?" ); */
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_E,                       0x2091, U"ₑ" );
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_F,                       0x????, U"?" ); */
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_G,                       0x????, U"?" ); */
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_H,                       0x2095, U"ₕ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_I,                       0x1d62, U"ᵢ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_J,                       0x2c7c, U"ⱼ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_K,                       0x2096, U"ₖ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_L,                       0x2097, U"ₗ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_M,                       0x2098, U"ₘ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_N,                       0x2099, U"ₙ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_O,                       0x2092, U"ₒ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_P,                       0x209a, U"ₚ" );
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_Q,                       0x????, U"?" ); */
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_R,                       0x1d63, U"ᵣ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_S,                       0x209b, U"ₛ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_T,                       0x209c, U"ₜ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_U,                       0x1d64, U"ᵤ" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_V,                       0x1d65, U"ᵥ" );
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_W,                       0x????, U"?" ); */
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_X,                       0x2093, U"ₓ" );
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_Y,                       0x????, U"?" ); */
+/* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_Z,                       0x????, U"?" ); */
 
 /* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_CAPITAL_LETTER_A = code_point_t( 0x ); */
 /* missing from Unicode *//* static code_point_t constexpr LATIN_SUBSCRIPT_CAPITAL_LETTER_B = code_point_t( 0x ); */
