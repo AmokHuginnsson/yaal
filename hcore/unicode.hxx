@@ -349,16 +349,16 @@ M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SMALL_LETTER_X,                       0x209
 /* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_CAPITAL_LETTER_Y,                     0x????, U"?" ); */
 /* missing from Unicode *//* M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_CAPITAL_LETTER_Z,                     0x????, U"?" ); */
 
-static code_point_t constexpr LATIN_SUBSCRIPT_ZERO                  = code_point_t( 0x2080 );
-static code_point_t constexpr LATIN_SUBSCRIPT_ONE                   = code_point_t( 0x2081 );
-static code_point_t constexpr LATIN_SUBSCRIPT_TWO                   = code_point_t( 0x2082 );
-static code_point_t constexpr LATIN_SUBSCRIPT_THREE                 = code_point_t( 0x2083 );
-static code_point_t constexpr LATIN_SUBSCRIPT_FOUR                  = code_point_t( 0x2084 );
-static code_point_t constexpr LATIN_SUBSCRIPT_FIVE                  = code_point_t( 0x2085 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SIX                   = code_point_t( 0x2086 );
-static code_point_t constexpr LATIN_SUBSCRIPT_SEVEN                 = code_point_t( 0x2087 );
-static code_point_t constexpr LATIN_SUBSCRIPT_EIGHT                 = code_point_t( 0x2088 );
-static code_point_t constexpr LATIN_SUBSCRIPT_NINE                  = code_point_t( 0x2089 );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_ZERO,                                 0x2080, U"₀" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_ONE,                                  0x2081, U"₁" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_TWO,                                  0x2082, U"₂" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_THREE,                                0x2083, U"₃" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_FOUR,                                 0x2084, U"₄" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_FIVE,                                 0x2085, U"₅" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SIX,                                  0x2086, U"₆" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_SEVEN,                                0x2087, U"₇" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_EIGHT,                                0x2088, U"₈" );
+M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_NINE,                                 0x2089, U"₉" );
 
 /* Mathematical Operators */
 
