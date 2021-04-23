@@ -362,9 +362,9 @@ M_DEFINE_CODE_POINT( LATIN_SUBSCRIPT_NINE,                                 0x208
 
 /* Mathematical Operators */
 
-static code_point_t constexpr N_ARY_PRODUCT                         = code_point_t( 0x220F );
-static code_point_t constexpr N_ARY_SUMMATION                       = code_point_t( 0x2211 );
-static code_point_t constexpr SQUARE_ROOT                           = code_point_t( 0x221a );
+M_DEFINE_CODE_POINT( N_ARY_PRODUCT,                                        0x220F, U"∏" );
+M_DEFINE_CODE_POINT( N_ARY_SUMMATION,                                      0x2211, U"∑" );
+M_DEFINE_CODE_POINT( SQUARE_ROOT,                                          0x221a, U"√" );
 
 /* Miscellaneous Symbols. */
 static code_point_t constexpr SYMBOL_WHITE_FROWINING_FACE           = code_point_t( 0x2639 );
