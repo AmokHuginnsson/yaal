@@ -367,9 +367,9 @@ M_DEFINE_CODE_POINT( N_ARY_SUMMATION,                                      0x221
 M_DEFINE_CODE_POINT( SQUARE_ROOT,                                          0x221a, U"√" );
 
 /* Miscellaneous Symbols. */
-static code_point_t constexpr SYMBOL_WHITE_FROWINING_FACE           = code_point_t( 0x2639 );
-static code_point_t constexpr SYMBOL_WHITE_SMILING_FACE             = code_point_t( 0x263a );
-static code_point_t constexpr SYMBOL_BLACK_SMILING_FACE             = code_point_t( 0x263b );
+M_DEFINE_CODE_POINT( SYMBOL_WHITE_FROWINING_FACE,                          0x2639, U"☹" );
+M_DEFINE_CODE_POINT( SYMBOL_WHITE_SMILING_FACE,                            0x263a, U"☺" );
+M_DEFINE_CODE_POINT( SYMBOL_BLACK_SMILING_FACE,                            0x263b, U"☻" );
 
 /* UCS-4 code points, UTF-8 4-byte code points. 65536 - 1114111, U+00010000 - U+0010ffff */
 
