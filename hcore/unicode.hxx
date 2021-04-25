@@ -374,10 +374,10 @@ M_DEFINE_CODE_POINT( SYMBOL_BLACK_SMILING_FACE,                            0x263
 /* UCS-4 code points, UTF-8 4-byte code points. 65536 - 1114111, U+00010000 - U+0010ffff */
 
 /* Emoji. */
-static code_point_t constexpr EMOJI_SNAKE                           = code_point_t( 0x1f40d );
-static code_point_t constexpr EMOJI_PENGUIN                         = code_point_t( 0x1f427 );
-static code_point_t constexpr EMOJI_PERSON_WALKING                  = code_point_t( 0x1f6b6 );
-static code_point_t constexpr EMOJI_STOP_SIGN                       = code_point_t( 0x1f6d1 );
+M_DEFINE_CODE_POINT( EMOJI_SNAKE,                                          0x1f40d, U"🐍" );
+M_DEFINE_CODE_POINT( EMOJI_PENGUIN,                                        0x1f427, U"🐧" );
+M_DEFINE_CODE_POINT( EMOJI_PERSON_WALKING,                                 0x1f6b6, U"🚶" );
+M_DEFINE_CODE_POINT( EMOJI_STOP_SIGN,                                      0x1f6d1, U"🛑" );
 
 /* Private Use Areas */
 
