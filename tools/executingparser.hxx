@@ -806,6 +806,7 @@ public:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, range_t )> action_string_range_t;
 private:
+	code_point_t _quotingCharacter;
 	action_string_t _actionString;
 	action_string_range_t _actionStringPosition;
 	bool _evaluate;
@@ -817,11 +818,12 @@ public:
 	HStringLiteral operator[]( action_string_t const& ) const;
 	HStringLiteral operator[]( action_string_range_t const& ) const;
 	HStringLiteral operator() ( SEMANTIC ) const;
+	HStringLiteral operator() ( code_point_t const& ) const;
 protected:
-	HStringLiteral( action_t const&, SEMANTIC );
-	HStringLiteral( action_range_t const&, SEMANTIC );
-	HStringLiteral( action_string_t const&, SEMANTIC );
-	HStringLiteral( action_string_range_t const&, SEMANTIC );
+	HStringLiteral( action_t const&, SEMANTIC, code_point_t const& );
+	HStringLiteral( action_range_t const&, SEMANTIC, code_point_t const& );
+	HStringLiteral( action_string_t const&, SEMANTIC, code_point_t const& );
+	HStringLiteral( action_string_range_t const&, SEMANTIC, code_point_t const& );
 	virtual ptr_t do_clone( void ) const override;
 	virtual yaal::hcore::HUTF8String::const_iterator do_parse( HExecutingParser*, yaal::hcore::HUTF8String::const_iterator const&, yaal::hcore::HUTF8String::const_iterator const& ) const override;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const override;
@@ -830,7 +832,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) override;
 	virtual bool do_has_action( void ) const override;
 private:
-	HStringLiteral( SEMANTIC );
+	HStringLiteral( SEMANTIC, code_point_t const& );
 	HStringLiteral& operator = ( HStringLiteral const& ) = delete;
 	friend HStringLiteral const& get_string_literal_instance( void );
 };
