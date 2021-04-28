@@ -3411,7 +3411,7 @@ HRuleBase::ptr_t HStringLiteral::do_clone( void ) const {
 
 void HStringLiteral::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
-	rd_.desc( "string_literal" );
+	rd_.desc( "string_literal<"_ys.append( _quotingCharacter ).append( '>' ) );
 	return;
 	M_EPILOG
 }
