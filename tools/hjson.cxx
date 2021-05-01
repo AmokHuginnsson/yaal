@@ -296,7 +296,7 @@ void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int
 				dump( member.second, out_, indentLevel_ + 1, indent_ );
 				next = true;
 			}
-			if ( indent_ ) {
+			if ( indent_ && next ) {
 				out_ << "\n";
 			}
 			indent( out_, indentLevel_, indent_ );
