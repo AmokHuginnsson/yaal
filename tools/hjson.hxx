@@ -22,6 +22,10 @@ namespace tools {
 class HJSON {
 public:
 	typedef HJSON this_type;
+	enum class PARSER {
+		STRICT,
+		RELAXED
+	};
 	class HValue {
 	public:
 		typedef HValue this_type;
@@ -104,7 +108,7 @@ public:
 		return ( ! operator == ( other_ ) );
 	}
 	HValue& element( void );
-	void load( yaal::hcore::HStreamInterface& );
+	void load( yaal::hcore::HStreamInterface&, PARSER = PARSER::STRICT );
 	void save( yaal::hcore::HStreamInterface&, bool = true ) const;
 	void clear( void );
 };
