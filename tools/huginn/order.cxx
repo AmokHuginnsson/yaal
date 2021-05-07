@@ -342,7 +342,8 @@ bool HOrder::do_operator_equals( huginn::HThread* thread_, HHuginn::value_t cons
 
 void HOrder::do_operator_add( HThread* thread_, HHuginn::value_t&, HHuginn::value_t const& other_, int position_ ) {
 	HOrder const& otherValue( *static_cast<HOrder const*>( other_.raw() ) );
-	if ( otherValue.key_type()->type_id() != HHuginn::TYPE::NONE ) {
+	HClass const* otherKeyType( otherValue.key_type() );
+	if ( otherKeyType && ( otherKeyType->type_id() != HHuginn::TYPE::NONE ) ) {
 		update_key_type( thread_, otherValue.key_type(), position_ );
 	}
 	HOrder::values_t const& otherData( otherValue.value() );
