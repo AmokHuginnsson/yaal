@@ -36,7 +36,11 @@ hash<code_point_t>::hash_value_type hash<code_point_t>::operator () ( code_point
 
 template<>
 hash<double long>::hash_value_type hash<double long>::operator () ( double long const& val_ ) const {
-	return ( static_cast<hash_value_type>( reinterpret_cast<int long long unsigned const&>( static_cast<double const&>( val_ ) ) ) );
+	union {
+		double _double;
+		int long long unsigned _intLongLongUnsigned;
+	} val{ static_cast<double>( val_ ) };
+	return ( static_cast<hash<double long>::hash_value_type>( val._intLongLongUnsigned ) );
 }
 
 template<typename T>

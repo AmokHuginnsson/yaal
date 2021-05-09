@@ -444,13 +444,23 @@ public:
 	type_t const* data( void ) const {
 		M_PROLOG
 		M_ASSERT( _buf != nullptr );
+#	pragma GCC diagnostic push
+#if __GCC_VERSION__ > 0
+#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* #if __GCC_VERSION__ > 0 */
 		return ( _buf );
+#	pragma GCC diagnostic pop
 		M_EPILOG
 	}
 	type_t* data( void ) {
 		M_PROLOG
 		M_ASSERT( _buf != nullptr );
+#	pragma GCC diagnostic push
+#if __GCC_VERSION__ > 0
+#	pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* #if __GCC_VERSION__ > 0 */
 		return ( _buf );
+#	pragma GCC diagnostic pop
 		M_EPILOG
 	}
 	/*! \brief Get reference to first element in this array.
