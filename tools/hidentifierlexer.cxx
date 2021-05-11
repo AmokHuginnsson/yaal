@@ -74,6 +74,7 @@ HIdentifierLexer::HIdentifierLexer( HIdentifierLexer const& identifier_ )
 	: HRuleBase( identifier_._action, identifier_._actionPosition, identifier_._skipWS )
 	, _name( identifier_._name )
 	, _actionStringPosition( identifier_._actionStringPosition )
+	, _actionString( identifier_._actionString )
 	, _errorMessage( identifier_._errorMessage ) {
 	return;
 }
@@ -82,6 +83,16 @@ HIdentifierLexer::HIdentifierLexer( yaal::hcore::HString const& name_, action_st
 	: HRuleBase( true )
 	, _name( name_ )
 	, _actionStringPosition( action_ )
+	, _actionString()
+	, _errorMessage( "expected "_ys.append( article( _name ) ).append( " " ).append( _name ) ) {
+	return;
+}
+
+HIdentifierLexer::HIdentifierLexer( yaal::hcore::HString const& name_, action_string_t const& action_ )
+	: HRuleBase( true )
+	, _name( name_ )
+	, _actionStringPosition()
+	, _actionString( action_ )
 	, _errorMessage( "expected "_ys.append( article( _name ) ).append( " " ).append( _name ) ) {
 	return;
 }
@@ -107,6 +118,8 @@ hcore::HUTF8String::const_iterator HIdentifierLexer::do_parse( HExecutingParser*
 			executing_parser::range_t rng( range( executingParser_, first_, scan ) );
 			if ( !! _actionStringPosition ) {
 				add_execution_step( executingParser_, call( _actionStringPosition, hcore::HUTF8String( first_, scan ), rng ) );
+			} else if ( !! _actionString ) {
+				add_execution_step( executingParser_, call( _actionString, hcore::HUTF8String( first_, scan ) ) );
 			}
 			matched = true;
 		}
@@ -136,7 +149,7 @@ bool HIdentifierLexer::do_detect_recursion( executing_parser::HRecursionDetector
 }
 
 bool HIdentifierLexer::do_has_action( void ) const {
-	return ( HRuleBase::do_has_action() || ( !! _actionStringPosition ) );
+	return ( HRuleBase::do_has_action() || ( !! _actionStringPosition ) || ( !! _actionString ) );
 }
 
 }

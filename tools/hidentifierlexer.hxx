@@ -18,9 +18,11 @@ public:
 	typedef HIdentifierLexer this_type;
 	typedef HRuleBase base_type;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, executing_parser::range_t )> action_string_range_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 private:
 	yaal::hcore::HString _name;
 	action_string_range_t _actionStringPosition;
+	action_string_t _actionString;
 	yaal::hcore::HString _errorMessage;
 public:
 	HIdentifierLexer( HIdentifierLexer const& );
@@ -41,12 +43,17 @@ protected:
 	virtual bool do_has_action( void ) const override;
 private:
 	HIdentifierLexer( yaal::hcore::HString const&, action_string_range_t const& );
+	HIdentifierLexer( yaal::hcore::HString const&, action_string_t const& );
 	HIdentifierLexer& operator = ( HIdentifierLexer const& ) = delete;
 	friend HIdentifierLexer identifier( yaal::hcore::HString const&, HIdentifierLexer::action_string_range_t const& );
-	friend HIdentifierLexer identifier( HIdentifierLexer::action_string_range_t const& );
+	friend HIdentifierLexer identifier( yaal::hcore::HString const&, HIdentifierLexer::action_string_t const& );
 };
 
 inline HIdentifierLexer identifier( yaal::hcore::HString const& name_, HIdentifierLexer::action_string_range_t const& action_ ) {
+	return ( HIdentifierLexer( name_, action_ ) );
+}
+
+inline HIdentifierLexer identifier( yaal::hcore::HString const& name_, HIdentifierLexer::action_string_t const& action_ ) {
 	return ( HIdentifierLexer( name_, action_ ) );
 }
 

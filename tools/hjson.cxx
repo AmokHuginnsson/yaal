@@ -5,6 +5,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hjson.hxx"
 #include "hcore/system.hxx"
+#include "tools/hidentifierlexer.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -444,6 +445,10 @@ executing_parser::HRule HJSONParser::make_engine( HJSON::PARSER style_ ) {
 		"JSON.string",
 		e_p::string_literal( '\''_ycp )[e_p::HStringLiteral::action_string_t( hcore::call( &HJSONParser::store_string, this, _1 ) )]
 	);
+	e_p::HRule key(
+		"JSON.string",
+		identifier( "key", e_p::HStringLiteral::action_string_t( hcore::call( &HJSONParser::store_string, this, _1 ) ) )
+	);
 	e_p::HRule integerLiteral(
 		"JSON.integer",
 		e_p::integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HJSONParser::store_integer, this, _1 ) )]
@@ -467,7 +472,7 @@ executing_parser::HRule HJSONParser::make_engine( HJSON::PARSER style_ ) {
 		"JSON.Object.member",
 		style_ == HJSON::PARSER::STRICT
 			? static_cast<e_p::HRule&&>( stringLiteral >> ":" >> element )
-			: static_cast<e_p::HRule&&>( ( stringLiteral | singleQuotedStringLiteral ) >> ":" >> element )
+			: static_cast<e_p::HRule&&>( ( stringLiteral | singleQuotedStringLiteral | key ) >> ":" >> element )
 	);
 	e_p::HRule members(
 		"JSON.Object.members",
