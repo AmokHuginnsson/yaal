@@ -137,9 +137,27 @@ void json_serialize( huginn::HThread* thread_, yaal::tools::HHuginn::value_t con
 }
 
 class HJSON : public HPackage {
+	enumeration::HEnumerationClass::ptr_t _parser;
 public:
 	HJSON( HClass* class_ )
-		: HPackage( class_ ) {
+		: HPackage( class_ )
+		, _parser(
+			add_enumeration_as_member(
+				class_,
+				enumeration::create_class(
+					class_->runtime(),
+					"PARSER",
+					enumeration::descriptions_t{
+						{ "STRICT",  "Parse according to strict RFC JSON specification.",            static_cast<int>( tools::HJSON::PARSER::STRICT ) },
+						{ "RELAXED", "Use relaxed JSON5 (ECMAScript5 extension compatible) parser.", static_cast<int>( tools::HJSON::PARSER::RELAXED ) },
+					},
+					"The `PARSER` is set of possible JSON parsing modes.",
+					HHuginn::VISIBILITY::PACKAGE,
+					class_
+				),
+				"set of possible modes used for JSON parsing."
+			)
+		) {
 		return;
 	}
 	static HHuginn::value_t save( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
@@ -204,12 +222,25 @@ public:
 	static HHuginn::value_t load( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 		M_PROLOG
 		HObjectFactory& of( thread_->object_factory() );
-		verify_signature_by_class( "JSON.load", values_, { of.stream_class() }, thread_, position_ );
+		HJSON* package( static_cast<HJSON*>( object_->raw() ) );
+		HParameter namedParameters[] = {
+			{ "parser", package->_parser->enumeral_class() },
+			{}
+		};
+		char const name[] = "JSON.load";
+		verify_named_parameters( name, values_, namedParameters, thread_, position_ );
+		verify_arg_count( name, values_, 1, 1, thread_, position_ );
+		verify_arg_type( name, values_, 0, of.stream_class(), ARITY::MULTIPLE, thread_, position_ );
 		HStream& s( *static_cast<HStream*>( values_[0].raw() ) );
 		tools::HJSON json;
 		HHuginn::value_t v( of.none_value() );
 		try {
-			json.load( *s.raw() );
+			if ( !! namedParameters[0].value() ) {
+				HEnumeral::value_type val( get_enumeral( namedParameters[0].value() ) );
+				json.load( *s.raw(), static_cast<tools::HJSON::PARSER>( val ) );
+			} else {
+				json.load( *s.raw() );
+			}
 			v = cxx_to_huginn( thread_, json.element(), position_ );
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( static_cast<HJSON*>( object_->raw() )->exception_class(), e.what(), position_ );
@@ -237,7 +268,7 @@ HPackageCreatorInterface::HInstance HJSONCreator::do_new_instance( HRuntime* run
 		)
 	);
 	HHuginn::field_definitions_t fd{
-		{ "load", runtime_->create_method( &HJSON::load ), "( *stream* ) - load data from a JSON *stream*" },
+		{ "load", runtime_->create_method( &HJSON::load ), "( *stream*[, *parser*:*{mode}*] ) - load data from a JSON *stream*" },
 		{ "save", runtime_->create_method( &HJSON::save ), "( *data*, *stream* ) - save *data* to *stream* in JSON format" }
 	};
 	c->redefine( nullptr, fd );

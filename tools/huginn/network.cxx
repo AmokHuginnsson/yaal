@@ -299,7 +299,7 @@ HPackageCreatorInterface::HInstance HNetworkCreator::do_new_instance( HRuntime* 
 	HHuginn::field_definitions_t fd{
 		{ "hostname", runtime_->create_method( &HNetwork::hostname ), "get this host network name" },
 		{ "connect",  runtime_->create_method( &HNetwork::connect ),  "( *connectionType*, *target*[, *port*] ) - create a TCP connection of type *connectionType* to given *target*, optionally at given *port*" },
-		{ "get",      runtime_->create_method( &HNetwork::get ),      "( *url*[, *login*:*{login}*, *password*:*{pass}*] ) - fetch a resource from a remote HTTP server" },
+		{ "get",      runtime_->create_method( &HNetwork::get ),      "( *url*[, *login*:*{login}*, *password*:*{pass}*] ) - fetch a resource from a remote HTTP server located under given *url*" },
 		{ "post",     runtime_->create_method( &HNetwork::post ),     "( *url*, *payload1*, [*payload2*, ..., *login*:*{login}*, *password*:*{pass}*] ) - push *payloads* to a remote HTTP server" },
 		{ "resolve",  runtime_->create_method( &HNetwork::resolve ),  "( *hostName* ) - resolve IP address of given *hostName*" }
 	};
