@@ -47,6 +47,8 @@ AC_PROG_RANLIB
 AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 AC_CHECK_PROG([GTAGS],[gtags],[gtags],[true])
+AC_CHECK_PROG([GDB_ADD_INDEX], [gdb-add-index], [gdb-add-index], [true])
+AC_CHECK_PROG([READELF], [readelf], [readelf])
 
 YAAL_CHECK_COMPILER_VERSION
 

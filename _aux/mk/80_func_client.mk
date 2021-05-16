@@ -46,8 +46,13 @@ $$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
 	@$$(call msg,printf "%b" "Linking \`$$(@)' ... " && ) \
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(if $$(STATIC),$$(STATICLIBS),$$(EXTRA_LIBS)) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
+ifeq ($$(READELF),readelf)
+ifneq ($$(findstring $$(LIB_INFIX),-d -rd),)
+	@$$(call invoke, $$(GDB_ADD_INDEX) $$(@))
+endif
+endif
 ifdef DO_RELEASE
-	$$(call invoke,strip $$(REAL_TARGET))
+	@$$(call invoke,strip $$(REAL_TARGET))
 endif
 	@test -f $$(@) \
 	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")

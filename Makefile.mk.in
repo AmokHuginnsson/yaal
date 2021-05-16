@@ -33,6 +33,8 @@ RANLIB         = @RANLIB@
 GITID          = @GITID@
 CTAGS          = @CTAGS@
 GTAGS          = @GTAGS@
+GDB_ADD_INDEX  = @GDB_ADD_INDEX@
+READELF        = @READELF@
 MAIN_LIB_HEADER= include/$(LIB_NAME)/$(LIB_NAME).hxx
 SSL_KEYS_DIR   = db/$(LIB_NAME)/keys
 SSL_KEYS       = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
@@ -106,6 +108,11 @@ ifeq ($(LIB_PREFIX),lib)
 	@$(call invoke,$(AR) $(ARFLAGS) lib$(LIB_NAME)_$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ) ; \
 	$(call invoke,$(RANLIB) lib$(LIB_NAME)_$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX))
 endif # just to allow shared linking during the build
+ifeq ($(READELF),readelf)
+ifneq ($(findstring $(LIB_INFIX),-d -rd),)
+	@$(GDB_ADD_INDEX) $(@)
+endif
+endif
 	@$(call invoke,ln -sf lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(RELEASE) lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION)) && \
 	$(call invoke,ln -sf lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(LIB_NAME)_$(*)$(LIB_INFIX).$(LIB_EXT)) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")

@@ -70,9 +70,9 @@ else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
 
+AC_CHECK_PROG([READELF], [readelf], [readelf])
 AC_MSG_CHECKING([host dynamic linker])
 if test ["x${HOST_OS_TYPE}"] = ["xLinux"] ; then
-	READELF=`whereis -b readelf | awk '{print $2}'`
 	DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
 fi
 if test ["x${DYNAMIC_LINKER}"] = ["x"] ; then
@@ -93,8 +93,9 @@ fi
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
-AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
-AC_CHECK_PROG([GTAGS],[gtags],[gtags],[true])
+AC_CHECK_PROG([CTAGS], [exctags], [exctags], [ctags])
+AC_CHECK_PROG([GTAGS], [gtags], [gtags], [true])
+AC_CHECK_PROG([GDB_ADD_INDEX], [gdb-add-index], [gdb-add-index], [true])
 
 dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
