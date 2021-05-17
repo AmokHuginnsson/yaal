@@ -980,6 +980,7 @@ void OCompiler::pop_scope_context_low( void ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	OFunctionContext::scope_context_t& childScope( fc._scopeStack.top() );
+	M_ASSERT( childScope->_argumentIndexes.is_empty() );
 	_scopeContextCache.push_back( yaal::move( childScope ) );
 	fc._scopeStack.pop();
 	return;

@@ -574,10 +574,10 @@ void OCompiler::dispatch_member_access( executing_parser::range_t range_ ) {
 void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t const& action_, executing_parser::range_t range_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	OScopeContext& sc( *fc._scopeStack.top() );
 	HExpression* expr( current_expression().raw() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		int from( range_.start() + 1 );
-		OScopeContext& sc( *fc._scopeStack.top() );
 		int len( sc._assertExpressionEnd - from );
 		sc._assertExpressionEnd = 0;
 		expr->oper( OPERATOR::FUNCTION_ARGUMENT, range_.start() );
@@ -596,20 +596,26 @@ void OCompiler::dispatch_function_call( HExpression::OExecutionStep::action_t co
 		fc._valueTypes.pop();
 	}
 	HClass const* c( type_to_class( HHuginn::TYPE::UNKNOWN ) );
+	bool doPopArgumentIndexes( false );
 	if ( ( action_ == &HExpression::function_call ) || ( action_ == &HExpression::make_partial ) ) {
 		OFunctionContext::OValueDesc vd( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( compiled_type_id( vd._class ) == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 			c = function_ref_to_class( vd._identifier );
 		}
+		doPopArgumentIndexes = true;
 	} else if ( action_ == &HExpression::make_dict ) {
 		c = type_to_class( HHuginn::TYPE::DICT );
 	} else {
+		M_ASSERT( action_ == &HExpression::make_lookup );
 		c = type_to_class( HHuginn::TYPE::LOOKUP );
 	}
 	fc._valueTypes.push( c );
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
 	defer_function_call( action_, range_ );
+	if ( doPopArgumentIndexes ) {
+		sc._argumentIndexes.pop();
+	}
 	expr->commit_oper( OPERATOR::FUNCTION_CALL, _fileId, range_.start() );
 	fc._operations.pop();
 	return;
@@ -733,7 +739,6 @@ bool OCompiler::commit_unbound( HExpression::OExecutionStep::action_t const& act
 		}
 		++ internalIndex;
 	}
-	sc._argumentIndexes.pop();
 	OScopeContext::argument_indexes_t uniqCounter( unboundIndexes.get_size(), IMPLICIT_UNBOUND_INDEX + 0 );
 	for ( HPartial::HIndexMap const& indexMap : unboundIndexes ) {
 		uniqCounter[indexMap.external_index()] = IMPLICIT_UNBOUND_INDEX + 1;
