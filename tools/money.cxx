@@ -357,7 +357,7 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 	int long length( string.get_length() );
 	for ( int i( 0 ); i < length; i ++ ) {
 		if ( ( i % 3 ) == 0 ) {
-			int sub( ( length - i ) > 1 ? 2 : 1 );
+			int sub( min( i == 0 ? 2 : 3, static_cast<int>( length ) - i ) );
 			form = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
 			if ( ( i > 5 ) && ( ( length - i ) > 2 ) && ( string.substr( ( length - i ) - 3, 3 ) == "000" ) ) {
 				continue;
@@ -380,24 +380,26 @@ HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 				instance = unit[ unitIdx ];
 				if ( form == 1 ) {
 					instance += end[ unitIdx ] [ 0 ];
-				} else if ( ( ( ( form % 10 ) > 1 ) && ( ( form % 10 ) < 5 ) )
-						&& ( ( form < 10 ) || ( form > 20 ) ) ) {
+				} else if (
+					( ( ( form % 10 ) > 1 ) && ( ( form % 10 ) < 5 ) )
+					&& ( ( ( form % 100 ) < 10 ) || ( ( form % 100 ) > 20 ) )
+				) {
 					instance += end[ unitIdx ] [ 1 ];
 				} else {
 					instance += end[ unitIdx ] [ 2 ];
 				}
 				inWords = instance + inWords;
-				if ( ( form < 20 ) &&  ( form > 9 ) ) {
+				if ( ( ( form % 100 ) < 20 ) &&  ( ( form % 100 ) > 9 ) ) {
 					inWords = pl::_numbers_[ form ] + inWords;
 				} else if ( digit ) {
 					inWords = pl::_numbers_[ static_cast<int>( digit ) ] + inWords;
-				} else if ( ! form && ( ( i < 3 ) || ( kwota_ < 1 ) ) ) {
+				} else if ( ! ( form % 100 ) && ( ( i < 3 ) || ( kwota_ < 1 ) ) ) {
 					inWords = pl::_numbers_[ 0 ] + inWords;
 				}
 			}
 			break;
 			case ( 1 ) : {
-				if ( form > 19 ) {
+				if ( ( form % 100 ) > 19 ) {
 					inWords = pl::_tenths_[ static_cast<int>( digit ) ] + inWords;
 				}
 			} break;
