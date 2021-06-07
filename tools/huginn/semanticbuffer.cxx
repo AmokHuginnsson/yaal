@@ -160,6 +160,15 @@ void HSemanticBuffer::write( yaal::hcore::HString const& str_ ) {
 	M_EPILOG
 }
 
+void HSemanticBuffer::write( double long val_ ) {
+	M_PROLOG
+	double_long_storage doubleLongStorage;
+	store_double_long( val_, doubleLongStorage );
+	write( doubleLongStorage.data, SIZEOF_DOUBLE_LONG );
+	return;
+	M_EPILOG
+}
+
 void HSemanticBuffer::write( void const* data_, int long size_ ) {
 	M_PROLOG
 	_buffer.realloc( _size + size_ );

@@ -128,9 +128,10 @@ HBinaryFormatter& HBinaryFormatter::operator << ( double v_ ) {
 
 HBinaryFormatter& HBinaryFormatter::operator << ( double long v_ ) {
 	M_PROLOG
-	char* mem( static_cast<char*>( static_cast<void*>( &v_ ) ) );
-	reverse( mem, mem + SIZEOF_DOUBLE_LONG_PRECISION );
-	return ( binary( mem, SIZEOF_DOUBLE_LONG_PRECISION ) );
+	double_long_storage doubleLongStorage;
+	store_double_long( v_, doubleLongStorage );
+	reverse( doubleLongStorage.data, doubleLongStorage.data + SIZEOF_DOUBLE_LONG );
+	return ( binary( doubleLongStorage.data, SIZEOF_DOUBLE_LONG ) );
 	M_EPILOG
 }
 

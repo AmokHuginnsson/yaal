@@ -84,18 +84,14 @@ to_t bit_cast( from_t val_ ) {
 	return ( cast._to );
 }
 
-#if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
-static int const SIZEOF_DOUBLE_LONG_PRECISION( 10 );
-#else /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
-static int const SIZEOF_DOUBLE_LONG_PRECISION( SIZEOF_DOUBLE_LONG );
-#endif /* #else #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
-inline void normalize_double_long( double long& val_ ) {
-	char* mem( static_cast<char*>( static_cast<void*>( &val_ ) ) );
-	for ( int i( SIZEOF_DOUBLE_LONG_PRECISION ); i < SIZEOF_DOUBLE_LONG; ++ i ) {
-		mem[ i ] = 0;
+struct double_long_storage {
+	char unsigned data[SIZEOF_DOUBLE_LONG];
+	double_long_storage()
+		: data() {
 	}
-	return;
-}
+};
+void store_double_long( double long, double_long_storage& );
+double long load_double_long( double_long_storage const& );
 
 /*! \brief Temporarily backup some value on a side and restore it at end of scope.
  */

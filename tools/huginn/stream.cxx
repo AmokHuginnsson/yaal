@@ -564,7 +564,10 @@ HHuginn::value_t HStream::read_real( HThread* thread_, huginn::HInteger::value_t
 		} break;
 #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
 		case ( sizeof ( HReal::value_type ) ): {
-			nRead = static_cast<int>( _stream->read( &val, toRead ) );
+			double_long_storage doubleLongStorage;
+			M_ASSERT( toRead == SIZEOF_DOUBLE_LONG );
+			nRead = static_cast<int>( _stream->read( doubleLongStorage.data, toRead ) );
+			val = load_double_long( doubleLongStorage );
 		} break;
 #endif /* #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE */
 		default: {
@@ -739,8 +742,10 @@ void HStream::write_real( HThread* thread_, HHuginn::value_t const& value_, hugi
 		} break;
 #if SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE
 		case ( sizeof ( HReal::value_type ) ): {
-			normalize_double_long( val );
-			nWritten = static_cast<int>( _stream->write( &val, toWrite ) );
+			double_long_storage doubleLongStorage;
+			store_double_long( val, doubleLongStorage );
+			M_ASSERT( toWrite == SIZEOF_DOUBLE_LONG );
+			nWritten = static_cast<int>( _stream->write( doubleLongStorage.data, toWrite ) );
 		} break;
 #endif /* #if SIZEOF_DOUBLE > SIZEOF_DOUBLE_LONG */
 		default: {

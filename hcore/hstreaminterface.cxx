@@ -347,7 +347,10 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ ) {
 		_conversionCache = _wordCache;
 		write( _conversionCache.raw(), _conversionCache.byte_count() );
 	} else {
-		write( &longDouble_, static_cast<int>( sizeof ( longDouble_ ) ) );
+		double_long_storage doubleLongStorage;
+		store_double_long( longDouble_, doubleLongStorage );
+		static_assert( sizeof ( longDouble_ ) == SIZEOF_DOUBLE_LONG, "Inconsistent sizeof ( double long )." );
+		write( doubleLongStorage.data, static_cast<int>( sizeof ( longDouble_ ) ) );
 	}
 	return ( *this );
 	M_EPILOG
@@ -1201,11 +1204,12 @@ HStreamInterface& HStreamInterface::do_input( double long& dl ) {
 			}
 		}
 	} else {
-		double long buffer( 0 );
-		int long toRead( static_cast<int>( sizeof ( buffer ) ) );
-		_fail = ( read( &buffer, toRead ) ) != toRead;
+		static_assert( sizeof ( dl ) == SIZEOF_DOUBLE_LONG, "Inconsistent sizeof ( double long )." );
+		int long toRead( static_cast<int>( sizeof ( dl ) ) );
+		double_long_storage doubleLongStorage;
+		_fail = ( read( doubleLongStorage.data, toRead ) ) != toRead;
 		if ( good() ) {
-			dl = buffer;
+			dl = load_double_long( doubleLongStorage );
 		}
 	}
 	return ( *this );

@@ -20,6 +20,38 @@ namespace yaal {
 
 exit_flag_t _isKilled_{ false };
 
+void store_double_long( double long value_, double_long_storage& storage_ ) {
+	u8_t* src( static_cast<u8_t*>( static_cast<void*>( &value_ ) ) );
+#if ( SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE ) && ! defined( __aarch64__ )
+	storage_.data[15] = src[9];
+	storage_.data[14] = src[8];
+	u64_t mantisa( 0 );
+	memcpy( &mantisa, src, 8 );
+	mantisa <<= 1;
+	memcpy( storage_.data + 6, &mantisa, 8 );
+#else
+	memcpy( storage_.data, src, SIZEOF_DOUBLE_LONG );
+#endif
+	return;
+}
+
+double long load_double_long( double_long_storage const& storage_ ) {
+	double long value( 0.0L );
+#if ( SIZEOF_DOUBLE_LONG > SIZEOF_DOUBLE ) && ! defined( __aarch64__ )
+	u8_t* dst( static_cast<u8_t*>( static_cast<void*>( &value ) ) );
+	dst[9] = storage_.data[15];
+	dst[8] = storage_.data[14];
+	u64_t mantisa( 0 );
+	memcpy( &mantisa, storage_.data + 6, 8 );
+	mantisa >>= 1;
+	mantisa |= ( 0x1ULL << 63 );
+	memcpy( dst, &mantisa, 8 );
+#else
+	memcpy( &value, storage_.data, SIZEOF_DOUBLE_LONG );
+#endif
+	return ( value );
+}
+
 template<>
 bool is_hexadecimal( HString const& str_ ) {
 	return ( is_hexadecimal( str_.begin(), str_.end() ) );

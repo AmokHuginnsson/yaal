@@ -38,13 +38,11 @@ public:
 	template <typename T>
 	void write( T val_ ) {
 		M_PROLOG
-		int long s( static_cast<int>( sizeof ( val_ ) ) );
-		_buffer.realloc( _size + s );
-		memcpy( _buffer.get<char>() + _size, &val_, static_cast<size_t>( s ) );
-		_size += s;
+		write( &val_, static_cast<int>( sizeof ( val_ ) ) );
 		return;
 		M_EPILOG
 	}
+	void write( HReal::value_type );
 	void write( yaal::hcore::HString const& );
 	void write( void const*, int long );
 private:
