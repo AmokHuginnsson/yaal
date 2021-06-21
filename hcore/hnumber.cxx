@@ -576,6 +576,7 @@ void HNumber::from_string( HString const& number_ ) {
 		} else if ( ( end - dot - 1 ) >= _precision ) {
 			_precision = end - dot;
 		}
+		normalize( true );
 		if ( denormalizedEnd >= len ) {
 			break;
 		}
