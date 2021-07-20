@@ -15,31 +15,34 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu 19.10 (Eoan Ermine)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 20.04 (Focal Fossa)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>CentOS 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>CentOS 8 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Fedora 27</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Fedora 34</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 12.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 13.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Raspbian</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Raspberry Pi OS (64 bit)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+	</tr>
+	<tr>
+		<td>Raspbian (32 bit)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Oracle Solaris 11.3</td><td class="good">100%</td><td class="good">100%</td><td class="fine">Fail<a class="note" href="#solaris">3)</a></td>
 	</tr>
 	<tr>
-		<td>Darwin 14.5.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Darwin 20.6.0 (macOS/11.5.2, compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Windows 7 SP1 32bit with Cygwin 2.9.0</td><td class="good">100%</td><td class="good">100%</td><td class="fine">Fail<a class="note" href="#cygwin">4)</a></td>
+		<td>Windows 10 32bit with Cygwin 3.2.0</td><td class="good">100%</td><td class="good">100%</td><td class="fine">Fail<a class="note" href="#cygwin">4)</a></td>
 	</tr>
 	<tr>
-		<td>Windows 7 SP1 32bit with Visual Studio 2015 (C++)<a class="note" href="#note_fork">5)</a></td>
+		<td>Windows 10 32bit with Visual Studio 2019 (C++)<a class="note" href="#note_fork">5)</a></td>
 		<td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>

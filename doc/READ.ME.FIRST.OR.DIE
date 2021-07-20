@@ -5,19 +5,21 @@
 ## Hardware:
   - amd64 aka x64.
   - x86 aka i386 (soon to be deprecated).
+  - aarch64 (64 bit arm architecture).
   - armhf (32 bit arm architecture).
 
 ## Software:
   - Debian (latest development branch, currently `unstable` aka `Sid`, and always latest stable release)
-  - Ubuntu (latest development branch and latest stable release, currently 18.04 and 19.10 respectively)
-  - CentOS (latest stable release, currently 7)
-  - Fedora (latest stable release, currently 27)
-  - FreeBSD (latest stable release, currently 12.0-RELEASE)
+  - Ubuntu (latest development branch and latest stable release, currently 20.04 and 21.04 respectively)
+  - CentOS (latest stable release, currently 8)
+  - Fedora (latest stable release, currently 34)
+  - FreeBSD (latest stable release, currently 13.0-RELEASE)
+  - Darwin (latest stable release, 20.6.0/macOS/11.5.2)
+  - Windows 10 with Cygwin (latest available cygwin release, currently 3.2.0)
+  - Windows 10 with Visual Studio (latest available Visual Studio release, currently 2019)
+  - Raspberry Pi OS (latest stable release, currently 11.x (aka Bullseye))
+  - Raspbian (latest stable release, currently 11.x (aka Bullseye))
   - Oracle Solaris (latest stable release, currently 11.3)
-  - Darwin (latest stable release, 14.5.0)
-  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 2.9.0)
-  - Windows 7 SP1 with Visual Studio (latest available Visual Studio release, currently 2015)
-  - Raspbian (latest stable release, currently 9.x (aka Stretch))
 
 [For more detailed information regarding platform support
 please look into HTML documentation.]
