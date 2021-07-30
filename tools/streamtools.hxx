@@ -636,6 +636,34 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_EPILOG
 }
 
+class HCat : public yaal::hcore::HStreamInterface {
+public:
+	typedef HCat this_type;
+	typedef yaal::hcore::HStreamInterface base_type;
+	typedef yaal::hcore::HArray<yaal::hcore::HStreamInterface*> streams_t;
+private:
+	streams_t _streams;
+	int _current;
+public:
+	HCat( streams_t&& );
+	HCat( HCat const& );
+	HCat( HCat&& );
+	virtual ~HCat( void );
+protected:
+	virtual int long do_write( void const*, int long ) override M_DEBUG_CODE( __attribute__((noreturn)) );
+	virtual int long do_read( void*, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual bool do_is_valid( void ) const override;
+	virtual POLL_TYPE do_poll_type( void ) const override;
+	virtual void const* do_data( void ) const override;
+};
+
+template<typename... stream_t>
+HCat cat( yaal::hcore::HStreamInterface* first_, yaal::hcore::HStreamInterface* second_, stream_t... rest_ ) {
+	yaal::hcore::HStreamInterface* streams[] { first_, second_, rest_... };
+	return HCat( HCat::streams_t( streams, streams + size ( streams ) ) );
+}
+
 class HTee : public yaal::hcore::HStreamInterface {
 public:
 	typedef HTee this_type;

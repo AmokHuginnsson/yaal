@@ -239,6 +239,66 @@ int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInter
 
 }
 
+HCat::HCat( streams_t&& streams_ )
+	: _streams( yaal::move( streams_ ) )
+	, _current( 0 ) {
+	return;
+}
+
+HCat::HCat( HCat const& other_ )
+	: _streams( other_._streams )
+	, _current( other_._current ) {
+}
+
+HCat::HCat( HCat&& other_ )
+	: _streams( yaal::move( other_._streams ) )
+	, _current( other_._current ) {
+	other_._current = -1;
+}
+
+HCat::~HCat( void ) {
+	return;
+}
+
+int long HCat::do_write( void const*, int long ) {
+	M_ASSERT( 0 && "operation makes no sense for `cat` stream" );
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
+	return ( -1 );
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
+}
+
+int long HCat::do_read( void* buffer_, int long size_ ) {
+	int long nReadTotal( 0 );
+	while ( ( _current < _streams.get_size() ) && ( size_ > 0 ) ) {
+		int long nRead( _streams[_current]->read( static_cast<char*>( buffer_ ) + nReadTotal, size_ ) );
+		if ( nRead > 0 ) {
+			nReadTotal += nRead;
+			size_ -= nRead;
+		} else {
+			++ _current;
+		}
+	}
+	return ( nReadTotal );
+}
+
+void HCat::do_flush( void ) {
+	return _streams[_current]->flush();
+}
+
+bool HCat::do_is_valid( void ) const {
+	return ( ( _current < _streams.get_size() ) && _streams[_current]->is_valid() ) || ( immediate_read_size() > 0 );
+}
+
+HStreamInterface::POLL_TYPE HCat::do_poll_type( void ) const {
+	return ( _current < _streams.get_size() )
+		? _streams[_current]->poll_type()
+		: ( immediate_read_size() > 0 ? HStreamInterface::POLL_TYPE::EMULATED : HStreamInterface::POLL_TYPE::INVALID );
+}
+
+void const* HCat::do_data( void ) const {
+	return ( _current < _streams.get_size() ) ? _streams[_current]->data() : this;
+}
+
 HTee::HTee( HTee const& tee_ )
 	: HStreamInterface()
 	, _stream1( tee_._stream1 )
@@ -262,7 +322,7 @@ int long HTee::do_write( void const* data_, int long size_ ) {
 
 int long HTee::do_read( void*, int long ) {
 	M_PROLOG
-	M_ASSERT( 0 && "operation makes no sense for tee stream" );
+	M_ASSERT( 0 && "operation makes no sense for `tee` stream" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( -1 );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
