@@ -25,6 +25,7 @@ HSource::HSource( void )
 	, _orig()
 	, _preprocessed()
 	, _skips()
+	, _lineNumbers()
 	, _comments()
 	, _skippedLines( 0 ) {
 	return;
@@ -34,6 +35,7 @@ void HSource::reset( void ) {
 	M_PROLOG
 	_skippedLines = 0;
 	_comments.clear();
+	_lineNumbers.clear();
 	_skips.clear();
 	_preprocessed.clear();
 	_orig.clear();
@@ -59,6 +61,15 @@ void HSource::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString
 	} while ( nRead == PAGE_SIZE );
 	_name = name_.is_empty() ? get_stream_id( &stream_ ) : name_;
 	_orig.assign( readBuffer.get<char>(), readSize );
+	int lineNo( 0 );
+	int pos( 0 );
+	for ( code_point_t const& cp : _orig ) {
+		if ( cp == NEWLINE ) {
+			_lineNumbers[pos] = lineNo;
+			++ lineNo;
+		}
+		++ pos;
+	}
 	_skippedLines = skippedLines_;
 	return;
 	M_EPILOG
@@ -117,10 +128,23 @@ int HSource::real_position( int position_ ) const {
 	M_EPILOG
 }
 
+int HSource::line_number( int position_ ) const {
+	M_PROLOG
+	if ( _orig.is_empty() ) {
+		return ( 0 );
+	}
+	if ( _lineNumbers.is_empty() ) {
+		return ( 0 );
+	}
+	line_numbers_t::const_iterator it( _lineNumbers.lower_bound( position_ ) );
+	return ( it != _lineNumbers.end() ? it->second : ( _lineNumbers.rbegin()->second + 1 ) );
+	M_EPILOG
+}
+
 HHuginn::HCoordinate HSource::get_coordinate( int position_ ) const {
 	M_PROLOG
 	/* +1 because we count lines starting from 1 (not starting from 0) */
-	int line( static_cast<int>( count( _orig.begin(), _orig.begin() + position_, NEWLINE ) ) + 1 );
+	int line( line_number( position_ ) + 1 );
 	int lastNewlinePosition( 0 );
 	if ( line > 1 ) {
 		int nlPos( static_cast<int>( _orig.find_last( NEWLINE, position_ - 1 ) ) );

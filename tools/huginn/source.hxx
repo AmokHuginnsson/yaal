@@ -19,12 +19,14 @@ class HSource final {
 public:
 	typedef HSource this_type;
 	typedef yaal::hcore::HMap<int, int> skips_t;
+	typedef yaal::hcore::HMap<int, int> line_numbers_t;
 	typedef yaal::hcore::HLookupMap<int, yaal::hcore::HString> comments_t;
 private:
 	yaal::hcore::HString _name;
 	yaal::hcore::HString _orig;
 	yaal::hcore::HString _preprocessed;
 	skips_t _skips;
+	line_numbers_t _lineNumbers;
 	comments_t _comments;
 	int _skippedLines;
 public:
@@ -41,6 +43,8 @@ public:
 	yaal::hcore::HString::const_iterator begin( void ) const;
 	yaal::hcore::HString::const_iterator end( void ) const;
 	void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
+private:
+	int line_number( int ) const;
 };
 
 }
