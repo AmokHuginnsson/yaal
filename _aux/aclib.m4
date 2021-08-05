@@ -283,11 +283,13 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	AC_ARG_ENABLE([native],[AS_HELP_STRING([--enable-native],[Use all available CPU features.])],[YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-march=native], [C++])])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_COMPILER_OPTIMIZATION_FLAGS, [-fexpensive-optimizations], [C++])
+	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fno-semantic-interposition], [C++])
 	YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
 	YAAL_DETECT_FLAGS(YES_AS_NEEDED, [-Wl,--as-needed], [C++])
 	YAAL_DETECT_FLAGS(NO_AS_NEEDED, [-Wl,--no-as-needed], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-Wmissing-declarations], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-Wlarger-than-65536], [C++])
+	YAAL_DETECT_FLAGS(EXTRA_LINKER_OPTIMIZATION_FLAGS, [-Wl,-Bsymbolic], [C++])
 	YAAL_DETECT_FLAGS(FATAL_WARNINGS, [-Wl,--fatal-warnings], [C++])
 	EXTRA_LXXFLAGS="${EXTRA_LXXFLAGS} ${FATAL_WARNINGS}"
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-m64], [C++])

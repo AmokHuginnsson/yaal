@@ -25,7 +25,10 @@ static bool const has256colors( TERM ? ( to_string( TERM ).find( "256" ) != HStr
 
 HSequence::HSequence( char const* data_ )
 	: _data() {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 	::strncpy( _data, data_, SEQUENCE_BUFFER_SIZE );
+#pragma GCC diagnostic pop
 	_data[SEQUENCE_BUFFER_SIZE - 1] = 0;
 	return;
 }

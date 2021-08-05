@@ -1,45 +1,45 @@
 # Read yaal/LICENSE.md file for copyright and licensing information.
 
 $(eval DIR_ROOT?=$(subst /Makefile.mk.in,,$(lastword $(realpath $(foreach DIR,$(subst /, ,$(CURDIR)), $(eval DIR_ROOT_TEST=$(DIR_ROOT_TEST)/$(DIR))$(DIR_ROOT_TEST)/Makefile.mk.in)))))
-PRJNAME        = yaal
-LIB_NAME       = $(PRJNAME)
-VERSION        = 0
-SUBVERSION     = 0
-EXTRAVERSION   = 44
-COMPONENTS     = hcore tools dbwrapper hconsole hdata
-DRIVERS        = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
-prefix         = @prefix@
-exec_prefix    = @exec_prefix@
-datarootdir    = @datarootdir@
-localstatedir  = @localstatedir@
-PACKAGE_TARNAME= $(PRJNAME)
-DIR_SYSCONF    = $(DESTDIR)@sysconfdir@
-DIR_BIN        = $(DESTDIR)@bindir@
-DIR_LIB        = $(DESTDIR)@libdir@
-DIR_LIBEXEC    = $(DESTDIR)@libexecdir@
-DIR_LOCALSTATE = $(DESTDIR)@localstatedir@
-DIR_SHAREDSTATE= $(DESTDIR)@sharedstatedir@
-DIR_HEADERS    = $(DESTDIR)@includedir@
-DIR_SHARE      = $(DESTDIR)@datarootdir@
-DIR_DOC        = $(DESTDIR)@docdir@
-DIR_MAN        = $(DESTDIR)@mandir@
-LIB_PREFIX     = @LIB_PREFIX@
-LIB_EXT        = @LIB_EXT@
-CXX            = @CXX@
-CXX_STANDARD   = @CXX_STANDARD@
-MKDIR_P        = @MKDIR_P@
-INSTALL        = @INSTALL@
-RANLIB         = @RANLIB@
-GITID          = @GITID@
-CTAGS          = @CTAGS@
-GTAGS          = @GTAGS@
-GDB_ADD_INDEX  = @GDB_ADD_INDEX@
-READELF        = @READELF@
-MAIN_LIB_HEADER= include/$(LIB_NAME)/$(LIB_NAME).hxx
-SSL_KEYS_DIR   = db/$(LIB_NAME)/keys
-SSL_KEYS       = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
-DIRS           = $(DIR_BUILD) $(SSL_KEYS_DIR)
-DO_@DO_TARGET@=1
+PRJNAME         = yaal
+LIB_NAME        = $(PRJNAME)
+VERSION         = 0
+SUBVERSION      = 0
+EXTRAVERSION    = 44
+COMPONENTS      = hcore tools dbwrapper hconsole hdata
+DRIVERS         = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+datarootdir     = @datarootdir@
+localstatedir   = @localstatedir@
+PACKAGE_TARNAME = $(PRJNAME)
+DIR_SYSCONF     = $(DESTDIR)@sysconfdir@
+DIR_BIN         = $(DESTDIR)@bindir@
+DIR_LIB         = $(DESTDIR)@libdir@
+DIR_LIBEXEC     = $(DESTDIR)@libexecdir@
+DIR_LOCALSTATE  = $(DESTDIR)@localstatedir@
+DIR_SHAREDSTATE = $(DESTDIR)@sharedstatedir@
+DIR_HEADERS     = $(DESTDIR)@includedir@
+DIR_SHARE       = $(DESTDIR)@datarootdir@
+DIR_DOC         = $(DESTDIR)@docdir@
+DIR_MAN         = $(DESTDIR)@mandir@
+LIB_PREFIX      = @LIB_PREFIX@
+LIB_EXT         = @LIB_EXT@
+CXX             = @CXX@
+CXX_STANDARD    = @CXX_STANDARD@
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+RANLIB          = @RANLIB@
+GITID           = @GITID@
+CTAGS           = @CTAGS@
+GTAGS           = @GTAGS@
+GDB_ADD_INDEX   = @GDB_ADD_INDEX@
+READELF         = @READELF@
+MAIN_LIB_HEADER = include/$(LIB_NAME)/$(LIB_NAME).hxx
+SSL_KEYS_DIR    = db/$(LIB_NAME)/keys
+SSL_KEYS        = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
+DIRS            = $(DIR_BUILD) $(SSL_KEYS_DIR)
+DO_@DO_TARGET@  = 1
 include $(DIR_ROOT)/_aux/mk/00_sanity.mk
 include $(DIR_ROOT)/_aux/mk/10_basic.mk
 include $(DIR_ROOT)/_aux/mk/20_term.mk
@@ -47,13 +47,14 @@ include $(DIR_ROOT)/_aux/mk/30_suffix.mk
 include $(DIR_ROOT)/_aux/mk/40_commit-id.mk
 include $(DIR_ROOT)/_aux/mk/50_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/60_flags.mk
-EXTRA_COMPILER_DEBUG_FLAGS=@EXTRA_COMPILER_DEBUG_FLAGS@
-EXTRA_COMPILER_COVERAGE_FLAGS=@EXTRA_COMPILER_COVERAGE_FLAGS@
-EXTRA_COMPILER_OPTIMIZATION_FLAGS=@EXTRA_COMPILER_OPTIMIZATION_FLAGS@
-EXTRA_INCLUDE_PATHS=@EXTRA_INCLUDE_PATHS@
-EXTRA_LIBRARY_PATHS=@EXTRA_LIBRARY_PATHS@
-override EXTRA_CXXFLAGS+=@EXTRA_CXXFLAGS@
-override EXTRA_LXXFLAGS+=@EXTRA_LXXFLAGS@
+EXTRA_COMPILER_DEBUG_FLAGS        = @EXTRA_COMPILER_DEBUG_FLAGS@
+EXTRA_COMPILER_COVERAGE_FLAGS     = @EXTRA_COMPILER_COVERAGE_FLAGS@
+EXTRA_COMPILER_OPTIMIZATION_FLAGS = @EXTRA_COMPILER_OPTIMIZATION_FLAGS@
+EXTRA_LINKER_OPTIMIZATION_FLAGS   = @EXTRA_LINKER_OPTIMIZATION_FLAGS@
+EXTRA_INCLUDE_PATHS               = @EXTRA_INCLUDE_PATHS@
+EXTRA_LIBRARY_PATHS               = @EXTRA_LIBRARY_PATHS@
+override EXTRA_CXXFLAGS +=@EXTRA_CXXFLAGS@
+override EXTRA_LXXFLAGS +=@EXTRA_LXXFLAGS@
 override CXXFLAGS+= -D__YAAL_BUILD__ @DEFS@ \
 	$(patsubst -I%, -isystem %, @PCRE_CFLAGS@ @SSL_CFLAGS@ @XML2_CFLAGS@ @XSLT_CFLAGS@ @EXSLT_CFLAGS@)
 override LXXFLAGS+= -shared @YAAL_LXXFLAGS@
