@@ -1267,6 +1267,19 @@ int long HStreamInterface::do_read_some( void* buffer_, int long size_ ) {
 	return ( do_read( buffer_, size_ ) );
 }
 
+void HStreamInterface::do_unread( void const* buffer_, int long size_ ) {
+	M_PROLOG
+	flush_write_buffer();
+	M_ASSERT( _cacheContent == CACHE_CONTENT::READ );
+	_cache.realloc( _cachedBytes + size_ );
+	char* cache( _cache.get<char>() );
+	::memmove( cache + size_, cache, static_cast<size_t>( _cachedBytes ) );
+	::memcpy( cache, buffer_, static_cast<size_t>( size_ ) );
+	_cachedBytes += static_cast<int>( size_ );
+	return;
+	M_EPILOG
+}
+
 int long HStreamInterface::read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long nRead( 0 );

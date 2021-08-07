@@ -118,6 +118,7 @@ protected:
 	virtual int long do_write( void const*, int long ) override;
 	virtual int long do_read( void*, int long ) override;
 	virtual int long do_read_some( void*, int long ) override;
+	virtual void do_unread( void const*, int long ) override;
 	virtual void do_seek( int long, SEEK ) override;
 	virtual void do_flush( void ) override;
 	virtual bool do_is_valid( void ) const override;
