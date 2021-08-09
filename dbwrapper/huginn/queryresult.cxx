@@ -35,7 +35,7 @@ HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator&
 			row->push_back( none );
 		}
 	}
-	return ( v );
+	return v;
 }
 }
 
@@ -170,7 +170,7 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( qrc->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -193,7 +193,7 @@ HHuginn::class_t HQueryResult::get_class( HRuntime* runtime_, HClass const* orig
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

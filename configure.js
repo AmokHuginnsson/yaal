@@ -50,7 +50,7 @@ function isBoostUsed( buildDefinitionPath ) {
 	} catch ( e ) {
 		msg( "Reading build definition: " + e.description );
 	}
-	return ( used );
+	return used;
 }
 
 function boostInfo( install_path ) {
@@ -123,7 +123,7 @@ function vcVersion() {
 		var version = cmd.stdout.readAll().trim().concat( " " );
 		var cmd = shell.exec( vswhere + " -latest -property installationVersion" );
 		version += cmd.stdout.readAll().split( "." )[0];
-		return ( version );
+		return version;
 	} catch ( ex ) {
 	}
 	var versions = [
@@ -141,7 +141,7 @@ function vcVersion() {
 			break;
 		}
 	}
-	return ( version );
+	return version;
 }
 
 function makeBoostDesc( boostInfo ) {
@@ -151,7 +151,7 @@ function makeBoostDesc( boostInfo ) {
 		+ "Boost Threading: " + boostInfo.version.thread + "\n"
 		+ "Boost Target: " + boostInfo.version.target + "\n"
 		+ "Boost Library binary version: " + boostInfo.version.lib;
-	return ( msg );
+	return msg;
 }
 
 function msg( str ) {

@@ -104,7 +104,7 @@ bool registrar( void ) {
 	bool volatile failed = false;
 	HPackageFactory& factory = HPackageFactory::get_instance();
 	factory.register_package_creator( "Database", &databaseCreator );
-	return ( failed );
+	return failed;
 	M_EPILOG
 }
 

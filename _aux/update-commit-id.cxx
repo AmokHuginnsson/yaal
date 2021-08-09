@@ -30,7 +30,7 @@ string read_cmd( string const& cmd_ ) {
 		}
 		::fclose( idCmd );
 	}
-	return ( out );
+	return out;
 }
 
 int main( int argc_, char** argv_ ) try {

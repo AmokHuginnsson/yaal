@@ -109,7 +109,7 @@ private:
 		} catch ( hcore::HException const& e ) {
 			thread_->raise( exception_class(), e.what(), position_ );
 		}
-		return ( v );
+		return v;
 		M_EPILOG
 	}
 };
@@ -128,7 +128,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::value_t HDatabaseConnection::do_table_names(
@@ -150,7 +150,7 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::value_t HDatabaseConnection::do_column_names(
@@ -171,7 +171,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 }
 
 HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HClass* origin_, HHuginn::class_t const& exceptionClass_ ) {
@@ -193,7 +193,7 @@ HHuginn::class_t HDatabaseConnection::get_class( HRuntime* runtime_, HClass* ori
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

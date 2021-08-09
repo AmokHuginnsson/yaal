@@ -278,7 +278,7 @@ int long HCat::do_read( void* buffer_, int long size_ ) {
 			++ _current;
 		}
 	}
-	return ( nReadTotal );
+	return nReadTotal;
 }
 
 void HCat::do_flush( void ) {

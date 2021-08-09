@@ -46,7 +46,7 @@ std::string remove_address( std::string s_ ) {
 		}
 		s_.erase( hexPos, atPos - hexPos );
 	}
-	return ( s_ );
+	return s_;
 }
 
 bool compare_symbols( std::string const& left_, std::string const& right_ ) {
@@ -124,6 +124,6 @@ int main( int argc_, char** argv_ ) {
 		ret = 1;
 		cerr << "Exception caught: " << e.what() << endl;
 	}
-	return ( ret );
+	return ret;
 }
 

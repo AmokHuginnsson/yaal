@@ -158,7 +158,7 @@ int main( int argc_, char** argv_ ) {
 		cerr << e.what() << endl;
 	} catch ( int const& ) {
 	}
-	return ( errorCode );
+	return errorCode;
 }
 
 void copy_modification_time( string const& from_, string const& to_ ) {
@@ -206,7 +206,7 @@ bool is_private( string const& p ) {
 			break;
 		}
 	}
-	return ( priv );
+	return priv;
 }
 
 void process_line( string& line ) {
@@ -251,7 +251,7 @@ bool is_directory( string const& p ) {
 	bool dir( false );
 	if ( ! stat( p.c_str(), &s ) )
 		dir = ( s.st_mode & S_IFDIR ) ? true : false;
-	return ( dir );
+	return dir;
 }
 
 string dirname( string const& p ) {
@@ -265,13 +265,13 @@ string dirname( string const& p ) {
 		} else
 			dir = p;
 	}
-	return ( dir );
+	return dir;
 }
 
 string basename( string const& p ) {
 	int long idx( 0 );
 	string name( ( ( idx = p.find_last_of( "/\\" ) ) != string::npos ) ? string( p, idx + 1 ) : p );
-	return ( name );
+	return name;
 }
 
 void remove_all( string const& p ) {

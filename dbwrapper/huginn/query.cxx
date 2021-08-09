@@ -83,7 +83,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -100,7 +100,7 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 	} catch ( hcore::HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}
-	return ( v );
+	return v;
 	M_EPILOG
 }
 
@@ -123,7 +123,7 @@ HHuginn::class_t HQuery::get_class( HRuntime* runtime_, HClass* origin_, HHuginn
 		)
 	);
 	runtime_->huginn()->register_class( c );
-	return ( c );
+	return c;
 	M_EPILOG
 }
 

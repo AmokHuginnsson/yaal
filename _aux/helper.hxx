@@ -38,5 +38,5 @@ to_t lexical_cast( from_t const& from ) {
 	ss << from;
 	to_t to;
 	ss >> to;
-	return ( to );
+	return to;
 }

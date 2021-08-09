@@ -49,7 +49,7 @@ double long load_double_long( double_long_storage const& storage_ ) {
 #else
 	memcpy( &value, storage_.data, SIZEOF_DOUBLE_LONG );
 #endif
-	return ( value );
+	return value;
 }
 
 template<>

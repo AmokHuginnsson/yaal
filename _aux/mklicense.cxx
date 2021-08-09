@@ -22,7 +22,7 @@ location_t locate_project_name( std::string const& str_ ) {
 			l = make_pair( start, pos - start );
 		}
 	}
-	return ( l );
+	return l;
 }
 
 std::string get_project_name( std::istream& src_ ) {
@@ -35,13 +35,13 @@ std::string get_project_name( std::istream& src_ ) {
 			break;
 		}
 	}
-	return ( name );
+	return name;
 }
 
 std::string toupper( std::string const& str_ ) {
 	string s;
 	std::transform( str_.begin(), str_.end(), std::back_insert_iterator<std::string>( s ), static_cast<int(*)(int)>( &std::toupper ) );
-	return ( s );
+	return s;
 }
 
 int main( int argc_, char** argv_ ) try {

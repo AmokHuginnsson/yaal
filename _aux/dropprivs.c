@@ -82,6 +82,6 @@ int main( int argc, char** argv ) {
 	} else {
 		printf( "%s\n", errmsg );
 	}
-	return ( error );
+	return error;
 }
 
