@@ -214,58 +214,6 @@ void HFile::do_seek( int long pos, SEEK seek_ ) {
 	M_EPILOG
 }
 
-HFile& HFile::read_line( HString& line_, READ read_, int maximumLength_ ) {
-	M_PROLOG
-	M_ASSERT( _handle );
-	flush_write_buffer();
-	READ readMode( read_ );
-	if ( readMode == READ::DEFAULTS ) {
-		readMode = READ::BUFFERED_READS;
-	}
-	M_ENSURE( _handle, _error_ );
-	int length( -1 );
-	if ( readMode == READ::BUFFERED_READS ) {
-		int bufferSize( max( maximumLength_, system::get_page_size() ) );
-		char* nl( nullptr );
-		char* ptr( _cache.get<char>() );
-		if ( _cachedBytes > 0 ) {
-			nl = static_cast<char*>( memchr( ptr, '\n', static_cast<size_t>( _cachedBytes ) ) );
-		}
-		while ( ! nl ) {
-			ptr = static_cast<char*>( _cache.realloc( bufferSize ) );
-			int nRead( static_cast<int>( do_read( ptr + _cachedBytes, bufferSize - _cachedBytes ) ) );
-			if ( nRead < 0 ) {
-				_valid = false;
-				M_THROW( "read error", errno );
-			} else if ( nRead == 0 ) {
-				_valid = false;
-				nl = ptr + _cachedBytes;
-				break;
-			}
-			_cachedBytes += nRead;
-			nl = static_cast<char*>( memchr( ptr, '\n', static_cast<size_t>( _cachedBytes ) ) );
-			bufferSize *= 2;
-		}
-		length = static_cast<int>( nl - ptr );
-		line_.assign( ptr, length );
-		if ( _cachedBytes > length ) {
-			::memmove( ptr, nl + 1, static_cast<size_t>( _cachedBytes - ( length + 1 ) ) );
-			_cachedBytes -= ( length + 1 );
-		} else {
-			_cachedBytes = 0;
-		}
-	} else { /* UNBUFFERED_READS */
-		length = static_cast<int>( read_until( line_, "\n", true ) );
-	}
-	if ( maximumLength_ && ( length > maximumLength_ ) ) {
-		_fail = true;
-		M_THROW( _( "line too long" ), length );
-	}
-	line_.trim_right( "\r\n" );
-	return ( *this );
-	M_EPILOG
-}
-
 HString const& HFile::get_path( void ) const {
 	M_PROLOG
 	return ( _path );

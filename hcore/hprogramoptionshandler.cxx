@@ -632,7 +632,7 @@ bool read_rc_line( HString& option_, HString& value_, HFile& file_, int& line_ )
 	int long index = 0, length = 0, end = 0;
 	option_.clear();
 	value_.clear();
-	while ( file_.read_line( option_ ).good() ) {
+	while ( getline( file_, option_ ).good() ) {
 		line_ ++;
 		index = 0;
 		if ( option_.is_empty() ) {

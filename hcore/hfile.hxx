@@ -37,13 +37,6 @@ public:
 		ACQUIRED,
 		EXTERNAL
 	};
-	/*! \brief Read operation modifiers.
-	 */
-	enum class READ {
-		DEFAULTS, /* BUFFERED_READS */
-		BUFFERED_READS,
-		UNBUFFERED_READS
-	};
 private:
 	void* _handle;
 	HString _path;
@@ -75,7 +68,6 @@ public:
 	int open( void* raw, OWNERSHIP ownership );
 	int close( void );
 	void* release( void );
-	HFile& read_line( HString&, READ = READ::DEFAULTS, int = 0 );
 	int long tell( void ) const;
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
