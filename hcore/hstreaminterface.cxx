@@ -719,6 +719,9 @@ int long HStreamInterface::semantic_read(
 
 HStreamInterface& HStreamInterface::do_consume( yaal::hcore::HString const& pattern_ ) {
 	M_PROLOG
+	if ( ! good() ) {
+		return ( *this );
+	}
 	_conversionCache.assign( pattern_ );
 	int len( static_cast<int>( _conversionCache.byte_count() ) );
 	char const* p( _conversionCache.raw() );
@@ -737,6 +740,9 @@ HStreamInterface& HStreamInterface::do_consume( yaal::hcore::HString const& patt
 
 HStreamInterface& HStreamInterface::do_ignore( int count_ ) {
 	M_PROLOG
+	if ( ! good() ) {
+		return ( *this );
+	}
 	static int const IGNORE_SIZE( 1024 );
 	char buffer[IGNORE_SIZE];
 	while ( good() && ( count_ > 0 ) ) {
@@ -747,6 +753,28 @@ HStreamInterface& HStreamInterface::do_ignore( int count_ ) {
 		}
 		count_ -= nRead;
 	}
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_skipws( void ) {
+	M_PROLOG
+	if ( ! good() ) {
+		_wordCache.clear();
+		return ( *this );
+	}
+	if ( ! _skipWS ) {
+		int peeked( HStreamInterface::do_peek() );
+		if (
+			( peeked == INVALID_CHARACTER )
+			|| character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( peeked ) ) )
+		) {
+			_fail = true;
+		}
+	} else {
+		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
+	}
+	_wordCache.clear();
 	return ( *this );
 	M_EPILOG
 }
@@ -780,32 +808,20 @@ int HStreamInterface::do_pending_write_size( void ) const {
 
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
-	if ( ! _skipWS ) {
-		int peeked( HStreamInterface::do_peek() );
-		if ( ( peeked == INVALID_CHARACTER )
-				|| character_class<CHARACTER_CLASS::WHITESPACE>().hasz( code_point_t( static_cast<yaal::u32_t>( peeked ) ) ) ) {
-			_fail = true;
-		}
+	skipws();
+	if ( ! good() ) {
+		return ( false );
 	}
-	if ( good() ) {
-		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
-		if ( _skipWS ) {
-			_wordCache.clear();
-		}
-		if ( good() ) {
-			read_until_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data(), false );
-			_wordCache.trim_right( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
-		}
-	}
+	read_until_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data(), false );
+	_wordCache.trim_right( character_class<CHARACTER_CLASS::WHITESPACE>().data() );
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 }
 
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
-	read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
-	_wordCache.clear();
 	do {
+		skipws();
 		if ( ! good() ) {
 			break;
 		}
@@ -846,8 +862,7 @@ bool HStreamInterface::read_integer( void ) {
 bool HStreamInterface::read_floating_point( void ) {
 	M_PROLOG
 	do {
-		read_while_retry( _wordCache, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
-		_wordCache.clear();
+		skipws();
 		if ( ! good() ) {
 			break;
 		}

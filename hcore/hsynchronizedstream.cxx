@@ -590,6 +590,18 @@ HStreamInterface& HSynchronizedStream::do_ignore( int count_ ) {
 	M_EPILOG
 }
 
+HStreamInterface& HSynchronizedStream::do_skipws( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	if ( _streamRef == this ) {
+		HStreamInterface::do_skipws();
+	} else if ( _streamRef ) {
+		_streamRef->skipws();
+	}
+	return ( *this );
+	M_EPILOG
+}
+
 int HSynchronizedStream::do_peek( void ) {
 	M_PROLOG
 	HLock l( _mutex );

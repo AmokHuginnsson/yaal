@@ -408,6 +408,13 @@ public:
 	HStreamInterface& ignore( int count_ ) {
 		return ( do_ignore( count_ ) );
 	}
+	/*! \brief Skip whitespace characters from input if this stream is so configured.
+	 *
+	 * \return Self.
+	 */
+	HStreamInterface& skipws( void ) {
+		return ( do_skipws() );
+	}
 	M_YAAL_HCORE_PUBLIC_API static char const eol[];
 	/*! \brief Tell if given stream instance if a valid stream object.
 	 *
@@ -583,6 +590,7 @@ protected:
 	virtual void do_unread( void const*, int long );
 	virtual HStreamInterface& do_consume( yaal::hcore::HString const& );
 	virtual HStreamInterface& do_ignore( int );
+	virtual HStreamInterface& do_skipws( void );
 	virtual int do_peek( void );
 	virtual int do_immediate_read_size( void ) const;
 	virtual int do_pending_write_size( void ) const;
