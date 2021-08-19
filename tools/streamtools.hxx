@@ -98,7 +98,7 @@ template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& is, yaal::hcore::HPair<first_t, second_t>& p ) {
 	M_PROLOG
 	if ( is.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-		read( read( is.consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
+		read( read( is.skipws().consume( "pair<" ), p.first ).consume( "," ), p.second ).consume( ">" );
 	} else {
 		is >> p.first >> p.second;
 	}
@@ -163,6 +163,10 @@ yaal::hcore::HStreamInterface& container_scan(
 	container_t container;
 	do {
 		if ( in.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
+			in.skipws();
+			if ( ! in.good() ) {
+				break;
+			}
 			if ( name_ ) {
 				in.consume( name_ );
 				if ( ! in.good() ) {
@@ -271,7 +275,7 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hc
 	container_t container;
 	do {
 		if ( in.get_mode() == yaal::hcore::HStreamInterface::MODE::TEXT ) {
-			in.consume( "staticarray(" );
+			in.skipws().consume( "staticarray(" );
 			if ( ! in.good() ) {
 				break;
 			}

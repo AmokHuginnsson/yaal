@@ -514,27 +514,27 @@ HStreamInterface& HSynchronizedStream::do_input( manipulator_t const& val_ ) {
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* delim, bool strip ) {
+int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* delim, bool extractDelim ) {
 	M_PROLOG
 	HLock l( _mutex );
 	int long nRead( 0 );
 	if ( _streamRef == this ) {
-		nRead = HStreamInterface::do_read_until( store, delim, strip );
+		nRead = HStreamInterface::do_read_until( store, delim, extractDelim );
 	} else if ( _streamRef ) {
-		nRead = _streamRef->read_until( store, delim, strip );
+		nRead = _streamRef->read_until( store, delim, extractDelim );
 	}
 	return nRead;
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim, bool strip ) {
+int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim, bool extractDelim ) {
 	M_PROLOG
 	HLock l( _mutex );
 	int long nRead( 0 );
 	if ( _streamRef == this ) {
-		nRead = HStreamInterface::do_read_until_n( store, maxcount, delim, strip );
+		nRead = HStreamInterface::do_read_until_n( store, maxcount, delim, extractDelim );
 	} else if ( _streamRef ) {
-		nRead = _streamRef->read_until_n( store, maxcount, delim, strip );
+		nRead = _streamRef->read_until_n( store, maxcount, delim, extractDelim );
 	}
 	return nRead;
 	M_EPILOG

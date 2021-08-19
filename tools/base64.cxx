@@ -212,7 +212,8 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	char* inputBuffer( buffer.get<char>() );
 	int inputSize( 0 );
 	int long pos( 0 );
-	while ( in.read_until_n( line, BUF_LEN ) ) {
+	while ( in.read_until_n( line, BUF_LEN ) > 0 ) {
+		line.trim_right();
 		for ( code_point_t ch : line ) {
 			M_ENSURE( is_base64_character( ch, standardCompliantMode ) || is_whitespace( ch ), format( "char: %C, at position: %ld", ch, pos ) );
 			if ( is_base64_character( ch, standardCompliantMode	) ) {

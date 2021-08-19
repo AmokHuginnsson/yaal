@@ -794,7 +794,7 @@ void HStream::write_character( HThread* thread_, HHuginn::value_t const& value_,
 yaal::hcore::HString& HStream::read_line_raw( HThread* thread_, int position_ ) {
 	M_PROLOG
 	try {
-		_stream->read_until( _lineBuffer, HStreamInterface::eol, false );
+		_stream->read_until( _lineBuffer, HStreamInterface::eol );
 	} catch ( HStringException const& e ) {
 		raise( thread_, e.what(), position_, thread_->runtime().object_factory()->conversion_exception_class() );
 	} catch ( hcore::HException const& e ) {

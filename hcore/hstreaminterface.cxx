@@ -533,16 +533,16 @@ HStreamInterface::HManipulator setfill( code_point_t fill_ ) {
 }
 
 int long HStreamInterface::do_read_until( HString& message_,
-		char const* stopSet_, bool stripDelim_ ) {
+		char const* stopSet_, bool extractDelim_ ) {
 	M_PROLOG
-	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int>::value, stopSet_, stripDelim_ ) );
+	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int>::value, stopSet_, extractDelim_ ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::do_read_until_n( HString& message_, int long maxCount_,
-		char const* stopSet_, bool stripDelim_ ) {
+		char const* stopSet_, bool extractDelim_ ) {
 	M_PROLOG
-	return ( semantic_read( message_, maxCount_, stopSet_, stripDelim_, true ) );
+	return ( semantic_read( message_, maxCount_, stopSet_, extractDelim_, true ) );
 	M_EPILOG
 }
 
@@ -572,11 +572,11 @@ int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
 }
 
 int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
-		char const* stopSet_, bool stripDelim_ ) {
+		char const* stopSet_, bool extractDelim_ ) {
 	M_PROLOG
 	int long nRead( -1 );
 	while ( good() && ( nRead < 0 ) ) {
-		nRead = HStreamInterface::do_read_until( message_, stopSet_, stripDelim_ );
+		nRead = HStreamInterface::do_read_until( message_, stopSet_, extractDelim_ );
 	}
 	return nRead;
 	M_EPILOG
@@ -618,9 +618,8 @@ inline char const* find_delim( char const* buffer_, int long size_, char const* 
 	return ( ( isStopSet_ ? find_first_of : find_first_other_than )( buffer_, size_, set_, setLen_ ) );
 }
 
-inline void consume( HString& message_, int long consumedSize_, char* buffer_, int& bufferSize_, bool delim_, bool stripDelim_ ) {
-	int long messageByteCount( consumedSize_ - ( ( ( consumedSize_ > 0 ) && delim_ && stripDelim_ ) ? 1 : 0 ) );
-	bytes_to_string( message_, buffer_, messageByteCount );
+inline void consume( HString& message_, int long consumedSize_, char* buffer_, int& bufferSize_ ) {
+	bytes_to_string( message_, buffer_, consumedSize_ );
 	bufferSize_ -= static_cast<int>( consumedSize_ );
 	::memmove( buffer_, buffer_ + consumedSize_, static_cast<size_t>( bufferSize_ ) );
 }
@@ -629,11 +628,11 @@ int long HStreamInterface::semantic_read(
 	yaal::hcore::HString& message_,
 	int long maxCount_,
 	char const* set_,
-	bool stripDelim_,
+	bool extractDelim_,
 	bool isStopSet_
 ) {
 	M_PROLOG
-	M_ASSERT( isStopSet_ || ! stripDelim_ );
+	M_ASSERT( isStopSet_ || ! extractDelim_ );
 	M_ASSERT( _cachedBytes >= 0 );
 	flush_write_buffer();
 	int long nRead( 0 ); /* how many bytes were read in this single invocation */
@@ -647,13 +646,13 @@ int long HStreamInterface::semantic_read(
 		char const* p( find_delim( buffer, toReadFromCache, set_, setLen, isStopSet_ ) );
 		if ( p ) {
 			byDelim = true;
-			cached = static_cast<int>( p - buffer ) + ( isStopSet_ ? 1 : 0 );
+			cached = static_cast<int>( p - buffer ) + ( isStopSet_ && extractDelim_ ? 1 : 0 );
 		} else {
 			cached = static_cast<int>( toReadFromCache );
 		}
 		if ( ( cached == maxCount_ ) || byDelim ) {
 			nRead = cached;
-			hcore::consume( message_, nRead, buffer, _cachedBytes, byDelim, stripDelim_ );
+			hcore::consume( message_, nRead, buffer, _cachedBytes );
 		}
 	}
 	if ( ! ( nRead || byDelim ) ) {
@@ -688,7 +687,7 @@ int long HStreamInterface::semantic_read(
 			_cachedBytes += static_cast<int>( nRead );
 			_cacheContent = CACHE_CONTENT::READ;
 			if ( byDelim ) {
-				nRead = ( p - buffer ) + 1;
+				nRead = ( p - buffer ) + ( isStopSet_ && extractDelim_ ? 1 : 0 );
 				break;
 			}
 			if ( _cachedBytes >= maxCount_ ) {
@@ -697,13 +696,11 @@ int long HStreamInterface::semantic_read(
 			}
 		}
 		if ( nRead >= 0 ) {
-			_valid = !! nRead;
+			_valid = !! nRead || ( byDelim && ! isStopSet_ );
 			if ( ! byDelim ) {
 				nRead = _cachedBytes;
-			} else if ( ! isStopSet_ ) {
-				-- nRead;
 			}
-			hcore::consume( message_, nRead, buffer, _cachedBytes, byDelim, stripDelim_ );
+			hcore::consume( message_, nRead, buffer, _cachedBytes );
 		} else {
 			message_.clear();
 		}
@@ -1596,7 +1593,7 @@ void HStreamInterface::HManipulator::set_precision( HStreamInterface& iface_ ) c
 HStreamInterface& getline( HStreamInterface& stream_, yaal::hcore::HString& store_ ) {
 	M_PROLOG
 	stream_.read_until( store_, HStreamInterface::eol );
-	store_.trim_right( "\r" );
+	store_.trim_right( "\n\r" );
 	return stream_;
 	M_EPILOG
 }

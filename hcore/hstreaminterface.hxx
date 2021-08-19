@@ -229,22 +229,22 @@ public:
 	 *
 	 * \param store - Store read date here.
 	 * \param delim - Stop reading data at any character in this set.
-	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \param extract - Extract delimiting stop char from input stream.
 	 * \return number of bytes read.
 	 */
-	int long read_until( yaal::hcore::HString& store, char const* delim = eol, bool strip = true ) {
-		return ( do_read_until( store, delim, strip ) );
+	int long read_until( yaal::hcore::HString& store, char const* delim = eol, bool extract = true ) {
+		return ( do_read_until( store, delim, extract ) );
 	}
 	/*! \brief Read data from stream until end of it or until delimiter is encountered or enough data has been acquired.
 	 *
 	 * \param store - Store read date here.
 	 * \param maxcount - A maximum number of bytes to read.
 	 * \param delim - Stop reading data at any character in this set.
-	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \param extract - Extract delimiting stop char from input stream.
 	 * \return number of bytes read.
 	 */
-	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim = eol, bool strip = true ) {
-		return ( do_read_until_n( store, maxcount, delim, strip ) );
+	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim = eol, bool extract = true ) {
+		return ( do_read_until_n( store, maxcount, delim, extract ) );
 	}
 	/*! \brief Read data from stream as long as read characters are in set and end of stream has not been reached.
 	 *
