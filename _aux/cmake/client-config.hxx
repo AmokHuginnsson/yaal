@@ -18,6 +18,7 @@
 #define WIN32_LEAN_AND_MEAN 1
 #define VC_EXTRALEAN 1
 #pragma warning( disable : 4068 )
+#pragma warning( disable : 4075 )
 #pragma warning( disable : 4146 )
 #pragma warning( disable : 4180 )
 #pragma warning( disable : 4221 )

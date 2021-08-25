@@ -2,6 +2,7 @@
 #define YAAL_MSVCXX_FIX_HXX_INCLUDED 1
 
 #pragma warning( disable : 4068 )
+#pragma warning( disable : 4075 )
 #pragma warning( disable : 4146 )
 #pragma warning( disable : 4180 )
 #pragma warning( disable : 4221 )

@@ -32,12 +32,22 @@
 #include "msio.hxx"
 #include "msvcxx.hxx"
 
+#include "emu_signals.hxx"
+
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace msvcxx;
 
+#pragma init_seg( ".CRT$XCT" )
+
+namespace msvcxx {
+
+TLSSignalsSetup _tlsSignalsSetup_;
 CMutex _backtraceMutex_;
+
+}
+
 __declspec( thread ) int SocketErrno::_errno = 0;
 int ESCDELAY = 0;
 static int const MAX_SYMBOL_NAME_LEN( 2048 );

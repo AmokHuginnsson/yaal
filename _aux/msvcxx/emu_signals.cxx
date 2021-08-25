@@ -94,8 +94,6 @@ void SignalsSetup::signal( void ) {
 	::SetEvent( _interrupt );
 }
 
-TLSSignalsSetup _tlsSignalsSetup_;
-
 SignalDispatcher::SignalDispatcher( void )
 	: _started( false ), _queue(), _block(), _accept(), _acceptedConsoleEvents() {
 }
