@@ -39,10 +39,11 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace msvcxx;
 
-#pragma init_seg( ".CRT$XCT" )
+#pragma init_seg( lib )
 
 namespace msvcxx {
 
+SignalDispatcher _signalDispatcher_;
 TLSSignalsSetup _tlsSignalsSetup_;
 CMutex _backtraceMutex_;
 

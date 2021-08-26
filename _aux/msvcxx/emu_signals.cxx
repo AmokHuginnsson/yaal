@@ -6,7 +6,6 @@
 
 #include "_aux/msvcxx/csignal"
 #include "_aux/msvcxx/unistd.h"
-#include "_aux/msvcxx/synchronizedqueue.hxx"
 #include "hcore/base.hxx"
 #include "_aux/msvcxx/emu_signals.hxx"
 #include "_aux/msvcxx/cleanup.hxx"
@@ -18,38 +17,6 @@ using namespace yaal::tools;
 using namespace msvcxx;
 
 namespace msvcxx {
-
-class SignalDispatcher {
-	typedef SynchronizedQueue<int> signal_queue_t;
-	bool _started;
-	signal_queue_t _queue;
-	sigset_t _block;
-	sigset_t _accept;
-	struct ConsoleEvents {
-		bool _ctrlC;
-		bool _break;
-		bool _close;
-		bool _logoff;
-		bool _shutdown;
-		ConsoleEvents( void )
-			: _ctrlC( false )
-			, _break( false )
-			, _close( false )
-			, _logoff( false )
-			, _shutdown( false ) {
-		}
-	} _acceptedConsoleEvents;
-public:
-	SignalDispatcher( void );
-	void dispatch( int );
-	bool sigwait( sigset_t const*, int& );
-	sigset_t get_mask( void ) const;
-	void set_mask( int, sigset_t const* );
-	bool is_started( void ) const;
-	void set_enabled_console_event( DWORD, bool );
-	bool is_console_event_enabled( DWORD ) const;
-	bool is_console_event_enabled( void ) const;
-} _signalDispatcher_;
 
 SignalsSetup::SignalsSetup( void )
 	: _mask( _signalDispatcher_.get_mask() )
@@ -95,7 +62,11 @@ void SignalsSetup::signal( void ) {
 }
 
 SignalDispatcher::SignalDispatcher( void )
-	: _started( false ), _queue(), _block(), _accept(), _acceptedConsoleEvents() {
+	: _started( false )
+	, _queue()
+	, _block()
+	, _accept()
+	, _acceptedConsoleEvents() {
 }
 
 void SignalDispatcher::dispatch( int sigNo_ ) {
@@ -103,10 +74,9 @@ void SignalDispatcher::dispatch( int sigNo_ ) {
 		_queue.push( sigNo_ );
 	} else {
 		HLock l( _tlsSignalsSetup_.acquire() );
-		for ( TLSSignalsSetup::iterator it( _tlsSignalsSetup_.begin() ), end( _tlsSignalsSetup_.end() );
-			it != end; ++ it ) {
-			if ( ! (**it)->is_blocked( sigNo_ ) ) {
-				(**it)->signal();
+		for ( TLSSignalsSetup::instances_t::value_type const& signalSetup : _tlsSignalsSetup_ ) {
+			if ( ! (*signalSetup)->is_blocked( sigNo_ ) ) {
+				(*signalSetup)->signal();
 				break;
 			}
 		}
@@ -313,16 +283,11 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 
 int pthread_sigmask( int how_, sigset_t const* set_, sigset_t* old_ ) {
 	if ( old_ ) {
-		if ( _signalDispatcher_.is_started() ) {
-			*old_ = _tlsSignalsSetup_->get_mask();
-		} else {
-			*old_ = _signalDispatcher_.get_mask();
-		}
+		*old_ = _tlsSignalsSetup_->get_mask();
 	}
 	if ( sigismember( set_, SIGALRM ) ) {
-		if ( _signalDispatcher_.is_started() ) {
-			_tlsSignalsSetup_->set_mask( how_, set_ );
-		} else {
+		_tlsSignalsSetup_->set_mask( how_, set_ );
+		if ( ! _signalDispatcher_.is_started() ) {
 			_signalDispatcher_.set_mask( how_, set_ );
 		}
 	}
