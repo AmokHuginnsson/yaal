@@ -299,14 +299,16 @@ int main( int, char const** ) {
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether basename is declared in cstring])
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#define _GNU_SOURCE 1
+	#include <cstring>
 	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether arg for basename is const])
 RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#define _GNU_SOURCE 1
+#include <cstring>
 #ifndef HAVE_BASENAME_IN_CSTRING
 # include <libgen.h>
 #endif /* not HAVE_BASENAME_IN_CSTRING */
@@ -469,7 +471,13 @@ AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_CHECK_DECLS([RLIMIT_AS, RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
 AC_CHECK_DECLS([VSWTC, B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
-AC_CHECK_DECLS([expl, logl, sqrtl, sinl, cosl, tanl, asinl, acosl, atanl, sincosl, fmodl, floorl, ceill, roundl],[],[],[#include <cmath>])
+AC_CHECK_DECLS(
+	[expl, logl, sqrtl, sinl, cosl, tanl, asinl, acosl, atanl, sincosl, fmodl, floorl, ceill, roundl],
+	[],[],[
+		[#define _GNU_SOURCE 1]
+		[#include <cmath>]
+	]
+)
 AC_CHECK_DECLS([has_mouse],[],[],[#include <${_NCURSES_HEADER}>])
 AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
