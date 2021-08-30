@@ -21,11 +21,8 @@ extern M_YAAL_TOOLS_PUBLIC_API char const* const _errMsgHRing_[];
 
 namespace ring {
 
-struct capacity_tag;
-struct size_tag;
-
-typedef yaal::hcore::HTaggedPOD<int long, capacity_tag> capacity_type;
-typedef yaal::hcore::HTaggedPOD<int long, size_tag> size_type;
+typedef yaal::hcore::HTaggedPOD<int long, struct capacity_tag> capacity_type;
+typedef yaal::hcore::HTaggedPOD<int long, struct size_tag> size_type;
 
 }
 

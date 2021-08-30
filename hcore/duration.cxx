@@ -181,11 +181,13 @@ UNIT scale( duration_t duration_, UNIT minScale_ ) {
 }
 
 namespace {
+
 typedef yaal::hcore::HHashMap<yaal::hcore::HString, time::UNIT> str_to_duration_unit_t;
-str_to_duration_unit_t _durationUnits_ = {
+static str_to_duration_unit_t const _durationUnits_ = {
 	{ "ns", time::UNIT::NANOSECOND },
 	{ "nanosecond", time::UNIT::NANOSECOND },
 	{ "nanoseconds", time::UNIT::NANOSECOND },
+	{ "μs", time::UNIT::MICROSECOND },
 	{ "us", time::UNIT::MICROSECOND },
 	{ "microsecond", time::UNIT::MICROSECOND },
 	{ "microseconds", time::UNIT::MICROSECOND },
@@ -212,6 +214,18 @@ str_to_duration_unit_t _durationUnits_ = {
 	{ "week", time::UNIT::WEEK },
 	{ "weeks", time::UNIT::WEEK }
 };
+
+}
+
+template<>
+hcore::time::UNIT lexical_cast( hcore::HString const& val_ ) {
+	HString unitStr( val_ );
+	unitStr.lower();
+	str_to_duration_unit_t::const_iterator it( _durationUnits_.find( unitStr ) );
+	if ( it == _durationUnits_.end() ) {
+		throw HLexicalCastException( "Invalid duration unit `"_ys.append( unitStr ).append( "'" ) );
+	}
+	return ( it->second );
 }
 
 template<>
@@ -238,16 +252,13 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 		if ( unitEnd == HString::npos ) {
 			unitEnd = val_.get_length();
 		}
-		time::UNIT unit( time::UNIT::SECOND );
 		unitStr = val_.substr( pos, unitEnd - pos );
-		unitStr.lower();
 		try {
-			unit = _durationUnits_.at( unitStr );
-		} catch ( ... ) {
-			throw HLexicalCastException( "Invalid duration unit `"_ys.append( unitStr ).append( "' at: " ).append( pos ) );
+			d += time::duration( v, lexical_cast<time::UNIT>( unitStr ) );
+		} catch ( HException const& e ) {
+			throw HLexicalCastException( to_string( e.what() ).append( " at: " ).append( pos ) );
 		}
 		pos = unitEnd;
-		d += time::duration( v, unit );
 	}
 	return d;
 	M_EPILOG

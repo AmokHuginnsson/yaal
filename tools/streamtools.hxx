@@ -19,6 +19,7 @@
 #include "hcore/hhashmap.hxx"
 #include "hcore/htuple.hxx"
 #include "hcore/hbitset.hxx"
+#include "hcore/duration.hxx"
 #include "tools/hring.hxx"
 #include "tools/htwowaymap.hxx"
 #include "tools/hbitmap.hxx"
@@ -992,6 +993,9 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaa
 class HComplex;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HComplex const& );
 yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaal::hcore::HComplex& );
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, time::duration_t const& );
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, time::duration_t& );
 
 }
 

@@ -576,6 +576,69 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 	M_EPILOG
 }
 
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os_, time::duration_t const& duration_ ) {
+	M_PROLOG
+	if ( os_.get_mode() == HStreamInterface::MODE::TEXT ) {
+		os_ << duration_to_string( duration_, time::UNIT::NANOSECOND );
+	} else {
+		os_ << duration_.get();
+	}
+	return os_;
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is_, time::duration_t& duration_ ) {
+	M_PROLOG
+	if ( is_.get_mode() == HStreamInterface::MODE::TEXT ) {
+		bool skipWS( is_.get_skipws() );
+		is_.set_skipws( false );
+		HString trace;
+		HString strVal;
+		HString strUnit;
+		HString white;
+		time::duration_t duration( 0 );
+		while ( true ) {
+			if ( ! is_.good() ) {
+				break;
+			}
+			trace.clear();
+			is_.read_while( white, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
+			trace.append( white );
+			is_ >> strVal;
+			trace.append( strVal );
+			time::duration_t::value_type val( 0 );
+			try {
+				val = lexical_cast<time::duration_t::value_type>( strVal );
+			} catch ( ... ) {
+				break;
+			}
+			is_.read_while( white, character_class<CHARACTER_CLASS::WHITESPACE>().data() );
+			trace.append( white );
+			is_ >> strUnit;
+			trace.append( strUnit );
+			time::UNIT unit( time::UNIT::SECOND );
+			try {
+				unit = lexical_cast<time::UNIT>( strUnit );
+			} catch ( ... ) {
+				break;
+			}
+			duration += time::duration( val, unit );
+			duration_ = duration;
+		}
+		if ( ! trace.is_empty() ) {
+			HUTF8String utf8( trace );
+			is_.unread( utf8.c_str(), utf8.byte_count() );
+		}
+		is_.set_skipws( skipWS );
+	} else {
+		time::duration_t::value_type val( 0 );
+		is_ >> val;
+		duration_ = time::duration_t( val );
+	}
+	return is_;
+	M_EPILOG
+}
+
 }
 
 }
