@@ -30,12 +30,17 @@ enum class UNIT {
 	WEEK
 };
 
+enum class UNIT_FORM {
+	FULL,
+	ABBREVIATED
+};
+
 typedef HTaggedPOD<yaal::i64_t, struct Duration> duration_t;
 
 duration_t duration( yaal::i64_t, UNIT );
 template <UNIT const u>
 yaal::i64_t in_units( duration_t );
-yaal::hcore::HString duration_to_string( duration_t, UNIT );
+yaal::hcore::HString duration_to_string( duration_t, UNIT, UNIT_FORM = UNIT_FORM::FULL );
 UNIT scale( duration_t, UNIT = UNIT::WEEK );
 
 }

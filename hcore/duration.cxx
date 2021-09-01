@@ -88,49 +88,38 @@ yaal::i64_t in_units<UNIT::WEEK>( duration_t d_ ) {
 	return ( ( ( ( ( d_.get() / si::NANO_IN_WHOLE ) / HTime::SECONDS_IN_MINUTE ) / HTime::MINUTES_IN_HOUR ) / HTime::HOURS_IN_DAY ) / HTime::DAYS_IN_WEEK );
 }
 
-yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_ ) {
+yaal::hcore::HString duration_to_string( duration_t val_, time::UNIT unit_, time::UNIT_FORM unitForm_ ) {
 	M_PROLOG
+	static time::UNIT const units[] = { UNIT::WEEK, UNIT::DAY, UNIT::HOUR, UNIT::MINUTE, UNIT::SECOND, UNIT::MILLISECOND, UNIT::MICROSECOND, UNIT::NANOSECOND };
+	static char const unitNames[][12] = {
+		"week", "day", "hour", "minute", "second", "millisecond", "microsecond", "nanosecond"
+	};
+	static char const unitShortNames[][4] = {
+		"w", "d", "h", "m", "s", "ms", "μs", "ns"
+	};
+	typedef yaal::i64_t ( *in_units_t ) ( duration_t );
+	static in_units_t in_units_func[] = {
+		in_units<UNIT::WEEK>, in_units<UNIT::DAY>, in_units<UNIT::HOUR>, in_units<UNIT::MINUTE>, in_units<UNIT::SECOND>, in_units<UNIT::MILLISECOND>, in_units<UNIT::MICROSECOND>, in_units<UNIT::NANOSECOND>
+	};
+	static_assert( size( units ) == size( unitNames ), "inconsistent duration unit description (full name)" );
+	static_assert( size( units ) == size( unitShortNames ), "inconsistent duration unit description (short name)" );
+	static_assert( size( units ) == size( in_units_func ), "inconsistent duration unit description (func)" );
 	HString s;
 	time::duration_t d( val_ );
-	i64_t x( time::in_units<time::UNIT::WEEK>( d ) );
-	if ( x > 0 ) {
-		s.append( x ).append( " week" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, time::UNIT::WEEK );
-	}
-	x = time::in_units<UNIT::DAY>( d );
-	if ( ( unit_ <= UNIT::DAY ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " day" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::DAY );
-	}
-	x = time::in_units<UNIT::HOUR>( d );
-	if ( ( unit_ <= UNIT::HOUR ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " hour" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::HOUR );
-	}
-	x = time::in_units<UNIT::MINUTE>( d );
-	if ( ( unit_ <= UNIT::MINUTE ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " minute" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::MINUTE );
-	}
-	x = time::in_units<UNIT::SECOND>( d );
-	if ( ( unit_ <= UNIT::SECOND ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " second" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::SECOND );
-	}
-	x = time::in_units<UNIT::MILLISECOND>( d );
-	if ( ( unit_ <= UNIT::MILLISECOND ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " millisecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::MILLISECOND );
-	}
-	x = time::in_units<UNIT::MICROSECOND>( d );
-	if ( ( unit_ <= UNIT::MICROSECOND ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " microsecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::MICROSECOND );
-	}
-	x = time::in_units<UNIT::NANOSECOND>( d );
-	if ( ( unit_ <= UNIT::NANOSECOND ) && ( x > 0 ) ) {
-		s.append( ! s.is_empty() ? " " : "" ).append( x ).append( " nanosecond" ).append( x > 1 ? "s" : "" );
-		d -= time::duration( x, UNIT::NANOSECOND );
+	for ( int i( 0 ); i < size( units ); ++ i ) {
+		i64_t x( in_units_func[i]( d ) );
+		if ( ( unit_ <= units[i] ) && ( x > 0 ) ) {
+			if ( ! s.is_empty() ) {
+				s.append( " " );
+			}
+			s.append( x );
+			if ( unitForm_ == time::UNIT_FORM::FULL ) {
+				s.append( " " ).append( unitNames[i] ).append( x > 1 ? "s" : "" );
+			} else {
+				s.append( unitShortNames[i] );
+			}
+			d -= time::duration( x, units[i] );
+		}
 	}
 	if ( s.is_empty() ) {
 		s.assign( "0s" );
@@ -231,6 +220,7 @@ hcore::time::UNIT lexical_cast( hcore::HString const& val_ ) {
 template<>
 hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 	M_PROLOG
+	static HString const unitStarts( "wdhmuμns" );
 	time::duration_t d( 0 );
 	int long pos( 0 );
 	HString unitStr;
@@ -243,20 +233,20 @@ hcore::time::duration_t lexical_cast( hcore::HString const& val_ ) {
 		i64_t v( lexical_cast<i64_t>( val_.substr( pos, numEnd - pos ) ) );
 		pos = numEnd;
 		pos = val_.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data(), pos );
-		int long unitStart( val_.find_one_of( character_class<CHARACTER_CLASS::LETTER>().data(), pos ) );
+		int long unitStart( val_.find_one_of( unitStarts, pos ) );
 		if ( unitStart == HString::npos ) {
 			throw HLexicalCastException( "Malformed duration specification at: "_ys.append( pos ) );
 		}
-		pos = unitStart;
+		pos = unitStart + 1;
 		int long unitEnd( val_.find_other_than( character_class<CHARACTER_CLASS::LETTER>().data(), pos ) );
 		if ( unitEnd == HString::npos ) {
 			unitEnd = val_.get_length();
 		}
-		unitStr = val_.substr( pos, unitEnd - pos );
+		unitStr = val_.substr( unitStart, unitEnd - unitStart );
 		try {
 			d += time::duration( v, lexical_cast<time::UNIT>( unitStr ) );
 		} catch ( HException const& e ) {
-			throw HLexicalCastException( to_string( e.what() ).append( " at: " ).append( pos ) );
+			throw HLexicalCastException( to_string( e.what() ).append( " at: " ).append( unitStart ) );
 		}
 		pos = unitEnd;
 	}
