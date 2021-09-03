@@ -77,6 +77,12 @@ ssl_key "@SHAREDSTATEDIR@/yaal/keys/key"
 # ssl_cert is path to file with ssl certificate
 ssl_cert "@SHAREDSTATEDIR@/yaal/keys/pem"
 
+# duration_unit_form
+# type: enumerator { FULL, ABBREVIATED }, default: FULL
+# Specify what should be default form for duration units used for conversion of durations to string.
+# e.g: `3 seconds 765 microceconds` in `FULL` would be `3s 765μs` if `ABBREVIATED`
+duration_unit_form FULL
+
 ### core END
 
 ### tools BEGIN

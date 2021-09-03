@@ -3,11 +3,11 @@
 syn keyword yaalValues true false on off yes no enable disable auto DEBUG INFO NOTICE WARNING ERROR CRITICAL ALERT EMERGENCY
 syn keyword yaalValues BRIGHTMAGENTA MySQL PostgreSQL SQLite null none FLOW_CONTROL_HARDWARE FLOW_CONTROL_SOFTWARE
 syn keyword yaalValues STOP_BITS_1 STOP_BITS_2 PARITY_CHECK PARITY_ODD CANONICAL ECHO CR2NL BITS_PER_BYTE_8 BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5
-syn keyword yaalValues POSIX YAAL ABORT THROW
+syn keyword yaalValues POSIX YAAL ABORT THROW FULL ABBREVIATED
 syn keyword yaalKeyword attribute_disabled attribute_enabled attribute_focused attribute_search_highlight attribute_statusbar
 syn keyword yaalKeyword child_kill_grace_period client_character_set command_compose_character
-syn keyword yaalKeyword command_compose_delay compression_buffer_size compression_level data_base_driver default_encoding
-syn keyword yaalKeyword disable_XON esc_delay exception_logging huginn_max_call_stack_size ignore_signal_SIGINT ignore_signal_SIGQUIT ignore_signal_SIGTSTP
+syn keyword yaalKeyword command_compose_delay compression_buffer_size compression_level data_base_driver default_encoding disable_XON
+syn keyword yaalKeyword duration_unit_form esc_delay exception_logging huginn_max_call_stack_size ignore_signal_SIGINT ignore_signal_SIGQUIT ignore_signal_SIGTSTP
 syn keyword yaalKeyword instance_name kill_grace_period latency log_level log_sql on_alloc_failure resolve_hostnames screen_background
 syn keyword yaalKeyword serial_baudrate serial_device serial_flags ssl_cert ssl_key thread_stack_size
 syn keyword yaalKeyword use_mouse write_timeout

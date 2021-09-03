@@ -17,6 +17,8 @@ namespace hcore {
 
 namespace time {
 
+UNIT_FORM _durationUnitForm_ = UNIT_FORM::FULL;
+
 duration_t duration( yaal::i64_t duration_, UNIT unit_ ) {
 	duration_t nanoseconds( 0 );
 	switch ( unit_ ) {

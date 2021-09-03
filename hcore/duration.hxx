@@ -35,12 +35,14 @@ enum class UNIT_FORM {
 	ABBREVIATED
 };
 
+extern M_YAAL_HCORE_PUBLIC_API UNIT_FORM _durationUnitForm_;
+
 typedef HTaggedPOD<yaal::i64_t, struct Duration> duration_t;
 
 duration_t duration( yaal::i64_t, UNIT );
 template <UNIT const u>
 yaal::i64_t in_units( duration_t );
-yaal::hcore::HString duration_to_string( duration_t, UNIT, UNIT_FORM = UNIT_FORM::FULL );
+yaal::hcore::HString duration_to_string( duration_t, UNIT, UNIT_FORM = _durationUnitForm_ );
 UNIT scale( duration_t, UNIT = UNIT::WEEK );
 
 }

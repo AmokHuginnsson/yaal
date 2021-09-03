@@ -665,9 +665,9 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			.argument_name( "strategy" )
 			.setter(
 				[]( yaal::hcore::HString const& value_ ) {
-					if ( value_ == "ABORT" ) {
+					if ( ! stricasecmp( value_, "ABORT" ) ) {
 						memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
-					} else if ( value_ == "THROW" ) {
+					} else if ( ! stricasecmp( value_, "THROW" ) ) {
 						memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
 					} else {
 						throw HProgramOptionsHandlerException( "Bad allocation failure strategy: "_ys.append( value_ ) );
@@ -677,6 +677,28 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 			.getter(
 				[]( void ) {
 					return ( memory::_onAllocFailure_ == memory::ON_ALLOC_FAILURE::THROW ? "THROW" : "ABORT" );
+				}
+			)
+		)(
+			HProgramOptionsHandler::HOption()
+			.long_form( "duration_unit_form" )
+			.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+			.description( "Specify what should be default form for duration units used for conversion of durations to string." )
+			.argument_name( "form" )
+			.setter(
+				[]( yaal::hcore::HString const& value_ ) {
+					if ( ! stricasecmp( value_, "FULL" ) ) {
+						time::_durationUnitForm_ = time::UNIT_FORM::FULL;
+					} else if ( ! stricasecmp( value_, "ABBREVIATED" ) ) {
+						time::_durationUnitForm_ = time::UNIT_FORM::ABBREVIATED;
+					} else {
+						throw HProgramOptionsHandlerException( "Bad duration unit form: "_ys.append( value_ ) );
+					}
+				}
+			)
+			.getter(
+				[]( void ) {
+					return ( time::_durationUnitForm_ == time::UNIT_FORM::FULL ? "FULL" : "ABBREVIATED" );
 				}
 			)
 		)(
