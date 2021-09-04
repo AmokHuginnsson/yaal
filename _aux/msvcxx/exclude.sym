@@ -150,6 +150,7 @@
 ?_debugLevel_@hcore@yaal@@3HA
 ?_defaultEncoding_@tools@yaal@@3VHString@hcore@2@A
 ?_disableXON_@tools@yaal@@3_NA
+?_durationUnitForm_@time@hcore@yaal@@3W4UNIT_FORM@123@A
 ?_errMsgHArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHDeque_@hcore@yaal@@3QBQBDB
 ?_errMsgHHashMap_@hcore@yaal@@3QBQBDB

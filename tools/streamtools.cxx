@@ -579,7 +579,7 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os_, time::duration_t const& duration_ ) {
 	M_PROLOG
 	if ( os_.get_mode() == HStreamInterface::MODE::TEXT ) {
-		os_ << duration_to_string( duration_, time::UNIT::NANOSECOND );
+		os_ << duration_to_string( duration_, time::scale( duration_ ) );
 	} else {
 		os_ << duration_.get();
 	}
@@ -637,6 +637,57 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& is_,
 	}
 	return is_;
 	M_EPILOG
+}
+
+HDurationFormatter::HDurationFormatter( yaal::hcore::HStreamInterface* stream_, yaal::hcore::time::UNIT scale_, yaal::hcore::time::UNIT_FORM durationUnitForm_, bool autoScale_ )
+	: _stream( stream_ )
+	, _scale( scale_ )
+	, _durationUnitForm( durationUnitForm_ )
+	, _autoScale( autoScale_ ) {
+}
+
+HDurationFormatter& HDurationFormatter::operator << ( time::duration_t const& duration_ ) {
+	M_PROLOG
+	if ( _stream->get_mode() == HStreamInterface::MODE::TEXT ) {
+		*_stream << duration_to_string( duration_, _autoScale ? time::scale( duration_ ) : _scale, _durationUnitForm );
+	} else {
+		*_stream << duration_;
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& HDurationFormatter::operator << ( yaal::hcore::HStreamInterface::manipulator_t M ) {
+	M_PROLOG
+	return ( M( *_stream) );
+	M_EPILOG
+}
+
+HDurationFormatterSeed::HDurationFormatterSeed( yaal::hcore::time::UNIT scale_, yaal::hcore::time::UNIT_FORM durationUnitForm_, bool autoScale_ )
+	: _scale( scale_ )
+	, _durationUnitForm( durationUnitForm_ )
+	, _autoScale( autoScale_ ) {
+	return;
+}
+
+HDurationFormatter HDurationFormatterSeed::create( yaal::hcore::HStreamInterface* stream_ ) const {
+	return ( HDurationFormatter( stream_, _scale, _durationUnitForm, _autoScale ) );
+}
+
+HDurationFormatterSeed HDurationFormatterSeed::operator() ( yaal::hcore::time::UNIT scale_, yaal::hcore::time::UNIT_FORM unitForm_ ) const {
+	HDurationFormatterSeed seed( scale_, unitForm_, false );
+	return seed;
+}
+
+HDurationFormatterSeed HDurationFormatterSeed::operator() ( yaal::hcore::time::UNIT_FORM unitForm_ ) const {
+	HDurationFormatterSeed seed( time::UNIT::NANOSECOND, unitForm_, true );
+	return seed;
+}
+
+HDurationFormatterSeed const durationformat( time::UNIT::NANOSECOND, time::UNIT_FORM::FULL, true );
+
+HDurationFormatter operator << ( yaal::hcore::HStreamInterface& os_, HDurationFormatterSeed const& dfs_ ) {
+	return ( dfs_.create( &os_ ) );
 }
 
 }

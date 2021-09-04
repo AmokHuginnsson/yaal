@@ -997,6 +997,44 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, yaa
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, time::duration_t const& );
 yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface&, time::duration_t& );
 
+/*! \brief New manipulator for yaal::hcore::HStreamInterface, `abbrev'.
+ *
+ * Output duration_t with short units.
+ */
+class HDurationFormatter {
+private:
+	yaal::hcore::HStreamInterface* _stream;
+	yaal::hcore::time::UNIT _scale;
+	yaal::hcore::time::UNIT_FORM _durationUnitForm;
+	bool _autoScale;
+public:
+	HDurationFormatter( yaal::hcore::HStreamInterface*, yaal::hcore::time::UNIT, yaal::hcore::time::UNIT_FORM, bool );
+	HDurationFormatter& operator << ( time::duration_t const& );
+	template<typename T>
+	HDurationFormatter& operator << ( T const& v ) {
+		*_stream << v;
+		return ( *this );
+	}
+	yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface::manipulator_t );
+};
+
+class HDurationFormatterSeed {
+private:
+	yaal::hcore::time::UNIT _scale;
+	yaal::hcore::time::UNIT_FORM _durationUnitForm;
+	bool _autoScale;
+public:
+	HDurationFormatterSeed( yaal::hcore::time::UNIT, yaal::hcore::time::UNIT_FORM, bool );
+	HDurationFormatterSeed( HDurationFormatterSeed const& ) = default;
+	HDurationFormatterSeed( HDurationFormatterSeed&& ) = default;
+	HDurationFormatter create( yaal::hcore::HStreamInterface* ) const;
+	HDurationFormatterSeed operator() ( yaal::hcore::time::UNIT, yaal::hcore::time::UNIT_FORM = yaal::hcore::time::_durationUnitForm_ ) const;
+	HDurationFormatterSeed operator() ( yaal::hcore::time::UNIT_FORM ) const;
+};
+extern HDurationFormatterSeed const durationformat;
+
+HDurationFormatter operator << ( yaal::hcore::HStreamInterface&, HDurationFormatterSeed const& );
+
 }
 
 }
