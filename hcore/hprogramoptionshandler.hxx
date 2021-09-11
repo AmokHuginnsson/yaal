@@ -19,6 +19,14 @@
 #include "hcore/programoptionshelper.hxx"
 #include "hcore/system.hxx"
 
+#ifndef PACKAGE_NAME
+#define PACKAGE_NAME "PACKAGE_NAME-undefined"
+#endif /* #ifndef PACKAGE_NAME */
+
+#ifndef SYSCONFDIR
+#define SYSCONFDIR "SYSCONFDIR-undefined"
+#endif /* #ifndef SYSCONFDIR */
+
 namespace yaal {
 
 namespace hcore {
