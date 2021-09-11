@@ -298,6 +298,19 @@ HStreamInterface& HSynchronizedStream::do_output( HManipulator const& val_ ) {
 	M_EPILOG
 }
 
+int long HSynchronizedStream::do_output( void const* buffer_, int long size_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	int long nWritten( 0 );
+	if ( _streamRef == this ) {
+		nWritten = HStreamInterface::do_output( buffer_, size_ );
+	} else if ( _streamRef ) {
+		nWritten = _streamRef->write( buffer_, size_ );
+	}
+	return ( nWritten );
+	M_EPILOG
+}
+
 HStreamInterface& HSynchronizedStream::do_input( HString& val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
@@ -511,6 +524,19 @@ HStreamInterface& HSynchronizedStream::do_input( manipulator_t const& val_ ) {
 		*_streamRef >> val_;
 	}
 	return ( *this );
+	M_EPILOG
+}
+
+int long HSynchronizedStream::do_input( void* buffer_, int long size_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	int long nRead( 0 );
+	if ( _streamRef == this ) {
+		nRead = HStreamInterface::do_input( buffer_, size_ );
+	} else if ( _streamRef ) {
+		nRead = _streamRef->read( buffer_, size_ );
+	}
+	return ( nRead );
 	M_EPILOG
 }
 

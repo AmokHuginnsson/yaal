@@ -61,6 +61,7 @@ protected:
 	virtual HStreamInterface& do_output( void const* ) override;
 	virtual HStreamInterface& do_output( manipulator_t const& ) override;
 	virtual HStreamInterface& do_output( HManipulator const& ) override;
+	virtual int long do_output( void const*, int long ) override;
 	virtual HStreamInterface& do_input( HString& ) override;
 	virtual HStreamInterface& do_input( bool& ) override;
 	virtual HStreamInterface& do_input( code_point_t& ) override;
@@ -79,6 +80,7 @@ protected:
 	virtual HStreamInterface& do_input( float& ) override;
 	virtual HStreamInterface& do_input( void const*& ) override;
 	virtual HStreamInterface& do_input( manipulator_t const& ) override;
+	virtual int long do_input( void*, int long ) override;
 	virtual int long do_read_until( yaal::hcore::HString&, char const*, bool ) override;
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool ) override;
 	virtual int long do_read_while( yaal::hcore::HString&, char const* ) override;

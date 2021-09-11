@@ -313,7 +313,9 @@ public:
 	HStreamInterface& read( float& val_ ) {
 		return ( do_input( val_ ) );
 	}
-	int long read( void*, int long );
+	int long read( void* buffer_, int long size_ ) {
+		return ( do_input( buffer_, size_ ) );
+	}
 	/*! \brief Read available data in non-blocking mode.
 	 *
 	 * Read all data that is readily available, but not more
@@ -383,7 +385,9 @@ public:
 	HStreamInterface& write( void const* val_ ) {
 		return ( do_output( val_ ) );
 	}
-	int long write( void const*, int long );
+	int long write( void const* buffer_, int long size_ ) {
+		return ( do_output( buffer_, size_ ) );
+	}
 	/*! \brief Move reading/writing position on seekable stream.
 	 *
 	 * \param offset - new reading/writing position.
@@ -564,6 +568,7 @@ protected:
 	virtual HStreamInterface& do_output( void const* );
 	virtual HStreamInterface& do_output( manipulator_t const& );
 	virtual HStreamInterface& do_output( HManipulator const& );
+	virtual int long do_output( void const*, int long );
 	virtual HStreamInterface& do_input( HString& );
 	virtual HStreamInterface& do_input( bool& );
 	virtual HStreamInterface& do_input( code_point_t& );
@@ -582,6 +587,7 @@ protected:
 	virtual HStreamInterface& do_input( float& );
 	virtual HStreamInterface& do_input( void const*& );
 	virtual HStreamInterface& do_input( manipulator_t const& );
+	virtual int long do_input( void*, int long );
 	virtual int long do_read_until( yaal::hcore::HString&, char const*, bool );
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool );
 	virtual int long do_read_while( yaal::hcore::HString&, char const* );

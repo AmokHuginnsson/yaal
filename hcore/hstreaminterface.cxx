@@ -1292,7 +1292,7 @@ void HStreamInterface::do_unread( void const* buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-int long HStreamInterface::read( void* buffer_, int long size_ ) {
+int long HStreamInterface::do_input( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long nRead( 0 );
 	flush_write_buffer();
@@ -1352,7 +1352,7 @@ void HStreamInterface::do_seek( int long, SEEK ) {
 }
 #pragma GCC diagnostic pop
 
-int long HStreamInterface::write( void const* buffer_, int long size_ ) {
+int long HStreamInterface::do_output( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	if ( size_ == 0 ) {
 		return ( 0 );
