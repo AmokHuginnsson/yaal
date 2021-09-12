@@ -69,13 +69,16 @@ public:
 		HValue( float value_ ) : HValue( static_cast<double long>( value_ ) ) {}
 		HValue( yaal::hcore::HNumber const& );
 		HValue( array_t const& );
+		HValue( array_t&& );
 		HValue( members_t const& );
+		HValue( members_t&& );
 		HValue( LITERAL );
 		bool operator == ( HValue const& ) const;
 		bool operator != ( HValue const& other_ ) const {
 			return ( ! operator == ( other_ ) );
 		}
 		void push_back( HValue const& );
+		void push_back( HValue&& );
 		HValue& operator[] ( int );
 		HValue& operator[] ( int long );
 		HValue& operator[] ( yaal::hcore::HString const& );

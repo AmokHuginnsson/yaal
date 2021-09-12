@@ -42,8 +42,16 @@ HJSON::HValue::HValue( array_t const& value_ )
 	: _data( value_ ) {
 }
 
+HJSON::HValue::HValue( array_t&& value_ )
+	: _data( yaal::move( value_ ) ) {
+}
+
 HJSON::HValue::HValue( members_t const& value_ )
 	: _data( value_ ) {
+}
+
+HJSON::HValue::HValue( members_t&& value_ )
+	: _data( yaal::move( value_ ) ) {
 }
 
 bool HJSON::HValue::operator == ( HValue const& other_ ) const {
@@ -91,6 +99,20 @@ void HJSON::HValue::push_back( HValue const& value_ ) {
 		_data = data_t( array_t() );
 	}
 	_data.get<array_t>().push_back( value_ );
+	return;
+	M_EPILOG
+}
+
+void HJSON::HValue::push_back( HValue&& value_ ) {
+	M_PROLOG
+	int dt( _data.type() );
+	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::ARRAY ) ) ) {
+		throw HJSONException( "Pushing elements to non-array value." );
+	}
+	if ( dt == data_t::INVALID ) {
+		_data = data_t( array_t() );
+	}
+	_data.get<array_t>().push_back( yaal::move( value_ ) );
 	return;
 	M_EPILOG
 }
