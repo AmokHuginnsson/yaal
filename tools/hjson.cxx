@@ -9,261 +9,18 @@ M_VCSID( "$Id: " __TID__ " $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::model;
 
 namespace yaal {
 
 namespace tools {
 
-HJSON::HValue::HValue( void )
-	: _data() {
-}
-
-HJSON::HValue::HValue( yaal::hcore::HString const& value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( int long long value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( double long value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( yaal::hcore::HNumber const& value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( LITERAL value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( array_t const& value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( array_t&& value_ )
-	: _data( yaal::move( value_ ) ) {
-}
-
-HJSON::HValue::HValue( members_t const& value_ )
-	: _data( value_ ) {
-}
-
-HJSON::HValue::HValue( members_t&& value_ )
-	: _data( yaal::move( value_ ) ) {
-}
-
-bool HJSON::HValue::operator == ( HValue const& other_ ) const {
-	M_PROLOG
-	TYPE t( type() );
-	if ( other_.type() != t ) {
-		return ( false );
-	}
-	switch ( t ) {
-		case ( TYPE::INTEGER ): return ( get_integer() == other_.get_integer() );
-		case ( TYPE::REAL ):    return ( get_real()    == other_.get_real() );
-		case ( TYPE::NUMBER ):  return ( get_number()  == other_.get_number() );
-		case ( TYPE::STRING ):  return ( get_string()  == other_.get_string() );
-		case ( TYPE::LITERAL ): return ( get_literal() == other_.get_literal() );
-		case ( TYPE::ARRAY ): {
-			array_t const& a( get_elements() );
-			array_t const& oa( other_.get_elements() );
-			return ( a == oa );
-		}
-		case ( TYPE::MAP ): {
-			members_t const& m( get_members() );
-			members_t const& om( other_.get_members() );
-			return ( m == om );
-		}
-		default: break;
-	}
-	return ( true );
-	M_EPILOG
-}
-
-void HJSON::HValue::reset( void ) {
-	M_PROLOG
-	_data.reset();
-	return;
-	M_EPILOG
-}
-
-void HJSON::HValue::push_back( HValue const& value_ ) {
-	M_PROLOG
-	int dt( _data.type() );
-	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::ARRAY ) ) ) {
-		throw HJSONException( "Pushing elements to non-array value." );
-	}
-	if ( dt == data_t::INVALID ) {
-		_data = data_t( array_t() );
-	}
-	_data.get<array_t>().push_back( value_ );
-	return;
-	M_EPILOG
-}
-
-void HJSON::HValue::push_back( HValue&& value_ ) {
-	M_PROLOG
-	int dt( _data.type() );
-	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::ARRAY ) ) ) {
-		throw HJSONException( "Pushing elements to non-array value." );
-	}
-	if ( dt == data_t::INVALID ) {
-		_data = data_t( array_t() );
-	}
-	_data.get<array_t>().push_back( yaal::move( value_ ) );
-	return;
-	M_EPILOG
-}
-
-HJSON::HValue& HJSON::HValue::operator[]( int index_ ) {
-	return ( operator[]( static_cast<int long>( index_ ) ) );
-}
-
-HJSON::HValue& HJSON::HValue::operator[]( int long index_ ) {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::ARRAY ) ) {
-		throw HJSONException( "Getting element of non-array value." );
-	}
-	return ( _data.get<array_t>().at( index_ ) );
-	M_EPILOG
-}
-
-HJSON::HValue const& HJSON::HValue::operator[]( int index_ ) const {
-	return ( operator[]( static_cast<int long>( index_ ) ) );
-}
-
-HJSON::HValue const& HJSON::HValue::operator[]( int long index_ ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::ARRAY ) ) {
-		throw HJSONException( "Getting element of non-array value." );
-	}
-	return ( _data.get<array_t>().at( index_ ) );
-	M_EPILOG
-}
-
-HJSON::HValue& HJSON::HValue::operator[]( yaal::hcore::HString const& member_ ) {
-	M_PROLOG
-	int dt( _data.type() );
-	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::MAP ) ) ) {
-		throw HJSONException( "Getting member of non-map value." );
-	}
-	if ( dt == data_t::INVALID ) {
-		_data = data_t( members_t() );
-	}
-	return ( _data.get<members_t>()[ member_ ] );
-	M_EPILOG
-}
-
-HJSON::HValue const& HJSON::HValue::operator[]( yaal::hcore::HString const& member_ ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::MAP ) ) {
-		throw HJSONException( "Getting member of non-map value." );
-	}
-	return ( _data.get<members_t>().at( member_ ) );
-	M_EPILOG
-}
-
-yaal::hcore::HString const& HJSON::HValue::get_string( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::STRING ) ) {
-		throw HJSONException( "Getting string from non-string value." );
-	}
-	return ( _data.get<yaal::hcore::HString>() );
-	M_EPILOG
-}
-
-int long long HJSON::HValue::get_integer( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::INTEGER ) ) {
-		throw HJSONException( "Getting integer from non-integer value." );
-	}
-	return ( _data.get<int long long>() );
-	M_EPILOG
-}
-
-double long HJSON::HValue::get_real( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::REAL ) ) {
-		throw HJSONException( "Getting real from non-real value." );
-	}
-	return ( _data.get<double long>() );
-	M_EPILOG
-}
-
-yaal::hcore::HNumber const& HJSON::HValue::get_number( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::NUMBER ) ) {
-		throw HJSONException( "Getting number from non-number value." );
-	}
-	return ( _data.get<yaal::hcore::HNumber>() );
-	M_EPILOG
-}
-
-HJSON::HValue::LITERAL HJSON::HValue::get_literal( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::LITERAL ) ) {
-		throw HJSONException( "Getting literal from non-literal value." );
-	}
-	return ( _data.get<LITERAL>() );
-	M_EPILOG
-}
-
-HJSON::HValue::array_t const& HJSON::HValue::get_elements( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::ARRAY ) ) {
-		throw HJSONException( "Getting elements of non-array value." );
-	}
-	return ( _data.get<array_t>() );
-	M_EPILOG
-}
-
-HJSON::HValue::array_t& HJSON::HValue::get_elements( void ) {
-	M_PROLOG
-	int dt( _data.type() );
-	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::ARRAY ) ) ) {
-		throw HJSONException( "Pushing elements to non-array value." );
-	}
-	if ( dt == data_t::INVALID ) {
-		_data = data_t( array_t() );
-	}
-	return ( _data.get<array_t>() );
-	M_EPILOG
-}
-
-HJSON::HValue::members_t const& HJSON::HValue::get_members( void ) const {
-	M_PROLOG
-	if ( _data.type() != static_cast<int>( TYPE::MAP ) ) {
-		throw HJSONException( "Getting members of non-map value." );
-	}
-	return ( _data.get<members_t>() );
-	M_EPILOG
-}
-
-HJSON::HValue::members_t& HJSON::HValue::get_members( void ) {
-	M_PROLOG
-	int dt( _data.type() );
-	if ( ( dt != data_t::INVALID ) && ( dt != static_cast<int>( TYPE::MAP ) ) ) {
-		throw HJSONException( "Getting member of non-map value." );
-	}
-	if ( dt == data_t::INVALID ) {
-		_data = data_t( members_t() );
-	}
-	return ( _data.get<members_t>() );
-	M_EPILOG
-}
-
 HJSON::HJSON( void )
 	: _element() {
 }
 
-HJSON::HValue& HJSON::element( void ) {
+model::HValue& HJSON::element( void ) {
 	return ( _element );
-}
-
-HJSON::HValue::TYPE HJSON::HValue::type( void ) const {
-	return ( static_cast<TYPE>( _data.type() ) );
 }
 
 namespace {
@@ -278,24 +35,24 @@ void indent( yaal::hcore::HStreamInterface& out_, int level_, bool enabled_ ) {
 		out_.write( TAB, min( size( TAB ), level_ ) );
 	}
 }
-void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int indentLevel_, bool indent_ ) {
+void dump( HValue const& value_, yaal::hcore::HStreamInterface& out_, int indentLevel_, bool indent_ ) {
 	M_PROLOG
 	switch ( value_.type() ) {
-		case ( HJSON::HValue::TYPE::STRING ):  out_ << '"' << value_.get_string()  << '"'; break;
-		case ( HJSON::HValue::TYPE::INTEGER ): out_ << value_.get_integer(); break;
-		case ( HJSON::HValue::TYPE::REAL ):    out_ << value_.get_real(); break;
-		case ( HJSON::HValue::TYPE::NUMBER ):  out_ << value_.get_number().to_string(); break;
-		case ( HJSON::HValue::TYPE::LITERAL ): {
+		case ( HValue::TYPE::STRING ):  out_ << '"' << value_.get_string()  << '"'; break;
+		case ( HValue::TYPE::INTEGER ): out_ << value_.get_integer(); break;
+		case ( HValue::TYPE::REAL ):    out_ << value_.get_real(); break;
+		case ( HValue::TYPE::NUMBER ):  out_ << value_.get_number().to_string(); break;
+		case ( HValue::TYPE::LITERAL ): {
 			switch ( value_.get_literal() ) {
-				case ( HJSON::HValue::LITERAL::TRUE ):  out_ << "true";  break;
-				case ( HJSON::HValue::LITERAL::FALSE ): out_ << "false"; break;
-				case ( HJSON::HValue::LITERAL::NULL ):  out_ << "null";  break;
+				case ( HValue::LITERAL::TRUE ):  out_ << "true";  break;
+				case ( HValue::LITERAL::FALSE ): out_ << "false"; break;
+				case ( HValue::LITERAL::NULL ):  out_ << "null";  break;
 			}
 		} break;
-		case ( HJSON::HValue::TYPE::ARRAY ): {
+		case ( HValue::TYPE::ARRAY ): {
 			out_ << "[";
 			bool next( false );
-			for ( HJSON::HValue const& v : value_.get_elements() ) {
+			for ( HValue const& v : value_.get_elements() ) {
 				if ( next ) {
 					out_ << ", ";
 				}
@@ -304,13 +61,13 @@ void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int
 			}
 			out_ << "]";
 		} break;
-		case ( HJSON::HValue::TYPE::MAP ): {
+		case ( HValue::TYPE::MAP ): {
 			out_ << "{";
 			if ( indent_ ) {
 				out_ << "\n";
 			}
 			bool next( false );
-			for ( HJSON::HValue::members_t::value_type const& member : value_.get_members() ) {
+			for ( HValue::members_t::value_type const& member : value_.get_members() ) {
 				if ( next ) {
 					out_ << "," << ( indent_ ? "\n" : " " );
 				}
@@ -325,7 +82,7 @@ void dump( HJSON::HValue const& value_, yaal::hcore::HStreamInterface& out_, int
 			indent( out_, indentLevel_, indent_ );
 			out_ << "}";
 		} break;
-		case ( HJSON::HValue::TYPE::UNINITIALIZED ): {
+		case ( HValue::TYPE::UNINITIALIZED ): {
 			throw HJSONException( "Uninitialized value in JSON data structure during serialization." );
 		}
 	}
@@ -353,7 +110,7 @@ void HJSON::save( yaal::hcore::HStreamInterface& out_, bool indent_ ) const {
 
 class HJSONParser {
 private:
-	typedef yaal::hcore::HStack<HJSON::HValue::array_t> store_t;
+	typedef yaal::hcore::HStack<HValue::array_t> store_t;
 	HExecutingParser _engine;
 	HJSON& _json;
 	store_t _store;
@@ -362,7 +119,7 @@ public:
 		: _engine( make_engine( style_ ) )
 		, _json( json_ )
 		, _store() {
-		_store.push( HJSON::HValue::array_t() );
+		_store.push( HValue::array_t() );
 	}
 	void parse( yaal::hcore::HString const& data_ ) {
 		M_PROLOG
@@ -405,7 +162,7 @@ private:
 		return;
 		M_EPILOG
 	}
-	void store_literal( HJSON::HValue::LITERAL literal_ ) {
+	void store_literal( HValue::LITERAL literal_ ) {
 		M_PROLOG
 		_store.top().push_back( literal_ );
 		return;
@@ -413,13 +170,13 @@ private:
 	}
 	void nest( void ) {
 		M_PROLOG
-		_store.push( HJSON::HValue::array_t() );
+		_store.push( HValue::array_t() );
 		return;
 		M_EPILOG
 	}
 	void store_array( void ) {
 		M_PROLOG
-		HJSON::HValue::array_t array( yaal::move( _store.top() ) );
+		HValue::array_t array( yaal::move( _store.top() ) );
 		_store.pop();
 		_store.top().push_back( yaal::move( array ) );
 		return;
@@ -427,11 +184,11 @@ private:
 	}
 	void store_object( void ) {
 		M_PROLOG
-		HJSON::HValue::array_t membersParts( yaal::move( _store.top() ) );
+		HValue::array_t membersParts( yaal::move( _store.top() ) );
 		_store.pop();
 		M_ASSERT( ( membersParts.get_size() % 2 ) == 0 );
-		HJSON::HValue::members_t members;
-		for ( HJSON::HValue::array_t::iterator it( membersParts.begin() ), end( membersParts.end() ); it != end; ++ it ) {
+		HValue::members_t members;
+		for ( HValue::array_t::iterator it( membersParts.begin() ), end( membersParts.end() ); it != end; ++ it ) {
 			HString key( it->get_string() );
 			++ it;
 			members.insert( make_pair( key, yaal::move( *it ) ) );
@@ -449,15 +206,15 @@ executing_parser::HRule HJSONParser::make_engine( HJSON::PARSER style_ ) {
 	e_p::HRule element( "JSON.element" );
 	e_p::HRule literalTrue(
 		"JSON.Literal.true",
-		e_p::constant( "true" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::TRUE ) )]
+		e_p::constant( "true" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HValue::LITERAL::TRUE ) )]
 	);
 	e_p::HRule literalFalse(
 		"JSON.Literal.false",
-		e_p::constant( "false" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::FALSE ) )]
+		e_p::constant( "false" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HValue::LITERAL::FALSE ) )]
 	);
 	e_p::HRule literalNull(
 		"JSON.Literal.null",
-		e_p::constant( "null" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HJSON::HValue::LITERAL::NULL ) )]
+		e_p::constant( "null" )[e_p::HRuleBase::action_t( hcore::call( &HJSONParser::store_literal, this, HValue::LITERAL::NULL ) )]
 	);
 	e_p::HRule stringLiteral(
 		"JSON.string",

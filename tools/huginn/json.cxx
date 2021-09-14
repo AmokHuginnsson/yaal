@@ -28,9 +28,9 @@ namespace huginn {
 
 namespace {
 
-static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+static tools::model::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	M_PROLOG
-	tools::HJSON::HValue v;
+	tools::model::HValue v;
 	switch ( type_tag( v_->type_id() ) ) {
 		case ( HHuginn::TYPE::STRING ): {
 			v = get_string( v_ );
@@ -49,10 +49,10 @@ static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t co
 		} break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
 			bool booleanValue( get_boolean( v_ ) );
-			v = booleanValue ? tools::HJSON::HValue::LITERAL::TRUE : tools::HJSON::HValue::LITERAL::FALSE;
+			v = booleanValue ? tools::model::HValue::LITERAL::TRUE : tools::model::HValue::LITERAL::FALSE;
 		} break;
 		case ( HHuginn::TYPE::NONE ): {
-			v = tools::HJSON::HValue::LITERAL::NULL;
+			v = tools::model::HValue::LITERAL::NULL;
 		} break;
 		case ( HHuginn::TYPE::TUPLE ): {
 			HTuple::values_t const& data( static_cast<HTuple const*>( v_.raw() )->value() );
@@ -68,7 +68,7 @@ static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t co
 		} break;
 		case ( HHuginn::TYPE::LOOKUP ): {
 			HLookup::values_t const& data( static_cast<HLookup const*>( v_.raw() )->value() );
-			tools::HJSON::HValue::members_t& m( v.get_members() );
+			tools::model::HValue::members_t& m( v.get_members() );
 			for ( HLookup::values_t::value_type const& e : data ) {
 				if ( e.first->type_id() != HHuginn::TYPE::STRING ) {
 					throw HHuginn::HHuginnRuntimeException(
@@ -89,7 +89,7 @@ static tools::HJSON::HValue huginn_to_cxx( HThread* thread_, HHuginn::value_t co
 		case ( HHuginn::TYPE::DICT ): {
 			HDict const& dict( *static_cast<HDict const*>( v_.raw() ) );
 			HDict::values_t const& data( dict.value() );
-			tools::HJSON::HValue::members_t& m( v.get_members() );
+			tools::model::HValue::members_t& m( v.get_members() );
 			if ( ! data.is_empty() && ( dict.key_type()->type_id() != HHuginn::TYPE::STRING ) ) {
 				throw HHuginn::HHuginnRuntimeException(
 					"Keys in JSON objects must be `string`s, not "_ys.append( a_type_name( dict.key_type() ) ).append( "." ),
@@ -173,48 +173,48 @@ public:
 		return ( *object_ );
 		M_EPILOG
 	}
-	static HHuginn::value_t cxx_to_huginn( HThread* thread_, tools::HJSON::HValue const& v_, int position_ ) {
+	static HHuginn::value_t cxx_to_huginn( HThread* thread_, tools::model::HValue const& v_, int position_ ) {
 		M_PROLOG
 		HObjectFactory& of( thread_->object_factory() );
 		HHuginn::value_t v( of.none_value() );
 		switch ( v_.type() ) {
-			case ( tools::HJSON::HValue::TYPE::STRING ): {
+			case ( tools::model::HValue::TYPE::STRING ): {
 				v = of.create_string( v_.get_string() );
 			} break;
-			case ( tools::HJSON::HValue::TYPE::INTEGER ): {
+			case ( tools::model::HValue::TYPE::INTEGER ): {
 				v = of.create_integer( v_.get_integer() );
 			} break;
-			case ( tools::HJSON::HValue::TYPE::REAL ): {
+			case ( tools::model::HValue::TYPE::REAL ): {
 				v = of.create_real( v_.get_real() );
 			} break;
-			case ( tools::HJSON::HValue::TYPE::NUMBER ): {
+			case ( tools::model::HValue::TYPE::NUMBER ): {
 				v = of.create_number( v_.get_number() );
 			} break;
-			case ( tools::HJSON::HValue::TYPE::LITERAL ): {
-				tools::HJSON::HValue::LITERAL literal( v_.get_literal() );
-				if ( literal == tools::HJSON::HValue::LITERAL::TRUE ) {
+			case ( tools::model::HValue::TYPE::LITERAL ): {
+				tools::model::HValue::LITERAL literal( v_.get_literal() );
+				if ( literal == tools::model::HValue::LITERAL::TRUE ) {
 					v = of.true_value();
-				} else if ( literal == tools::HJSON::HValue::LITERAL::FALSE ) {
+				} else if ( literal == tools::model::HValue::LITERAL::FALSE ) {
 					v = of.false_value();
 				}
 			} break;
-			case ( tools::HJSON::HValue::TYPE::ARRAY ): {
+			case ( tools::model::HValue::TYPE::ARRAY ): {
 				HHuginn::values_t data;
-				for ( tools::HJSON::HValue const& e : v_.get_elements() ) {
+				for ( tools::model::HValue const& e : v_.get_elements() ) {
 					data.push_back( cxx_to_huginn( thread_, e, position_ ) );
 				}
 				v = of.create_list( yaal::move( data ) );
 			} break;
-			case ( tools::HJSON::HValue::TYPE::MAP ): {
+			case ( tools::model::HValue::TYPE::MAP ): {
 				v = of.create_lookup();
 				huginn::HLookup* lookup( static_cast<huginn::HLookup*>( v.raw() ) );
 				huginn::HLookup::values_t& data( lookup->value() );
 				HAnchorGuard<huginn::HLookup> ag( *lookup, thread_, position_ );
-				for ( tools::HJSON::HValue::members_t::value_type const& m : v_.get_members() ) {
+				for ( tools::model::HValue::members_t::value_type const& m : v_.get_members() ) {
 					data.insert( make_pair( of.create_string( m.first ), cxx_to_huginn( thread_, m.second, position_ ) ) );
 				}
 			} break;
-			case ( tools::HJSON::HValue::TYPE::UNINITIALIZED ): break;
+			case ( tools::model::HValue::TYPE::UNINITIALIZED ): break;
 		}
 		return v;
 		M_EPILOG
