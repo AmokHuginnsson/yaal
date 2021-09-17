@@ -29,10 +29,6 @@ HHuginn::class_t HFilter::get_class( HRuntime* runtime_, huginn::HClass const* o
 	M_EPILOG
 }
 
-int long HFilter::do_size( huginn::HThread* thread_, int position_ ) const {
-	throw HHuginn::HHuginnRuntimeException( "Getting size of `Filter` is an invalid operation.", thread_->file_id(), position_ );
-}
-
 HHuginn::value_t HFilter::do_clone( huginn::HThread* thread_, HHuginn::value_t*, int position_ ) const {
 	return ( thread_->object_factory().create<HFilter>( HIterable::get_class(), _source->clone( thread_, const_cast<HHuginn::value_t*>( &_source ), position_ ), _callable ) );
 }
@@ -92,6 +88,18 @@ private:
 HFilter::iterator_t HFilter::do_iterator( HThread* thread_, int position_ ) {
 	iterator_t impl( hcore::make_pointer<HFilterIterator>( static_cast<huginn::HIterable*>( _source.raw() )->iterator( thread_, position_ ), _callable, thread_, position_ ) );
 	return impl;
+}
+
+int long HFilter::do_size( huginn::HThread* thread_, int position_ ) const {
+	int long count( 0 );
+	HHuginn::value_t source( _source );
+	HHuginn::value_t callable( _callable );
+	HFilterIterator fi( static_cast<huginn::HIterable*>( source.raw() )->iterator( thread_, position_ ), callable, thread_, position_ );
+	while ( fi.is_valid( thread_, position_ ) ) {
+		++ count;
+		fi.next( thread_, position_ );
+	}
+	return count;
 }
 
 }

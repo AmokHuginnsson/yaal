@@ -25,7 +25,7 @@ public:
 	}
 	static HHuginn::class_t get_class( HRuntime*, huginn::HClass const* );
 protected:
-	virtual int long do_size( huginn::HThread*, int ) const override __attribute__(( noreturn ));
+	virtual int long do_size( huginn::HThread*, int ) const override;
 private:
 	virtual iterator_t do_iterator( HThread*, int ) override;
 private:
