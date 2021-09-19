@@ -506,7 +506,7 @@ inline iterator_t remove( iterator_t first_, iterator_t const& last_, value_t va
 			continue;
 		}
 		if ( move ) {
-			*first_ = *it;
+			*first_ = yaal::move( *it );
 		}
 		++ first_;
 	}
@@ -529,7 +529,7 @@ inline iterator_t remove_if( iterator_t first_, iterator_t const& last_, conditi
 			continue;
 		}
 		if ( move ) {
-			*first_ = *it;
+			*first_ = yaal::move( *it );
 		}
 		++ first_;
 	}
