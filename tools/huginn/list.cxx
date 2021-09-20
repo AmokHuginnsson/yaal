@@ -170,6 +170,40 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	char const name[] = "list.erase";
+	verify_arg_count( name, values_, 1, 2, thread_, position_ );
+	HList::values_t::size_type count( meta::max_signed<HList::values_t::size_type>::value );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		count = get_integer( values_[1] );
+		if ( count < 1 ) {
+			throw HHuginn::HHuginnRuntimeException( "invalid erase count: "_ys.append( count ), thread_->file_id(), position_ );
+		}
+	}
+	huginn::HList::values_t& data( static_cast<huginn::HList*>( object_->raw() )->value() );
+	HList::values_t::size_type erased( 0 );
+	HHuginn::value_t& toErase( values_.front() );
+	data.erase(
+		remove_if(
+			data.begin(),
+			data.end(),
+			[&toErase, &erased, count, thread_, position_]( HHuginn::value_t const& v_ ) {
+				bool equals( toErase->operator_equals( thread_, toErase, v_, position_ ) );
+				if ( equals ) {
+					++ erased;
+				}
+				return ( equals && ( erased <= count ) );
+			}
+		),
+		data.end()
+	);
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t resize( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_signature( "list.resize", values_, { HHuginn::TYPE::INTEGER, HHuginn::TYPE::UNKNOWN }, thread_, position_ );
@@ -287,6 +321,7 @@ public:
 			{ "pop",    objectFactory_->create_method( &list::pop ),    "remove last element from the `list`, `list` shrinks by 1" },
 			{ "append", objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 			{ "insert", objectFactory_->create_method( &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "erase",  objectFactory_->create_method( &list::erase ),  "( *elem*[, *count*] ) - erase (at most *count*) elements equal to *elem*ent from this `list`" },
 			{ "resize", objectFactory_->create_method( &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 			{ "clear",  objectFactory_->create_method( &list::clear ),  "erase `list`'s content, `list` becomes empty" },
 			{ "find",   objectFactory_->create_method( &list::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `list` not before *start* and before *stop*, return -1 if not found" },
