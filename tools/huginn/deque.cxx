@@ -218,6 +218,40 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_EPILOG
 }
 
+inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	char const name[] = "list.erase";
+	verify_arg_count( name, values_, 1, 2, thread_, position_ );
+	HDeque::values_t::size_type count( meta::max_signed<HDeque::values_t::size_type>::value );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		count = get_integer( values_[1] );
+		if ( count < 1 ) {
+			throw HHuginn::HHuginnRuntimeException( "invalid erase count: "_ys.append( count ), thread_->file_id(), position_ );
+		}
+	}
+	huginn::HDeque::values_t& data( static_cast<huginn::HDeque*>( object_->raw() )->value() );
+	HDeque::values_t::size_type erased( 0 );
+	HHuginn::value_t& toErase( values_.front() );
+	data.erase(
+		remove_if(
+			data.begin(),
+			data.end(),
+			[&toErase, &erased, count, thread_, position_]( HHuginn::value_t const& v_ ) {
+				bool equals( toErase->operator_equals( thread_, toErase, v_, position_ ) );
+				if ( equals ) {
+					++ erased;
+				}
+				return ( equals && ( erased <= count ) );
+			}
+		),
+		data.end()
+	);
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t push_front( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.push_front", values_, 1, 1, thread_, position_ );
@@ -296,6 +330,7 @@ public:
 			{ "append",     objectFactory_->create_method( &deque::append ),     "( *other* ) - append all elements from *other* collection at the end of  `deque`" },
 			{ "prepend",    objectFactory_->create_method( &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
 			{ "insert",     objectFactory_->create_method( &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
+			{ "erase",      objectFactory_->create_method( &deque::erase ),      "( *elem*[, *count*] ) - erase (at most *count*) elements equal to *elem*ent from this `deque`" },
 			{ "clear",      objectFactory_->create_method( &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
 			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" }
 		};
