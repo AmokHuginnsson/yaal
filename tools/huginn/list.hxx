@@ -15,10 +15,10 @@ namespace tools {
 
 namespace huginn {
 
-class HList : public HIterable {
+class HList : public HInvalidatingIterable {
 public:
 	typedef HList this_type;
-	typedef HIterable base_type;
+	typedef HInvalidatingIterable base_type;
 	typedef yaal::hcore::HArray<HHuginn::value_t> values_t;
 private:
 	values_t _data;

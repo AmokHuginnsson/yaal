@@ -25,12 +25,12 @@ namespace huginn {
 
 namespace heap {
 
-class HHeapIterator : public HNotifableIterator {
+class HHeapIterator : public HSkippingIterator {
 	HHeap const* _owner;
 	HHeap::values_t _heap;
 public:
 	HHeapIterator( HHeap* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _owner( owner_ )
 		, _heap( owner_->value() ) {
 		return;

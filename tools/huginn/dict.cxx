@@ -25,7 +25,7 @@ namespace huginn {
 
 namespace dict {
 
-class HDictIterator : public HNotifableIterator {
+class HDictIterator : public HSkippingIterator {
 public:
 	enum class TYPE {
 		KEYS,
@@ -39,7 +39,7 @@ private:
 	HObjectFactory& _objectFactory;
 public:
 	HDictIterator( huginn::HDict* owner_, HObjectFactory& objectFactory_, TYPE type_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _dict( &owner_->value() )
 		, _it( _dict->begin() )
 		, _valueGetter( type_ == TYPE::KEYS ? &HDictIterator::get_key : &HDictIterator::get_key_value )
@@ -123,12 +123,12 @@ private:
 	}
 };
 
-class HDictReverseIterator : public HNotifableIterator {
+class HDictReverseIterator : public HSkippingIterator {
 	huginn::HDict::values_t* _dict;
 	huginn::HDict::values_t::reverse_iterator _it;
 public:
 	HDictReverseIterator( huginn::HDict* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _dict( &owner_->value() )
 		, _it( _dict->rbegin() ) {
 		return;

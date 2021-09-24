@@ -35,13 +35,13 @@ protected:
 	virtual void do_next( HThread*, int ) = 0;
 };
 
-class HNotifableIterator : public HIteratorInterface, public HHuginn::HNotifableReference {
+class HSkippingIterator : public HIteratorInterface, public HIdentifableReference {
 protected:
 	int _skip;
 public:
-	HNotifableIterator( HInvalidatingIterable* owner_ )
+	HSkippingIterator( HInvalidatingIterable* owner_ )
 		: HIteratorInterface()
-		, HNotifableReference( owner_ )
+		, HIdentifableReference( owner_ )
 		, _skip( 0 ) {
 		return;
 	}
@@ -50,6 +50,20 @@ public:
 	}
 protected:
 	virtual void do_skip( HThread*, int ) = 0;
+};
+
+class HBacktrackingIterator : public HIteratorInterface, public HHuginn::HNotifableReference {
+public:
+	HBacktrackingIterator( HInvalidatingIterable* owner_ )
+		: HIteratorInterface()
+		, HNotifableReference( owner_ ) {
+		return;
+	}
+	void backtrack( HThread* thread_, int long index_, int position_ ) {
+		do_backtrack( thread_, index_, position_ );
+	}
+protected:
+	virtual void do_backtrack( HThread*, int long, int ) = 0;
 };
 
 class HIterator : public HIterable, public HIteratorInterface {

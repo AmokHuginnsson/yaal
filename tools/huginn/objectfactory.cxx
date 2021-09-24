@@ -92,17 +92,94 @@ HObjectFactory::HObjectFactory( HRuntime* runtime_ )
 	: HObjectFactoryBase( runtime_ )
 	, _taggedValuePool( this )
 	, _objectPool( this )
-	, _noneClass( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::NONE, IDENTIFIER::BUILTIN::TYPE_NONE, "A type of `none` value." ) )
-	, _observer( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::OBSERVER, IDENTIFIER::BUILTIN::TYPE_OBSERVER, "The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value." ) )
-	, _reference( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::REFERENCE, IDENTIFIER::BUILTIN::TYPE_REFERENCE, "Write only reference. Allows assign operator to work." ) )
-	, _functionReference( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::FUNCTION_REFERENCE, IDENTIFIER::BUILTIN::TYPE_FUNCTION_REFERENCE, "The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type." ) )
-	, _objectReference( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::OBJECT_REFERENCE, IDENTIFIER::BUILTIN::TYPE_OBJECT_REFERENCE, "The `*object_reference*` is a up-casting reference allowing to access super class methods." ) )
-	, _method( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::METHOD, IDENTIFIER::BUILTIN::TYPE_METHOD, "Raw *uncallable* method." ) )
-	, _unboundMethod( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::UNBOUND_METHOD, IDENTIFIER::BUILTIN::TYPE_UNBOUND_METHOD, "A reference to a callable but unbound method." ) )
-	, _boundMethod( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::BOUND_METHOD, IDENTIFIER::BUILTIN::TYPE_BOUND_METHOD, "A reference to a callable method with a valid runtime value bound to it." ) )
-	, _partial( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::PARTIAL, IDENTIFIER::BUILTIN::TYPE_PARTIAL, "A function/method call with partially bound arguments." ) )
-	, _variadicParameters( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::VARIADIC_PARAMETERS, IDENTIFIER::BUILTIN::TYPE_VARIADIC_PARAMETERS, "Variadic parameters pack." ) )
-	, _namedParameters( make_pointer<huginn::HClass>( runtime_, HHuginn::TYPE::NAMED_PARAMETERS, IDENTIFIER::BUILTIN::TYPE_NAMED_PARAMETERS, "Named parameters pack." ) )
+	, _noneClass(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::NONE,
+			IDENTIFIER::BUILTIN::TYPE_NONE,
+			"A type of `none` value."
+		)
+	)
+	, _observer(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::OBSERVER,
+			IDENTIFIER::BUILTIN::TYPE_OBSERVER,
+			"The `*observer*` is a type representing a reference cycle breaking, non-owning weak \"pointer\" to a value."
+		)
+	)
+	, _reference(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::REFERENCE,
+			IDENTIFIER::BUILTIN::TYPE_REFERENCE,
+			"Write only reference. Allows assign operator to work."
+		)
+	)
+	, _functionReference(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::FUNCTION_REFERENCE,
+			IDENTIFIER::BUILTIN::TYPE_FUNCTION_REFERENCE,
+			"The `*function_reference*` is a Huginn's way of providing information about a value's *runtime* type."
+		)
+	)
+	, _objectReference(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::OBJECT_REFERENCE,
+			IDENTIFIER::BUILTIN::TYPE_OBJECT_REFERENCE,
+			"The `*object_reference*` is a up-casting reference allowing to access super class methods."
+		)
+	)
+	, _method(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::METHOD,
+			IDENTIFIER::BUILTIN::TYPE_METHOD,
+			"Raw *uncallable* method."
+		)
+	)
+	, _unboundMethod(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::UNBOUND_METHOD,
+			IDENTIFIER::BUILTIN::TYPE_UNBOUND_METHOD,
+			"A reference to a callable but unbound method."
+		)
+	)
+	, _boundMethod(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::BOUND_METHOD,
+			IDENTIFIER::BUILTIN::TYPE_BOUND_METHOD,
+			"A reference to a callable method with a valid runtime value bound to it."
+		)
+	)
+	, _partial(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::PARTIAL,
+			IDENTIFIER::BUILTIN::TYPE_PARTIAL,
+			"A function/method call with partially bound arguments."
+		)
+	)
+	, _variadicParameters(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::VARIADIC_PARAMETERS,
+			IDENTIFIER::BUILTIN::TYPE_VARIADIC_PARAMETERS,
+			"Variadic parameters pack."
+		)
+	)
+	, _namedParameters(
+		make_pointer<huginn::HClass>(
+			runtime_,
+			HHuginn::TYPE::NAMED_PARAMETERS,
+			IDENTIFIER::BUILTIN::TYPE_NAMED_PARAMETERS,
+			"Named parameters pack."
+		)
+	)
 	, _referencePool( this, _reference.raw() )
 	, _functionReferencePool( this, _functionReference.raw() )
 	, _methodPool( this, _method.raw() )
@@ -276,6 +353,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 	typedef typename pool_type_info<huginn::HLookup>::pool_t lookup_pool_t;
 	typedef typename pool_type_info<huginn::HOrder>::pool_t  order_pool_t;
 	typedef typename pool_type_info<huginn::HSet>::pool_t    set_pool_t;
+	typedef typename pool_type_info<huginn::HObject>::pool_t object_pool_t;
 	typedef hcore::HBoundCall<int ( void**, int )> gc_t;
 	list_pool_t&   listPool( get_pool<huginn::HList>() );
 	deque_pool_t&  dequePool( get_pool<huginn::HDeque>() );
@@ -283,6 +361,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 	lookup_pool_t& lookupPool( get_pool<huginn::HLookup>() );
 	order_pool_t&  orderPool( get_pool<huginn::HOrder>() );
 	set_pool_t&    setPool( get_pool<huginn::HSet>() );
+	object_pool_t& objectPool( get_pool<huginn::HObject>() );
 	gc_t gc( hcore::call( &HObjectFactory::break_cycles, this, cref( longLived_ ), _1, _2 ) );
 	int dangling( 0 );
 	int freed( 0 );
@@ -294,6 +373,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 		freed += lookupPool.run_gc( gc );
 		freed += orderPool.run_gc( gc );
 		freed += setPool.run_gc( gc );
+		freed += objectPool.run_gc( gc );
 		dangling += freed;
 	} while ( freed > 0 );
 	if ( dangling > 0 ) {

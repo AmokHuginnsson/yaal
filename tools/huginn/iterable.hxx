@@ -43,6 +43,7 @@ class HInvalidatingIterable : public HIterable, public HHuginn::HReferenceTracke
 public:
 	HInvalidatingIterable( HClass const* );
 	void skip( HThread*, void const*, int );
+	void backtrack( HThread*, int long, int );
 };
 
 }

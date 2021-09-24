@@ -25,12 +25,12 @@ namespace huginn {
 
 namespace set {
 
-class HSetIterator : public HNotifableIterator {
+class HSetIterator : public HSkippingIterator {
 	huginn::HSet::values_t* _set;
 	huginn::HSet::values_t::iterator _it;
 public:
 	HSetIterator( huginn::HSet* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _set( &owner_->value() )
 		, _it( _set->begin() ) {
 		return;
@@ -64,12 +64,12 @@ private:
 	HSetIterator& operator = ( HSetIterator const& ) = delete;
 };
 
-class HSetReverseIterator : public HNotifableIterator {
+class HSetReverseIterator : public HSkippingIterator {
 	huginn::HSet::values_t* _set;
 	huginn::HSet::values_t::reverse_iterator _it;
 public:
 	HSetReverseIterator( huginn::HSet* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _set( &owner_->value() )
 		, _it( _set->rbegin() ) {
 		return;

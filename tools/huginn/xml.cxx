@@ -73,11 +73,11 @@ private:
 class HElement : public HInvalidatingIterable {
 public:
 	typedef yaal::hcore::HPointer<yaal::tools::HXml> xml_t;
-	class HTrackerProxy : public HHuginn::HNotifableReference {
+	class HTrackerProxy : public HIdentifableReference {
 		HElement& _element;
 	public:
 		HTrackerProxy( HHuginn::HReferenceTracker* owner_, HElement& element_ )
-			: HHuginn::HNotifableReference( owner_ )
+			: HIdentifableReference( owner_ )
 			, _element( element_ ) {
 		}
 	protected:
@@ -376,13 +376,13 @@ private:
 	HElementClass& operator = ( HElementClass const& ) = delete;
 };
 
-class HAttributesIterator : public HNotifableIterator {
+class HAttributesIterator : public HSkippingIterator {
 	HHuginn::value_t _element;
 	yaal::tools::HXml::HNode::properties_t& _properties;
 	yaal::tools::HXml::HNode::properties_t::iterator _it;
 public:
 	HAttributesIterator( HHuginn::value_t const& element_, HAttributes* attributes_ )
-		: HNotifableIterator( attributes_ )
+		: HSkippingIterator( attributes_ )
 		, _element( element_ )
 		, _properties( static_cast<HElement*>( _element.raw() )->properties() )
 		, _it( _properties.begin() ) {
@@ -431,14 +431,14 @@ int long HAttributes::do_size( huginn::HThread* thread_, int position_ ) const {
 	return ( static_cast<HElement const*>( _element.raw() )->properties().get_size() );
 }
 
-class HElementIterator : public HNotifableIterator {
+class HElementIterator : public HSkippingIterator {
 	HElementClass const* _elementClass;
 	HHuginn::value_t _doc;
 	yaal::tools::HXml::HNodeProxy _node;
 	yaal::tools::HXml::HIterator _it;
 public:
 	HElementIterator( HElementClass const* elementClass_, HHuginn::value_t const& doc_, HElement* element_ )
-		: HNotifableIterator( element_ )
+		: HSkippingIterator( element_ )
 		, _elementClass( elementClass_ )
 		, _doc( doc_ )
 		, _node( element_->node() )

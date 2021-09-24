@@ -198,20 +198,11 @@ void HHuginn::HReferenceTracker::invalidate( ids_t& ids_ ) {
 	M_PROLOG
 	sort( ids_.begin(), ids_.end() );
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
-		ids_t::const_iterator it( lower_bound( ids_.begin(), ids_.end(), nr->id() ) );
-		if ( ( it != ids_.end() ) && ( *it == nr->id() ) ) {
-			nr->invalidate();
-		}
-	}
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HReferenceTracker::invalidate( void const* id_ ) {
-	M_PROLOG
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
-		if ( nr->id() == id_ ) {
-			nr->invalidate();
+		M_ASSERT( dynamic_cast<huginn::HIdentifableReference*>( nr ) );
+		HIdentifableReference* ir( static_cast<huginn::HIdentifableReference*>( nr ) );
+		ids_t::const_iterator it( lower_bound( ids_.begin(), ids_.end(), ir->id() ) );
+		if ( ( it != ids_.end() ) && ( *it == ir->id() ) ) {
+			ir->invalidate();
 		}
 	}
 	return;
@@ -236,9 +227,21 @@ HInvalidatingIterable::HInvalidatingIterable( huginn::HClass const* class_ )
 void HInvalidatingIterable::skip( huginn::HThread* thread_, void const* id_, int position_ ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
-		if ( nr->id() == id_ ) {
-			static_cast<huginn::HNotifableIterator*>( nr )->skip( thread_, position_ );
+		M_ASSERT( dynamic_cast<huginn::HSkippingIterator*>( nr ) );
+		HSkippingIterator* si( static_cast<huginn::HSkippingIterator*>( nr ) );
+		if ( si->id() == id_ ) {
+			si->skip( thread_, position_ );
 		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HInvalidatingIterable::backtrack( huginn::HThread* thread_, int long index_, int position_ ) {
+	M_PROLOG
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		M_ASSERT( dynamic_cast<huginn::HBacktrackingIterator*>( nr ) );
+		static_cast<huginn::HBacktrackingIterator*>( nr )->backtrack( thread_, index_, position_ );
 	}
 	return;
 	M_EPILOG

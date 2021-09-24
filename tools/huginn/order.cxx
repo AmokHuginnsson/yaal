@@ -25,12 +25,12 @@ namespace huginn {
 
 namespace order {
 
-class HOrderIterator : public HNotifableIterator {
+class HOrderIterator : public HSkippingIterator {
 	HOrder::values_t* _order;
 	HOrder::values_t::iterator _it;
 public:
 	HOrderIterator( HOrder* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _order( &owner_->value() )
 		, _it( _order->begin() ) {
 		return;
@@ -64,12 +64,12 @@ private:
 	HOrderIterator& operator = ( HOrderIterator const& ) = delete;
 };
 
-class HOrderReverseIterator : public HNotifableIterator {
+class HOrderReverseIterator : public HSkippingIterator {
 	HOrder::values_t* _order;
 	HOrder::values_t::reverse_iterator _it;
 public:
 	HOrderReverseIterator( HOrder* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _order( &owner_->value() )
 		, _it( _order->rbegin() ) {
 		return;

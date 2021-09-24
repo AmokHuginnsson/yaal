@@ -24,12 +24,13 @@ namespace huginn {
 
 namespace list {
 
-class HListIterator : public HIteratorInterface {
+class HListIterator : public HBacktrackingIterator {
 	huginn::HList* _list;
 	int long _index;
 public:
 	HListIterator( huginn::HList* list_ )
-		: _list( list_ )
+		: HBacktrackingIterator( list_ )
+		, _list( list_ )
 		, _index( 0 ) {
 		return;
 	}
@@ -43,17 +44,26 @@ protected:
 	virtual void do_next( HThread*, int ) override {
 		++ _index;
 	}
+	virtual void do_invalidate( void ) override {
+		_index = meta::max_signed<int long>::value - 1;
+	}
+	virtual void do_backtrack( HThread*, int long index_, int ) override {
+		if ( index_ <= _index ) {
+			-- _index;
+		}
+	}
 private:
 	HListIterator( HListIterator const& ) = delete;
 	HListIterator& operator = ( HListIterator const& ) = delete;
 };
 
-class HListReverseIterator : public HIteratorInterface {
+class HListReverseIterator : public HBacktrackingIterator {
 	huginn::HList* _list;
 	int long _index;
 public:
 	HListReverseIterator( HThread* thread_, huginn::HList* list_, int position_ )
-		: _list( list_ )
+		: HBacktrackingIterator( list_ )
+		, _list( list_ )
 		, _index( list_->size( thread_, position_ ) - 1 ) {
 		return;
 	}
@@ -66,6 +76,14 @@ protected:
 	}
 	virtual void do_next( HThread*, int ) override {
 		-- _index;
+	}
+	virtual void do_invalidate( void ) override {
+		_index = -1;
+	}
+	virtual void do_backtrack( HThread*, int long index_, int ) override {
+		if ( index_ <= _index ) {
+			-- _index;
+		}
 	}
 private:
 	HListReverseIterator( HListReverseIterator const& ) = delete;
@@ -183,19 +201,23 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 			throw HHuginn::HHuginnRuntimeException( "invalid erase count: "_ys.append( count ), thread_->file_id(), position_ );
 		}
 	}
-	huginn::HList::values_t& data( static_cast<huginn::HList*>( object_->raw() )->value() );
+	huginn::HList& list( *static_cast<huginn::HList*>( object_->raw() ) );
+	huginn::HList::values_t& data( list.value() );
 	HList::values_t::size_type erased( 0 );
+	int long index( 0 );
 	HHuginn::value_t& toErase( values_.front() );
 	data.erase(
 		remove_if(
 			data.begin(),
 			data.end(),
-			[&toErase, &erased, count, thread_, position_]( HHuginn::value_t const& v_ ) {
-				bool equals( toErase->operator_equals( thread_, toErase, v_, position_ ) );
-				if ( equals ) {
+			[&list, &toErase, &index, &erased, count, thread_, position_]( HHuginn::value_t const& v_ ) {
+				bool toRemove( ( erased < count ) && toErase->operator_equals( thread_, toErase, v_, position_ ) );
+				if ( toRemove ) {
+					list.backtrack( thread_, index, position_ );
 					++ erased;
 				}
-				return ( equals && ( erased <= count ) );
+				++ index;
+				return ( toRemove );
 			}
 		),
 		data.end()
@@ -358,7 +380,7 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 }
 
 huginn::HList::HList( HClass const* class_, values_t&& data_ )
-	: HIterable( class_ )
+	: HInvalidatingIterable( class_ )
 	, _data( yaal::move( data_ ) ) {
 	return;
 }
@@ -383,6 +405,7 @@ int long huginn::HList::do_size( huginn::HThread*, int ) const {
 
 void huginn::HList::clear( void ) {
 	M_PROLOG
+	invalidate();
 	_data.clear();
 	return;
 	M_EPILOG

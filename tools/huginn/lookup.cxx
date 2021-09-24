@@ -24,7 +24,7 @@ namespace huginn {
 
 namespace lookup {
 
-class HLookupIterator : public HNotifableIterator {
+class HLookupIterator : public HSkippingIterator {
 public:
 	enum class TYPE {
 		KEYS,
@@ -38,7 +38,7 @@ private:
 	HObjectFactory& _objectFactory;
 public:
 	HLookupIterator( huginn::HLookup* owner_, HObjectFactory& objectFactory_, TYPE type_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _lookup( &owner_->value() )
 		, _it( _lookup->begin() )
 		, _valueGetter( type_ == TYPE::KEYS ? &HLookupIterator::get_key : &HLookupIterator::get_key_value )
@@ -122,12 +122,12 @@ private:
 	}
 };
 
-class HLookupReverseIterator : public HNotifableIterator {
+class HLookupReverseIterator : public HSkippingIterator {
 	huginn::HLookup::values_t* _lookup;
 	huginn::HLookup::values_t::reverse_iterator _it;
 public:
 	HLookupReverseIterator( huginn::HLookup* owner_ )
-		: HNotifableIterator( owner_ )
+		: HSkippingIterator( owner_ )
 		, _lookup( &owner_->value() )
 		, _it( _lookup->rbegin() ) {
 		return;

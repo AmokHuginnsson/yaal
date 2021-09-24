@@ -1,4 +1,5 @@
 /* Read yaal/LICENSE.md file for copyright and licensing information. */
+
 /*! \file tools/hhuginn.hxx
  * Declaration of HHuginn class and all its nested classes.
  */
@@ -515,7 +516,6 @@ public:
 	virtual ~HReferenceTracker() {}
 	void notify( HHuginn::HNotifableReference* );
 	void forget( HHuginn::HNotifableReference* );
-	void invalidate( void const* );
 	void invalidate( ids_t& );
 	void invalidate( void );
 };
@@ -534,18 +534,27 @@ public:
 	void invalidate( void ) {
 		do_invalidate();
 	}
-	void const* id( void ) const {
-		return ( do_id() );
-	}
 protected:
 	virtual void do_invalidate( void ) = 0;
-	virtual void const* do_id( void ) const = 0;
 private:
 	HNotifableReference( HNotifableReference const& ) = delete;
 	HNotifableReference& operator = ( HNotifableReference const& ) = delete;
 };
 
 namespace huginn {
+
+class HIdentifableReference : public HHuginn::HNotifableReference {
+public:
+	HIdentifableReference( HHuginn::HReferenceTracker* owner_ )
+		: HNotifableReference( owner_ ) {
+		return;
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
+protected:
+	virtual void const* do_id( void ) const = 0;
+};
 
 inline HHuginn::type_id_t type_id( HHuginn::TYPE typeTag_ ) {
 	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( typeTag_ ) ) );
