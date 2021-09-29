@@ -15,7 +15,7 @@ namespace tools {
 
 namespace huginn {
 
-class HDeque : public HIterable {
+class HDeque : public HInvalidatingIterable {
 public:
 	typedef HDeque this_type;
 	typedef HIterable base_type;
