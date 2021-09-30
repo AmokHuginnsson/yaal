@@ -62,8 +62,12 @@ public:
 	void backtrack( HThread* thread_, int long index_, int position_ ) {
 		do_backtrack( thread_, index_, position_ );
 	}
+	void skip( HThread* thread_, int long from_, int long to_, int position_ ) {
+		do_skip( thread_, from_, to_, position_ );
+	}
 protected:
 	virtual void do_backtrack( HThread*, int long, int ) = 0;
+	virtual void do_skip( HThread*, int long, int long, int ) = 0;
 };
 
 class HIterator : public HIterable, public HIteratorInterface {

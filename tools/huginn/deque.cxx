@@ -52,6 +52,13 @@ protected:
 			-- _index;
 		}
 	}
+	virtual void do_skip( HThread*, int long from_, int long to_, int ) override {
+		if ( to_ <= _index ) {
+			_index -= ( to_ - from_ );
+		} else if ( from_ <= _index ) {
+			_index = from_ - 1;
+		}
+	}
 private:
 	HDequeIterator( HDequeIterator const& ) = delete;
 	HDequeIterator& operator = ( HDequeIterator const& ) = delete;
@@ -83,6 +90,13 @@ protected:
 	virtual void do_backtrack( HThread*, int long index_, int ) override {
 		if ( index_ <= _index ) {
 			-- _index;
+		}
+	}
+	virtual void do_skip( HThread*, int long from_, int long to_, int ) override {
+		if ( to_ <= _index ) {
+			_index -= ( to_ - from_ );
+		} else if ( from_ <= _index ) {
+			_index = from_ - 1;
 		}
 	}
 private:
@@ -244,7 +258,7 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 	HDeque::values_t::size_type count( meta::max_signed<HDeque::values_t::size_type>::value );
 	if ( values_.get_size() > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
-		count = get_integer( values_[1] );
+		count = static_cast<HDeque::values_t::size_type>( get_integer( values_[1] ) );
 		if ( count < 1 ) {
 			throw HHuginn::HHuginnRuntimeException( "invalid erase count: "_ys.append( count ), thread_->file_id(), position_ );
 		}

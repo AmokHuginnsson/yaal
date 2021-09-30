@@ -52,6 +52,13 @@ protected:
 			-- _index;
 		}
 	}
+	virtual void do_skip( HThread*, int long from_, int long to_, int ) override {
+		if ( to_ <= _index ) {
+			_index -= ( to_ - from_ );
+		} else if ( from_ <= _index ) {
+			_index = from_ - 1;
+		}
+	}
 private:
 	HListIterator( HListIterator const& ) = delete;
 	HListIterator& operator = ( HListIterator const& ) = delete;
@@ -83,6 +90,13 @@ protected:
 	virtual void do_backtrack( HThread*, int long index_, int ) override {
 		if ( index_ <= _index ) {
 			-- _index;
+		}
+	}
+	virtual void do_skip( HThread*, int long from_, int long to_, int ) override {
+		if ( to_ <= _index ) {
+			_index -= ( to_ - from_ );
+		} else if ( from_ <= _index ) {
+			_index = from_ - 1;
 		}
 	}
 private:
@@ -196,7 +210,7 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 	HList::values_t::size_type count( meta::max_signed<HList::values_t::size_type>::value );
 	if ( values_.get_size() > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
-		count = get_integer( values_[1] );
+		count = static_cast<HList::values_t::size_type>( get_integer( values_[1] ) );
 		if ( count < 1 ) {
 			throw HHuginn::HHuginnRuntimeException( "invalid erase count: "_ys.append( count ), thread_->file_id(), position_ );
 		}
@@ -222,6 +236,35 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 		),
 		data.end()
 	);
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t splice( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
+	char const name[] = "list.splice";
+	verify_arg_count( name, values_, 1, 2, thread_, position_ );
+	HList::values_t::size_type from( get_integer( values_.front() ) );
+	if ( from < 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "invalid `from` in splice: "_ys.append( from ), thread_->file_id(), position_ );
+	}
+	HList::values_t::size_type to( from + 1 );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		to = get_integer( values_[1] );
+		if ( to < from ) {
+			throw HHuginn::HHuginnRuntimeException( "invalid `to` in splice: "_ys.append( to ), thread_->file_id(), position_ );
+		}
+	}
+	huginn::HList& list( *static_cast<huginn::HList*>( object_->raw() ) );
+	huginn::HList::values_t& data( list.value() );
+	to = min( to, data.get_size() );
+	from = min( from, to );
+	if ( from < to ) {
+		list.skip( thread_, from, to, position_ );
+		data.erase( data.begin() + from, data.begin() + to );
+	}
 	return ( *object_ );
 	M_EPILOG
 }
@@ -344,6 +387,7 @@ public:
 			{ "append", objectFactory_->create_method( &list::append ), "( *other* ) - append all elements from *other* collection at the end of this `list`" },
 			{ "insert", objectFactory_->create_method( &list::insert ), "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "erase",  objectFactory_->create_method( &list::erase ),  "( *elem*[, *count*] ) - erase (at most *count*) elements equal to *elem*ent from this `list`" },
+			{ "splice", objectFactory_->create_method( &list::splice ), "( *from*[, *to*] ) - erase all elements from inclusice *from* and up to exclusive *to* from this `list`" },
 			{ "resize", objectFactory_->create_method( &list::resize ), "( *size*, *elem* ) - resize `list` to given *size* optionally filling new elements with **copies** of value *elem*" },
 			{ "clear",  objectFactory_->create_method( &list::clear ),  "erase `list`'s content, `list` becomes empty" },
 			{ "find",   objectFactory_->create_method( &list::find ),   "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `list` not before *start* and before *stop*, return -1 if not found" },

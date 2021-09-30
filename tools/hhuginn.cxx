@@ -237,6 +237,17 @@ void HInvalidatingIterable::skip( huginn::HThread* thread_, void const* id_, int
 	M_EPILOG
 }
 
+void HInvalidatingIterable::skip( huginn::HThread* thread_, int long from_, int long to_, int position_ ) {
+	M_PROLOG
+	for ( HHuginn::HNotifableReference* nr : _observers ) {
+		M_ASSERT( dynamic_cast<huginn::HBacktrackingIterator*>( nr ) );
+		HBacktrackingIterator* si( static_cast<huginn::HBacktrackingIterator*>( nr ) );
+		si->skip( thread_, from_, to_, position_ );
+	}
+	return;
+	M_EPILOG
+}
+
 void HInvalidatingIterable::backtrack( huginn::HThread* thread_, int long index_, int position_ ) {
 	M_PROLOG
 	for ( HHuginn::HNotifableReference* nr : _observers ) {
