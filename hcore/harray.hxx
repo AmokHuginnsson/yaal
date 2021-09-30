@@ -678,6 +678,9 @@ public:
 		if ( last_._index < first_._index ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
 		}
+		if ( first_ == last_ ) {
+			return first_;
+		}
 		for ( iterator it( first_ ); it != last_; ++ it ) {
 			M_SAFE( (*it).~value_type() );
 		}

@@ -944,47 +944,48 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 	if ( last_._index < first_._index ) {
 		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], toRemove );
 	}
-	if ( toRemove ) {
-		value_type** chunks = _chunks.get<value_type*>();
-		if ( first_._index < ( _size - last_._index ) ) /* Move front. */ {
-			for ( size_type src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst ) {
-				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
-			}
-			for ( size_type del( _start ); del < ( _start + toRemove ); ++ del ) {
-				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
-			}
-			for (
-				size_type chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
-				chunkIndex < newFirstChunkIndex;
-				++ chunkIndex
-			) {
-				M_ASSERT( chunks[ chunkIndex ] );
-				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
-				chunks[ chunkIndex ] = nullptr;
-			}
-			_start += toRemove;
-		} else { /* Move back. */
-			for ( size_type src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst ) {
-				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
-			}
-			for ( size_type del( _start + _size - toRemove ); del < ( _start + _size ); ++ del ) {
-				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
-			}
-			size_type chunksCount( _chunks.template count_of<value_type*>() );
-			size_type trimAt( ( _start + _size - toRemove ) - 1 );
-			trimAt = ( ( trimAt >= _start ) ? trimAt : ( _start + _size - toRemove ) );
-			for (
-				size_type chunkIndex( ( trimAt / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
-				( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
-				++ chunkIndex
-			) {
-				M_ASSERT( chunks[ chunkIndex ] );
-				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
-				chunks[ chunkIndex ] = nullptr;
-			}
-		}
-		_size -= toRemove;
+	if ( toRemove == 0 ) {
+		return first_;
 	}
+	value_type** chunks = _chunks.get<value_type*>();
+	if ( first_._index < ( _size - last_._index ) ) /* Move front. */ {
+		for ( size_type src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst ) {
+			chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+		}
+		for ( size_type del( _start ); del < ( _start + toRemove ); ++ del ) {
+			M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
+		}
+		for (
+			size_type chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
+			chunkIndex < newFirstChunkIndex;
+			++ chunkIndex
+		) {
+			M_ASSERT( chunks[ chunkIndex ] );
+			::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
+			chunks[ chunkIndex ] = nullptr;
+		}
+		_start += toRemove;
+	} else { /* Move back. */
+		for ( size_type src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst ) {
+			chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+		}
+		for ( size_type del( _start + _size - toRemove ); del < ( _start + _size ); ++ del ) {
+			M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
+		}
+		size_type chunksCount( _chunks.template count_of<value_type*>() );
+		size_type trimAt( ( _start + _size - toRemove ) - 1 );
+		trimAt = ( ( trimAt >= _start ) ? trimAt : ( _start + _size - toRemove ) );
+		for (
+			size_type chunkIndex( ( trimAt / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
+			( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
+			++ chunkIndex
+		) {
+			M_ASSERT( chunks[ chunkIndex ] );
+			::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
+			chunks[ chunkIndex ] = nullptr;
+		}
+	}
+	_size -= toRemove;
 	if ( ! _size ) {
 		_start = 0;
 	}
