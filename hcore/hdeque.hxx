@@ -949,7 +949,7 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 	}
 	value_type** chunks = _chunks.get<value_type*>();
 	if ( first_._index < ( _size - last_._index ) ) /* Move front. */ {
-		for ( size_type src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst ) {
+		for ( size_type src( _start + first_._index - 1 ), dst( _start + last_._index - 1 ); src >= _start; -- src, -- dst ) {
 			chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
 		}
 		for ( size_type del( _start ); del < ( _start + toRemove ); ++ del ) {
