@@ -245,14 +245,14 @@ inline HHuginn::value_t splice( huginn::HThread* thread_, HHuginn::value_t* obje
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::LIST );
 	char const name[] = "list.splice";
 	verify_arg_count( name, values_, 1, 2, thread_, position_ );
-	HList::values_t::size_type from( get_integer( values_.front() ) );
+	HList::values_t::size_type from( static_cast<HList::values_t::size_type>( get_integer( values_.front() ) ) );
 	if ( from < 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "invalid `from` in splice: "_ys.append( from ), thread_->file_id(), position_ );
 	}
 	HList::values_t::size_type to( from + 1 );
 	if ( values_.get_size() > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
-		to = get_integer( values_[1] );
+		to = static_cast<HList::values_t::size_type>( get_integer( values_[1] ) );
 		if ( to < from ) {
 			throw HHuginn::HHuginnRuntimeException( "invalid `to` in splice: "_ys.append( to ), thread_->file_id(), position_ );
 		}

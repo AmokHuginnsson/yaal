@@ -253,7 +253,7 @@ inline HHuginn::value_t insert( huginn::HThread* thread_, HHuginn::value_t* obje
 inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
-	char const name[] = "list.erase";
+	char const name[] = "deque.erase";
 	verify_arg_count( name, values_, 1, 2, thread_, position_ );
 	HDeque::values_t::size_type count( meta::max_signed<HDeque::values_t::size_type>::value );
 	if ( values_.get_size() > 1 ) {
@@ -284,6 +284,35 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 		),
 		data.end()
 	);
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t splice( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( (*object_)->type_id() == HHuginn::TYPE::DEQUE );
+	char const name[] = "deque.splice";
+	verify_arg_count( name, values_, 1, 2, thread_, position_ );
+	HDeque::values_t::size_type from( static_cast<HDeque::values_t::size_type>( get_integer( values_.front() ) ) );
+	if ( from < 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "invalid `from` in splice: "_ys.append( from ), thread_->file_id(), position_ );
+	}
+	HDeque::values_t::size_type to( from + 1 );
+	if ( values_.get_size() > 1 ) {
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, ARITY::MULTIPLE, thread_, position_ );
+		to = static_cast<HDeque::values_t::size_type>( get_integer( values_[1] ) );
+		if ( to < from ) {
+			throw HHuginn::HHuginnRuntimeException( "invalid `to` in splice: "_ys.append( to ), thread_->file_id(), position_ );
+		}
+	}
+	huginn::HDeque& deque( *static_cast<huginn::HDeque*>( object_->raw() ) );
+	huginn::HDeque::values_t& data( deque.value() );
+	to = min( to, data.get_size() );
+	from = min( from, to );
+	if ( from < to ) {
+		deque.skip( thread_, from, to, position_ );
+		data.erase( data.begin() + from, data.begin() + to );
+	}
 	return ( *object_ );
 	M_EPILOG
 }
@@ -367,6 +396,7 @@ public:
 			{ "prepend",    objectFactory_->create_method( &deque::prepend ),    "( *other* ) - prepend all elements from *other* collection in front of  `deque`" },
 			{ "insert",     objectFactory_->create_method( &deque::insert ),     "( *index*, *elem* ) - insert given *elem*ent at given *index*" },
 			{ "erase",      objectFactory_->create_method( &deque::erase ),      "( *elem*[, *count*] ) - erase (at most *count*) elements equal to *elem*ent from this `deque`" },
+			{ "splice",     objectFactory_->create_method( &deque::splice ),     "( *from*[, *to*] ) - erase all elements from inclusice *from* and up to exclusive *to* from this `deque`" },
 			{ "clear",      objectFactory_->create_method( &deque::clear ),      "erase `deque`'s content, `deque` becomes empty" },
 			{ "find",       objectFactory_->create_method( &deque::find ),       "( *elem*[, *start*[, *stop*]] ) - get index of first *elem*ent of the `deque` not before *start* and before *stop*, return -1 if not found" }
 		};
