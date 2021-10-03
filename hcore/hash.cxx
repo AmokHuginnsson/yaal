@@ -3,7 +3,7 @@
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "hhashcontainer.hxx"
+#include "hash.hxx"
 #include "algorithm.hxx"
 
 namespace yaal {

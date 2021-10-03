@@ -35,7 +35,8 @@ template<
 	typename data_t,
 	typename hasher_t = hash<key_t>,
 	typename equal_key_t = yaal::equal_to<key_t>,
-	typename allocator_t = allocator::system<HPair<key_t, data_t>>
+	typename allocator_t = allocator::system<HPair<key_t, data_t>>,
+	typename engine_t = HHashContainer<HPair<key_t const, data_t>, hasher_t, equal_key_t, hashmap_helper<key_t, data_t>, allocator_t>
 >
 class HHashMap final {
 public:
@@ -45,6 +46,7 @@ public:
 	typedef HPair<key_t const, data_t> value_type;
 	typedef hasher_t hasher_type;
 	typedef equal_key_t equal_key_type;
+	typedef engine_t engine_type;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
@@ -63,7 +65,6 @@ public:
 		} error_t;
 	};
 private:
-	typedef HHashContainer<value_type, hasher_type, equal_key_type, hashmap_helper<key_type, data_type>, allocator_t> engine_t;
 	engine_t _engine;
 public:
 	typedef typename engine_t::size_type size_type;
@@ -386,14 +387,14 @@ private:
 };
 
 
-template<typename key_type_t, typename data_type_t, typename hasher_t, typename equal_key_t, typename allocator_t>
+template<typename key_type_t, typename data_type_t, typename hasher_t, typename equal_key_t, typename allocator_t, typename engine_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hasher_t, equal_key_t, allocator_t>::HIterator
+class HHashMap<key_type_t, data_type_t, hasher_t, equal_key_t, allocator_t, engine_t>::HIterator
 	: public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;
-	typedef HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t> hashmap_t;
-	typename hashmap_t::engine_t::HIterator _engine;
+	typedef HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t, engine_t> hashmap_t;
+	typename hashmap_t::engine_type::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
@@ -453,7 +454,7 @@ private:
 	friend class HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
-	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
+	explicit HIterator( typename hashmap_t::engine_type::HIterator const& it )
 		: base_type()
 		, _engine( it ) {
 		return;

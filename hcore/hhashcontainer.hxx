@@ -10,43 +10,12 @@
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/hash.hxx"
 #include "hcore/allocator.hxx"
 
 namespace yaal {
 
 namespace hcore {
-
-template<typename key_t>
-struct hash {
-	typedef hash_value_t hash_value_type;
-	hash_value_type operator () ( key_t const& ) const;
-};
-
-template<typename key_t>
-struct hash<key_t*> {
-	typedef hash_value_t hash_value_type;
-	hash_value_type operator () ( key_t* const& key_ ) const {
-		return ( reinterpret_cast<hash_value_type>( key_ ) );
-	}
-};
-
-template<typename first_t, typename second_t>
-struct hash<yaal::hcore::HPair<first_t, second_t>> {
-	typedef hash_value_t hash_value_type;
-	hash_value_type operator () ( yaal::hcore::HPair<first_t, second_t> const& key_ ) const {
-		return ( hash<first_t>()( key_.first ) * 3 + hash<second_t>()( key_.second ) );
-	}
-};
-
-template<typename key_t, typename TAG>
-struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
-	typedef hash_value_t hash_value_type;
-	hash_value_type operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
-		return ( hash<key_t>()( key_.get() ) );
-	}
-};
-
-extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
 class HHashContainer final {
@@ -178,22 +147,23 @@ public:
 					_atom = atom;
 				}
 			}
-			if ( ! _atom ) {
-				if ( _index > 0 ) {
+			if ( _atom ) {
+				return ( *this );
+			}
+			if ( _index > 0 ) {
+				-- _index;
+				while ( ( _index > 0 ) && ! buckets[ _index ] ) {
 					-- _index;
-					while ( ( _index > 0 ) && ! buckets[ _index ] ) {
-						-- _index;
-					}
-					_atom = buckets[ _index ];
-					while ( _atom && _atom->_next ) {
-						_atom = _atom->_next;
-					}
-					if ( ! _atom ) {
-						_index = _owner->_prime;
-					}
-				} else {
+				}
+				_atom = buckets[ _index ];
+				while ( _atom && _atom->_next ) {
+					_atom = _atom->_next;
+				}
+				if ( ! _atom ) {
 					_index = _owner->_prime;
 				}
+			} else {
+				_index = _owner->_prime;
 			}
 			return ( *this );
 		}
@@ -311,36 +281,38 @@ public:
 	}
 	void resize( size_type size_ ) {
 		M_PROLOG
-		if ( size_ < 1 )
+		if ( size_ < 1 ) {
 			M_THROW( "bad new container size", size_ );
-		if ( size_ > _size ) {
-			int n = 0;
-			while ( size_ ) {
-				size_ >>= 1;
-				n ++;
-			}
-			size_type prime( _primes_[ n - 1 ] );
-			HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
-			M_ASSERT( ( buckets.size() / static_cast<size_type>( sizeof ( HAtom* ) ) ) >= prime );
-			HAtom** oldBuckets = _buckets.get<HAtom*>();
-			HAtom** newBuckets = buckets.get<HAtom*>();
-			for ( size_type i( 0 ); i < _prime; ++ i ) {
-				HAtom* a( oldBuckets[ i ] );
-				while ( a ) {
-					HAtom* atom( a );
-					a = a->_next;
-					size_type newHash(
-						static_cast<size_type>(
-							static_cast<hash_value_t>( _hasher( get_key_type::key( atom->_value ) ) ) % static_cast<hash_value_t>( prime )
-						)
-					);
-					atom->_next = newBuckets[ newHash ];
-					newBuckets[ newHash ] = atom;
-				}
-			}
-			_buckets.swap( buckets );
-			_prime = prime;
 		}
+		if ( size_ <= _size ) {
+			return;
+		}
+		int n( 0 );
+		while ( size_ ) {
+			size_ >>= 1;
+			n ++;
+		}
+		size_type prime( _primes_[ n - 1 ] );
+		HChunk buckets( chunk_size<HAtom*>( prime ), HChunk::STRATEGY::GEOMETRIC );
+		M_ASSERT( ( buckets.size() / static_cast<size_type>( sizeof ( HAtom* ) ) ) >= prime );
+		HAtom** oldBuckets = _buckets.get<HAtom*>();
+		HAtom** newBuckets = buckets.get<HAtom*>();
+		for ( size_type i( 0 ); i < _prime; ++ i ) {
+			HAtom* a( oldBuckets[ i ] );
+			while ( a ) {
+				HAtom* atom( a );
+				a = a->_next;
+				size_type newHash(
+					static_cast<size_type>(
+						static_cast<hash_value_t>( _hasher( get_key_type::key( atom->_value ) ) ) % static_cast<hash_value_t>( prime )
+					)
+				);
+				atom->_next = newBuckets[ newHash ];
+				newBuckets[ newHash ] = atom;
+			}
+		}
+		_buckets.swap( buckets );
+		_prime = prime;
 		return;
 		M_EPILOG
 	}
@@ -353,42 +325,43 @@ public:
 		while ( atom != it._atom ) {
 			ancestor = atom, atom = atom->_next;
 		}
-		if ( atom ) {
-			if ( ancestor ) {
-				ancestor->_next = atom->_next;
-			} else {
-				buckets[ it._index ] = atom->_next;
-			}
-			M_SAFE( atom->~HAtom() );
-			_allocator.deallocate( atom, 1 );
-			-- _size;
+		if ( ! atom ) {
+			return;
 		}
+		if ( ancestor ) {
+			ancestor->_next = atom->_next;
+		} else {
+			buckets[ it._index ] = atom->_next;
+		}
+		M_SAFE( atom->~HAtom() );
+		_allocator.deallocate( atom, 1 );
+		-- _size;
 		return;
 		M_EPILOG
 	}
 	void copy_from( HHashContainer const& src_ ) {
 		M_PROLOG
-		if ( src_._size > 0 ) {
-			HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
-			HAtom const* const* otherBuckets = src_._buckets.template get<HAtom const*>();
-			HAtom** buckets = newBuckets.get<HAtom*>();
-			for ( size_type i( 0 ); i < src_._prime; ++ i ) {
-				HAtom const* origAtom( otherBuckets[ i ] );
-				while ( origAtom ) {
-					HAtom* atom( _allocator.allocate( 1 ) );
-					new ( atom ) HAtom( origAtom->_value );
-					origAtom = origAtom->_next;
-					atom->_next = buckets[ i ];
-					buckets[ i ] = atom;
-				}
-			}
+		if ( src_._size == 0 ) {
 			clear();
-			_prime = src_._prime;
-			_size = src_._size;
-			_buckets.swap( newBuckets );
-		} else {
-			clear();
+			return;
 		}
+		HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
+		HAtom const* const* otherBuckets = src_._buckets.template get<HAtom const*>();
+		HAtom** buckets = newBuckets.get<HAtom*>();
+		for ( size_type i( 0 ); i < src_._prime; ++ i ) {
+			HAtom const* origAtom( otherBuckets[ i ] );
+			while ( origAtom ) {
+				HAtom* atom( _allocator.allocate( 1 ) );
+				new ( atom ) HAtom( origAtom->_value );
+				origAtom = origAtom->_next;
+				atom->_next = buckets[ i ];
+				buckets[ i ] = atom;
+			}
+		}
+		clear();
+		_prime = src_._prime;
+		_size = src_._size;
+		_buckets.swap( newBuckets );
 		return;
 		M_EPILOG
 	}
@@ -417,30 +390,29 @@ private:
 				? find_impl( key, hashValue )
 				: end()
 		);
-		bool inserted( false );
-		if ( ! ( it != end() ) ) {
-			if ( ( _size + 1 ) > _prime ) {
-				resize( ( _size + 1 ) * 2 );
-			}
-
-			size_type newHash( static_cast<size_type>( hashValue % static_cast<hash_value_t>( _prime ) ) );
-
-			HAtom* atom( _allocator.allocate( 1 ) );
-			try {
-				constructor_.construct( atom );
-			} catch ( ... ) {
-				_allocator.deallocate( atom, 1 );
-				throw;
-			}
-
-			HAtom** buckets = _buckets.get<HAtom*>();
-			atom->_next = buckets[ newHash ];
-			buckets[ newHash ] = atom;
-			++ _size;
-			it = HIterator( this, newHash, atom );
-			inserted = true;
+		if ( it != end() ) {
+			return ( make_pair( it, false ) );
 		}
-		return ( make_pair( it, inserted ) );
+		if ( ( _size + 1 ) > _prime ) {
+			resize( ( _size + 1 ) * 2 );
+		}
+
+		size_type newHash( static_cast<size_type>( hashValue % static_cast<hash_value_t>( _prime ) ) );
+
+		HAtom* atom( _allocator.allocate( 1 ) );
+		try {
+			constructor_.construct( atom );
+		} catch ( ... ) {
+			_allocator.deallocate( atom, 1 );
+			throw;
+		}
+
+		HAtom** buckets = _buckets.get<HAtom*>();
+		atom->_next = buckets[ newHash ];
+		buckets[ newHash ] = atom;
+		++ _size;
+		it = HIterator( this, newHash, atom );
+		return ( make_pair( it, true ) );
 		M_EPILOG
 	}
 	HIterator find_impl( key_type const& key_, hash_value_t hashValue_ ) const {
