@@ -105,8 +105,30 @@ inline u8_t reverse( u8_t v_ ) {
 	return v_;
 }
 
-inline int least_significant( u64_t v_ ) {
+inline int most_significant_lookup( u64_t v_ ) {
 	return ( v_ ? MULTIPLY_DE_BRUIJN_BIT_POSITION[ ( ( v_ & -v_) * 0x03F79D71B4CB0A89ull ) >> 58 ] : -1 );
+}
+
+inline int most_significant( u64_t v_ ) {
+	int r( 0 );
+	if ( v_ > 0xffffffffULL ) {
+		r = 32;
+		v_ >>= 32;
+	}
+	if ( v_ > 0xffffULL ) {
+		r += 16;
+		v_ >>= 16;
+	}
+	if ( v_ > 0xff ) {
+		r += 8;
+		v_ >>= 8;
+	}
+	if ( v_ > 0xf ) {
+		r += 4;
+		v_ >>= 4;
+	}
+	static int const BITE_MSB[] = { -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3 };
+	return r + BITE_MSB[v_];
 }
 
 }

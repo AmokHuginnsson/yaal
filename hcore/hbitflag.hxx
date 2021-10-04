@@ -80,7 +80,7 @@ YAAL_DEFINE_OPER( ^ )
 	 */
 	int index( void ) const {
 		M_ASSERT( bit::count( _flag ) <= 1 );
-		return ( bit::least_significant( _flag ) + 1 );
+		return ( bit::most_significant( _flag ) + 1 );
 	}
 private:
 	HBitFlag( void )
