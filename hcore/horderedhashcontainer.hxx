@@ -209,6 +209,7 @@ public:
 		, _equals( equals_ ) {
 		provide_storage( START_PRIME );
 		grow_index_map( START_PRIME );
+		prune_index( 0, _cover );
 	}
 	~HOrderedHashContainer( void ) {
 		M_PROLOG
@@ -246,8 +247,7 @@ public:
 			M_SAFE( atom->~HAtom() );
 			atom->_hash = EMPTY_SLOT;
 		}
-		size_type* indexMap( _indexMap.get<size_type>() );
-		fill( indexMap, indexMap + _indexMap.count_of<size_type>(), INVALID + 0 );
+		prune_index( 0, _cover );
 		_erased = 0;
 		_size = 0;
 		return;
@@ -320,14 +320,13 @@ public:
 		hash_value_t hash( atom->_hash );
 		M_SAFE( atom->~HAtom() );
 		atom->_hash = EMPTY_SLOT;
-		size_type* indexMap( _indexMap.get<size_type>() );
 		hash_value_t pertubator( hash );
 		hash_value_t mapIndex( hash % static_cast<hash_value_t>( _prime ) );
 		while ( true ) {
-			size_type storeIndex( indexMap[mapIndex] );
+			size_type storeIndex( get_index( mapIndex ) );
 			M_ASSERT( storeIndex != INVALID );
 			if ( storeIndex == it._index ) {
-				indexMap[mapIndex] = ERASED;
+				set_index( mapIndex, ERASED );
 				break;
 			}
 			pertubator >>= HASH_PERTURBATION_SHIFT;
@@ -392,14 +391,13 @@ private:
 		M_ASSERT( next < _store.count_of<HAtom>() );
 		M_ASSERT( projection.storeIndex == INVALID );
 		HAtom* store = _store.get<HAtom>();
-		size_type* indexMap( _indexMap.get<size_type>() );
 		HAtom* atom( store + next );
 		try {
 			constructor_.construct( hashValue, atom );
 		} catch ( ... ) {
 			throw;
 		}
-		indexMap[projection.mapIndex] = next;
+		set_index( projection.mapIndex, next );
 		++ _size;
 		return ( make_pair( HIterator( this, next ), true ) );
 		M_EPILOG
@@ -459,20 +457,27 @@ private:
 		_prime = _primes_[ msb ];
 		_cover = static_cast<size_type>( 1ULL << static_cast<u64_t>( msb + 1 ) );
 		M_ASSERT( ( _cover > _prime ) && ( _cover < ( _prime << 1 ) ) && ( bit::count( static_cast<u64_t>( _cover ) ) == 1 ) );
-		size_type indexMapSize( _indexMap.count_of<size_type>() );
-		_indexMap.realloc<size_type>( _cover );
-		if ( _cover > indexMapSize ) {
-			size_type* indexMap( _indexMap.get<size_type>() );
-			fill( indexMap + indexMapSize, indexMap + _cover, INVALID + 0 );
+		if ( _cover <= ( 1ULL << 7 ) ) {
+			_indexMap.realloc<i8_t>( _cover );
+		} else if ( _cover <= ( 1ULL << 15 ) ) {
+			_indexMap.realloc<i16_t>( _cover );
+		} else if ( _cover <= ( 1ULL << 31 ) ) {
+			_indexMap.realloc<i32_t>( _cover );
+		} else {
+			_indexMap.realloc<size_type>( _cover );
 		}
+		/*
+		 * Pruning here is not required because `rebuild_index()`
+		 * or explict `prune_index()` will be called immediately
+		 * after this method finishes.
+		 */
 		return ( true );
 		M_EPILOG
 	}
 	void rebuild_index( void ) {
 		M_PROLOG
 		HAtom const* store = _store.get<HAtom>();
-		size_type* indexMap( _indexMap.get<size_type>() );
-		fill( indexMap, indexMap + _cover, INVALID + 0 );
+		prune_index( 0, _cover );
 		size_type endPos( _size + _erased  );
 		for ( size_type i( 0 ); i < endPos; ++ i ) {
 			HAtom const& atom( store[i] );
@@ -481,15 +486,15 @@ private:
 			}
 			hash_value_t pertubator( atom._hash );
 			hash_value_t mapIndex( atom._hash % static_cast<hash_value_t>( _prime ) );
-			size_type storeIndex( indexMap[mapIndex] );
+			size_type storeIndex( get_index( mapIndex ) );
 			while ( true ) {
 				if ( storeIndex == INVALID ) {
-					indexMap[mapIndex] = i;
+					set_index( mapIndex, i );
 					break;
 				}
 				pertubator >>= HASH_PERTURBATION_SHIFT;
 				mapIndex = ( 5 * mapIndex + 1 + pertubator ) % static_cast<hash_value_t>( _cover );
-				storeIndex = indexMap[mapIndex];
+				storeIndex = get_index( mapIndex );
 			}
 		}
 		return;
@@ -498,10 +503,9 @@ private:
 	Projection find_projection( key_type const& key_, hash_value_t hashValue_ ) const {
 		M_PROLOG
 		HAtom const* store = _store.get<HAtom>();
-		size_type const* indexMap( _indexMap.get<size_type>() );
 		hash_value_t pertubator( hashValue_ );
 		hash_value_t mapIndex( hashValue_ % static_cast<hash_value_t>( _prime ) );
-		size_type storeIndex( indexMap[mapIndex] );
+		size_type storeIndex( get_index( mapIndex ) );
 		size_type erasedSlot( INVALID );
 		while ( true ) {
 			if ( storeIndex == INVALID ) {
@@ -516,9 +520,45 @@ private:
 			}
 			pertubator >>= HASH_PERTURBATION_SHIFT;
 			mapIndex = ( 5 * mapIndex + 1 + pertubator ) % static_cast<hash_value_t>( _cover );
-			storeIndex = indexMap[mapIndex];
+			storeIndex = get_index( mapIndex );
 		}
 		M_EPILOG
+	}
+	size_type get_index( hash_value_t probe_ ) const {
+		if ( _cover <= ( 1ULL << 7 ) ) {
+			return ( _indexMap.get<i8_t>()[ probe_ ] );
+		} else if ( _cover <= ( 1ULL << 15 ) ) {
+			return ( _indexMap.get<i16_t>()[ probe_ ] );
+		} else if ( _cover <= ( 1ULL << 31 ) ) {
+			return ( _indexMap.get<i32_t>()[ probe_ ] );
+		}
+		return ( _indexMap.get<size_type>()[ probe_ ] );
+	}
+	void set_index( hash_value_t probe_, size_type index_ ) {
+		if ( _cover <= ( 1ULL << 7 ) ) {
+			_indexMap.get<i8_t>()[ probe_ ] = static_cast<i8_t>( index_ );
+		} else if ( _cover <= ( 1ULL << 15 ) ) {
+			_indexMap.get<i16_t>()[ probe_ ] = static_cast<i16_t>( index_ );
+		} else if ( _cover <= ( 1ULL << 31 ) ) {
+			_indexMap.get<i32_t>()[ probe_ ] = static_cast<i32_t>( index_ );
+		} else {
+			_indexMap.get<size_type>()[ probe_ ] = index_;
+		}
+	}
+	void prune_index( size_type from_, size_type to_ ) {
+		if ( _cover <= ( 1ULL << 7 ) ) {
+			i8_t* indexMap( _indexMap.get<i8_t>() );
+			fill( indexMap + from_, indexMap + to_, static_cast<i8_t>( INVALID + 0 ) );
+		} else if ( _cover <= ( 1ULL << 15 ) ) {
+			i16_t* indexMap( _indexMap.get<i16_t>() );
+			fill( indexMap + from_, indexMap + to_, static_cast<i16_t>( INVALID + 0 ) );
+		} else if ( _cover <= ( 1ULL << 31 ) ) {
+			i32_t* indexMap( _indexMap.get<i32_t>() );
+			fill( indexMap + from_, indexMap + to_, static_cast<i32_t>( INVALID + 0 ) );
+		} else {
+			size_type* indexMap( _indexMap.get<size_type>() );
+			fill( indexMap + from_, indexMap + to_, INVALID + 0 );
+		}
 	}
 };
 
