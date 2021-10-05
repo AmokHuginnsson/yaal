@@ -43,7 +43,7 @@ struct hash<yaal::hcore::HTaggedPOD<key_t, TAG>> {
 	}
 };
 
-extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
+extern M_YAAL_HCORE_PUBLIC_API int long const _primes_[32];
 
 }
 

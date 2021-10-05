@@ -10,6 +10,7 @@
 #include <initializer_list>
 
 #include "hcore/hhashcontainer.hxx"
+#include "hcore/horderedhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 
 namespace yaal {
@@ -282,6 +283,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	void compact( void ) {
+		M_PROLOG
+		_engine.compact();
+		return;
+		M_EPILOG
+	}
 	template<typename iterator_t>
 	void insert( iterator_t first, iterator_t last ) {
 		M_PROLOG
@@ -451,7 +458,7 @@ public:
 		return ( _engine.node_id() );
 	}
 private:
-	friend class HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>;
+	friend class HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t, engine_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename hashmap_t::engine_type::HIterator const& it )
@@ -467,6 +474,20 @@ inline void swap(
 	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>& b ) {
 	a.swap( b );
 }
+
+template<
+	typename key_type_t, typename value_type_t,
+	typename hasher_t = hash<key_type_t>,
+	typename equal_key_t = yaal::equal_to<key_type_t>
+>
+using HOrderedHashMap = HHashMap<
+	key_type_t,
+	value_type_t,
+	hasher_t,
+	equal_key_t,
+	trait::no_type,
+	HOrderedHashContainer<HPair<key_type_t const, value_type_t>, hasher_t, equal_key_t, hashmap_helper<key_type_t, value_type_t>>
+>;
 
 }
 

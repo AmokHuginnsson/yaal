@@ -12,6 +12,11 @@ namespace yaal {
 
 namespace hcore {
 
+template<typename T>
+int long chunk_size( int long count_ ) {
+	return ( static_cast<int>( sizeof ( T ) ) * count_ );
+}
+
 /*! \brief Simplest raw memory provisioner.
  */
 class HChunk final {
@@ -53,6 +58,10 @@ public:
 	}
 	void free( void );
 	void* realloc( int long, STRATEGY = STRATEGY::GEOMETRIC );
+	template<typename T>
+	void* realloc( int long count_, STRATEGY strategy_ = STRATEGY::GEOMETRIC ) {
+		return ( realloc( chunk_size<T>( count_ ), strategy_ ) );
+	}
 	void swap( HChunk& );
 	int long get_size( void ) const {
 		return ( _size );
@@ -68,11 +77,6 @@ private:
 	HChunk( HChunk const& ) = delete;
 	HChunk& operator = ( HChunk const& ) = delete;
 };
-
-template<typename T>
-int long chunk_size( int long count_ ) {
-	return ( static_cast<int>( sizeof ( T ) ) * count_ );
-}
 
 inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b ) {
 	a.swap( b );
