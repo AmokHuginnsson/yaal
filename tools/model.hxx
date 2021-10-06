@@ -43,7 +43,7 @@ public:
 		NULL
 	};
 	typedef yaal::hcore::HArray<HValue> array_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HValue> members_t;
+	typedef yaal::hcore::HOrderedHashMap<yaal::hcore::HString, HValue> members_t;
 	typedef yaal::hcore::HVariant<yaal::hcore::HString, int long long, double long, yaal::hcore::HNumber, array_t, members_t, LITERAL> data_t;
 private:
 	data_t _data;
