@@ -403,6 +403,9 @@ void HLookup::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int
 	if ( it != _data.end() ) {
 		skip( thread_, it.node_id(), position_ );
 		_data.erase( it );
+		if ( ! _observers || _observers->is_empty() ) {
+			_data.compact();
+		}
 	}
 	return;
 	M_EPILOG
@@ -431,6 +434,9 @@ void HLookup::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
+	if ( ! _observers || _observers->is_empty() ) {
+		_data.compact();
+	}
 	return;
 	M_EPILOG
 }
