@@ -129,9 +129,6 @@ public:
 			M_ASSERT( _owner );
 			typename owner_t::HAtom const* store = _owner->_store.template get<typename owner_t::HAtom>();
 			size_type end( _owner->_size + _owner->_erased );
-			if ( _index == end ) {
-				_index = -1;
-			}
 			++ _index;
 			while ( _index < end ) {
 				if ( store[_index]._hash != EMPTY_SLOT ) {
@@ -145,10 +142,6 @@ public:
 			M_ASSERT( _owner );
 			typename owner_t::HAtom const* store = _owner->_store.template get<typename owner_t::HAtom>();
 			size_type end( _owner->_size + _owner->_erased );
-			if ( _index == 0 ) {
-				_index = -1;
-				return ( *this );
-			}
 			-- _index;
 			while ( _index >= 0 ) {
 				if ( store[_index]._hash != EMPTY_SLOT ) {
@@ -272,7 +265,7 @@ public:
 	}
 	HIterator begin( void ) const {
 		M_PROLOG
-		HIterator it( this, _size + _erased );
+		HIterator it( this, -1 );
 		return ( ++ it );
 		M_EPILOG
 	}

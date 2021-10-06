@@ -250,7 +250,7 @@ class HObjectFactory final : public HObjectFactoryBase {
 	HObjectPool<huginn::HList> _listPool;
 	HObjectPool<huginn::HDeque> _dequePool;
 	HObjectPool<huginn::HDict, POOL_TYPE::COLLECTION> _dictPool;
-	HObjectPool<huginn::HLookup, POOL_TYPE::COLLECTION> _lookupPool;
+	HObjectPool<huginn::HLookup> _lookupPool;
 	HObjectPool<huginn::HOrder, POOL_TYPE::COLLECTION> _orderPool;
 	HObjectPool<huginn::HSet, POOL_TYPE::COLLECTION> _setPool;
 	HObjectPool<huginn::HHeap> _heapPool;

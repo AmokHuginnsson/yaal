@@ -34,6 +34,7 @@ public:
 private:
 	huginn::HLookup::values_t* _lookup;
 	huginn::HLookup::values_t::iterator _it;
+	bool _valid;
 	value_getter_t _valueGetter;
 	HObjectFactory& _objectFactory;
 public:
@@ -41,6 +42,7 @@ public:
 		: HSkippingIterator( owner_ )
 		, _lookup( &owner_->value() )
 		, _it( _lookup->begin() )
+		, _valid( true )
 		, _valueGetter( type_ == TYPE::KEYS ? &HLookupIterator::get_key : &HLookupIterator::get_key_value )
 		, _objectFactory( objectFactory_ ) {
 		return;
@@ -56,7 +58,7 @@ protected:
 		return ( (this->*_valueGetter)() );
 	}
 	virtual bool do_is_valid( huginn::HThread*, int ) override {
-		return ( _it != _lookup->end() );
+		return ( _valid && ( _it != _lookup->end() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		if ( _skip == 0 ) {
@@ -66,7 +68,7 @@ protected:
 		}
 	}
 	virtual void do_invalidate( void ) override {
-		_it = _lookup->end();
+		_valid = false;
 	}
 	virtual void do_skip( HThread*, int ) override {
 		++ _it;
@@ -125,11 +127,13 @@ private:
 class HLookupReverseIterator : public HSkippingIterator {
 	huginn::HLookup::values_t* _lookup;
 	huginn::HLookup::values_t::reverse_iterator _it;
+	bool _valid;
 public:
 	HLookupReverseIterator( huginn::HLookup* owner_ )
 		: HSkippingIterator( owner_ )
 		, _lookup( &owner_->value() )
-		, _it( _lookup->rbegin() ) {
+		, _it( _lookup->rbegin() )
+		, _valid( true ) {
 		return;
 	}
 protected:
@@ -137,7 +141,7 @@ protected:
 		return ( _it->first );
 	}
 	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _it != _lookup->rend() );
+		return ( _valid && ( _it != _lookup->rend() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		if ( _skip == 0 ) {
@@ -147,7 +151,7 @@ protected:
 		}
 	}
 	virtual void do_invalidate( void ) override {
-		_it = _lookup->rend();
+		_valid = false;
 	}
 	virtual void do_skip( HThread*, int ) override {
 		++ _it;
@@ -350,10 +354,10 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-HLookup::HLookup( HClass const* class_, allocator_t const& allocator_ )
+HLookup::HLookup( HClass const* class_ )
 	: HInvalidatingIterable( class_ )
 	, _helper()
-	, _data( _helper, _helper, allocator_ ) {
+	, _data( _helper, _helper ) {
 	return;
 }
 
