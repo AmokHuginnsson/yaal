@@ -508,9 +508,10 @@ public:
 class HHuginn::HReferenceTracker {
 public:
 	typedef yaal::hcore::HArray<HHuginn::HNotifableReference*> observers_t;
+	typedef yaal::hcore::HResource<observers_t> observers_ptr_t;
 	typedef yaal::hcore::HArray<void const*> ids_t;
 protected:
-	observers_t _observers;
+	observers_ptr_t _observers;
 public:
 	HReferenceTracker( void );
 	virtual ~HReferenceTracker() {}

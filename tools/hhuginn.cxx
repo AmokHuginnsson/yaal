@@ -182,22 +182,29 @@ HHuginn::HReferenceTracker::HReferenceTracker( void )
 
 void HHuginn::HReferenceTracker::notify( HHuginn::HNotifableReference* ref_ ) {
 	M_PROLOG
-	_observers.push_back( ref_ );
+	if ( ! _observers ) {
+		_observers = make_resource<observers_t>();
+	}
+	_observers->push_back( ref_ );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::HReferenceTracker::forget( HHuginn::HNotifableReference* ref_ ) {
 	M_PROLOG
-	_observers.erase( find( _observers.begin(), _observers.end(), ref_ ) );
+	M_ASSERT( !! _observers );
+	_observers->erase( find( _observers->begin(), _observers->end(), ref_ ) );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::HReferenceTracker::invalidate( ids_t& ids_ ) {
 	M_PROLOG
+	if ( ! _observers ) {
+		return;
+	}
 	sort( ids_.begin(), ids_.end() );
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
+	for ( HHuginn::HNotifableReference* nr : *_observers ) {
 		M_ASSERT( dynamic_cast<huginn::HIdentifableReference*>( nr ) );
 		HIdentifableReference* ir( static_cast<huginn::HIdentifableReference*>( nr ) );
 		ids_t::const_iterator it( lower_bound( ids_.begin(), ids_.end(), ir->id() ) );
@@ -211,7 +218,10 @@ void HHuginn::HReferenceTracker::invalidate( ids_t& ids_ ) {
 
 void HHuginn::HReferenceTracker::invalidate( void ) {
 	M_PROLOG
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
+	if ( ! _observers ) {
+		return;
+	}
+	for ( HHuginn::HNotifableReference* nr : *_observers ) {
 		nr->invalidate();
 	}
 	return;
@@ -226,7 +236,10 @@ HInvalidatingIterable::HInvalidatingIterable( huginn::HClass const* class_ )
 
 void HInvalidatingIterable::skip( huginn::HThread* thread_, void const* id_, int position_ ) {
 	M_PROLOG
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
+	if ( ! _observers ) {
+		return;
+	}
+	for ( HHuginn::HNotifableReference* nr : *_observers ) {
 		M_ASSERT( dynamic_cast<huginn::HSkippingIterator*>( nr ) );
 		HSkippingIterator* si( static_cast<huginn::HSkippingIterator*>( nr ) );
 		if ( si->id() == id_ ) {
@@ -239,7 +252,10 @@ void HInvalidatingIterable::skip( huginn::HThread* thread_, void const* id_, int
 
 void HInvalidatingIterable::skip( huginn::HThread* thread_, int long from_, int long to_, int position_ ) {
 	M_PROLOG
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
+	if ( ! _observers ) {
+		return;
+	}
+	for ( HHuginn::HNotifableReference* nr : *_observers ) {
 		M_ASSERT( dynamic_cast<huginn::HBacktrackingIterator*>( nr ) );
 		HBacktrackingIterator* si( static_cast<huginn::HBacktrackingIterator*>( nr ) );
 		si->skip( thread_, from_, to_, position_ );
@@ -250,7 +266,10 @@ void HInvalidatingIterable::skip( huginn::HThread* thread_, int long from_, int 
 
 void HInvalidatingIterable::backtrack( huginn::HThread* thread_, int long index_, int position_ ) {
 	M_PROLOG
-	for ( HHuginn::HNotifableReference* nr : _observers ) {
+	if ( ! _observers ) {
+		return;
+	}
+	for ( HHuginn::HNotifableReference* nr : *_observers ) {
 		M_ASSERT( dynamic_cast<huginn::HBacktrackingIterator*>( nr ) );
 		static_cast<huginn::HBacktrackingIterator*>( nr )->backtrack( thread_, index_, position_ );
 	}
