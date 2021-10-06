@@ -327,6 +327,9 @@ int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, 
 		if ( longLived_.find( owner.raw() ) != longLived_.end() ) {
 			continue;
 		}
+		if ( ! owner->get_class() ) {
+			continue;
+		}
 		switch ( owner->type_id().get() ) {
 			case ( static_cast<int>( HHuginn::TYPE::LIST ) ):   freed = try_release<huginn::HList>( owner );   break;
 			case ( static_cast<int>( HHuginn::TYPE::DEQUE ) ):  freed = try_release<huginn::HDeque>( owner );  break;
@@ -334,6 +337,7 @@ int HObjectFactory::break_cycles( long_lived_t const& longLived_, void** used_, 
 			case ( static_cast<int>( HHuginn::TYPE::LOOKUP ) ): freed = try_release<huginn::HLookup>( owner ); break;
 			case ( static_cast<int>( HHuginn::TYPE::ORDER ) ):  freed = try_release<huginn::HOrder>( owner );  break;
 			case ( static_cast<int>( HHuginn::TYPE::SET ) ):    freed = try_release<huginn::HSet>( owner );    break;
+			case ( static_cast<int>( HHuginn::TYPE::HEAP ) ):   freed = try_release<huginn::HHeap>( owner );   break;
 			default: {
 				if ( HObject* o = dynamic_cast<HObject*>( owner.raw() ) ) {
 					freed = try_release( *o, _none );
@@ -353,6 +357,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 	typedef typename pool_type_info<huginn::HLookup>::pool_t lookup_pool_t;
 	typedef typename pool_type_info<huginn::HOrder>::pool_t  order_pool_t;
 	typedef typename pool_type_info<huginn::HSet>::pool_t    set_pool_t;
+	typedef typename pool_type_info<huginn::HHeap>::pool_t   heap_pool_t;
 	typedef typename pool_type_info<huginn::HObject>::pool_t object_pool_t;
 	typedef hcore::HBoundCall<int ( void**, int )> gc_t;
 	list_pool_t&   listPool( get_pool<huginn::HList>() );
@@ -361,6 +366,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 	lookup_pool_t& lookupPool( get_pool<huginn::HLookup>() );
 	order_pool_t&  orderPool( get_pool<huginn::HOrder>() );
 	set_pool_t&    setPool( get_pool<huginn::HSet>() );
+	heap_pool_t&   heapPool( get_pool<huginn::HHeap>() );
 	object_pool_t& objectPool( get_pool<huginn::HObject>() );
 	gc_t gc( hcore::call( &HObjectFactory::break_cycles, this, cref( longLived_ ), _1, _2 ) );
 	int dangling( 0 );
@@ -373,6 +379,7 @@ void HObjectFactory::cleanup( long_lived_t const& longLived_ ) {
 		freed += lookupPool.run_gc( gc );
 		freed += orderPool.run_gc( gc );
 		freed += setPool.run_gc( gc );
+		freed += heapPool.run_gc( gc );
 		freed += objectPool.run_gc( gc );
 		dangling += freed;
 	} while ( freed > 0 );

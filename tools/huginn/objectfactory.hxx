@@ -97,7 +97,7 @@ public:
 		return ( static_cast<pool_holder_t*>( phRaw )->get() );
 	}
 	template<typename T>
-	typename pool_type_info<T>::allocator_t get_allocator( void ) {
+	typename pool_type_info<T>::allocator_t get_allocator() {
 		return ( get_pool<T>() );
 	}
 private:
