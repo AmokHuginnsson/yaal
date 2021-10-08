@@ -127,9 +127,6 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		if ( ! ( ( len > 0 ) && ( *it >= '0' ) && ( *it <= '9' ) ) ) {
 			M_THROW( "not a number: `"_ys.append( str_ ).append( "`" ), 0 );
 		}
-		if ( *it == '0' ) {
-			len = 1;
-		}
 	}
 	while ( skip > 0 ) {
 		++ it;
@@ -189,6 +186,12 @@ int preparse_integer( HString const& str_, char* alternate_ ) {
 		M_THROW( "trailing spacer", len );
 	}
 	*alternate_ = 0;
+	while ( it != str_.end() ) {
+		if ( ! character_class<CHARACTER_CLASS::WHITESPACE>().has( *it ) ) {
+			M_THROW( "not whole string could be interpreted as an integer value", static_cast<int>( it - str_.begin() ) );
+		}
+		++ it;
+	}
 	return base;
 }
 

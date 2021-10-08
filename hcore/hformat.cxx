@@ -671,10 +671,12 @@ bool HFormat::HFormatImpl::has_width( HString const& s, int i ) {
 int HFormat::HFormatImpl::get_position( HString const& s, int& i ) {
 	M_PROLOG
 	M_ENSURE( ( i + 1 ) < s.get_length() );
-	int position = lexical_cast<int>( s.mid( i ) );
+	int start( i );
 	while ( ( s[ i ] >= '0' ) && ( s[ i ] <= '9' ) ) {
 		++ i;
 	}
+	HString n( s.begin() + start, s.begin() + i );
+	int position = lexical_cast<int>( n );
 	++ i; /* for '$' character. */
 	return position;
 	M_EPILOG

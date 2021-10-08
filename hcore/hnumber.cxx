@@ -600,7 +600,8 @@ void HNumber::from_string( HString const& number_ ) {
 		if ( exponentStartChar == '+'_ycp ) {
 			++ exponentStartIdx;
 		}
-		exponent = lexical_cast<int>( number_.substr( exponentStartIdx ) );
+		HString::size_type exponentEndIdx( number_.find_other_than( DIGITS, exponentIdx ) );
+		exponent = lexical_cast<int>( number_.substr( exponentStartIdx, ( exponentEndIdx != HString::npos ) ? ( exponentEndIdx - exponentStartIdx ) : HString::npos ) );
 	} while ( false );
 	if ( _leafCount == 0 ) {
 		_negative = false;

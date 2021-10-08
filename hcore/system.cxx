@@ -210,7 +210,7 @@ HResourceInfo get_memory_size_info( void ) {
 						++ it;
 						if ( it != t.end() ) {
 							tokens = *it;
-							tokens.trim( " \t" );
+							tokens.trim( " \tkB" );
 							*(tagVar._var) = lexical_cast<i64_t>( tokens ) * 1024;
 							++ hit;
 						}
