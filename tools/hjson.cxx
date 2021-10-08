@@ -42,9 +42,9 @@ void dump( HValue const& value_, yaal::hcore::HStreamInterface& out_, int indent
 	switch ( value_.type() ) {
 		case ( HValue::TYPE::STRING ): {
 			HString s( value_.get_string() );
-			escape( s, cxx_escape_table() );
-			EscapeSet es( "\"", 1 );
+			EscapeSet es( "\"\\", 2 );
 			escape( s, es );
+			escape( s, cxx_escape_table() );
 			out_ << '"' << s << '"';
 		} break;
 		case ( HValue::TYPE::INTEGER ): out_ << value_.get_integer(); break;
