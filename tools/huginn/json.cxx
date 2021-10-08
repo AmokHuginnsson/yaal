@@ -11,6 +11,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "stream.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "time.hxx"
 #include "json.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
@@ -189,6 +190,9 @@ public:
 			} break;
 			case ( tools::model::HValue::TYPE::NUMBER ): {
 				v = of.create_number( v_.get_number() );
+			} break;
+			case ( tools::model::HValue::TYPE::TIME ): {
+				v = of.create<huginn::HTime>( of.time_class(), v_.get_time() );
 			} break;
 			case ( tools::model::HValue::TYPE::LITERAL ): {
 				tools::model::HValue::LITERAL literal( v_.get_literal() );

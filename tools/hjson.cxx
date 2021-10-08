@@ -38,10 +38,11 @@ void indent( yaal::hcore::HStreamInterface& out_, int level_, bool enabled_ ) {
 void dump( HValue const& value_, yaal::hcore::HStreamInterface& out_, int indentLevel_, bool indent_ ) {
 	M_PROLOG
 	switch ( value_.type() ) {
-		case ( HValue::TYPE::STRING ):  out_ << '"' << value_.get_string()  << '"'; break;
+		case ( HValue::TYPE::STRING ):  out_ << '"' << value_.get_string() << '"'; break;
 		case ( HValue::TYPE::INTEGER ): out_ << value_.get_integer(); break;
 		case ( HValue::TYPE::REAL ):    out_ << value_.get_real(); break;
 		case ( HValue::TYPE::NUMBER ):  out_ << value_.get_number().to_string(); break;
+		case ( HValue::TYPE::TIME ):    out_ << '"' << value_.get_time().to_string() << '"'; break;
 		case ( HValue::TYPE::LITERAL ): {
 			switch ( value_.get_literal() ) {
 				case ( HValue::LITERAL::TRUE ):  out_ << "true";  break;

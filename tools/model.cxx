@@ -31,6 +31,10 @@ HValue::HValue( yaal::hcore::HNumber const& value_ )
 	: _data( value_ ) {
 }
 
+HValue::HValue( yaal::hcore::HTime const& value_ )
+	: _data( value_ ) {
+}
+
 HValue::HValue( LITERAL value_ )
 	: _data( value_ ) {
 }
@@ -61,6 +65,7 @@ bool HValue::operator == ( HValue const& other_ ) const {
 		case ( TYPE::INTEGER ): return ( get_integer() == other_.get_integer() );
 		case ( TYPE::REAL ):    return ( get_real()    == other_.get_real() );
 		case ( TYPE::NUMBER ):  return ( get_number()  == other_.get_number() );
+		case ( TYPE::TIME ):	  return ( get_time()    == other_.get_time() );
 		case ( TYPE::STRING ):  return ( get_string()  == other_.get_string() );
 		case ( TYPE::LITERAL ): return ( get_literal() == other_.get_literal() );
 		case ( TYPE::ARRAY ): {
@@ -195,6 +200,15 @@ yaal::hcore::HNumber const& HValue::get_number( void ) const {
 		throw HModelException( "Getting number from non-number value." );
 	}
 	return ( _data.get<yaal::hcore::HNumber>() );
+	M_EPILOG
+}
+
+yaal::hcore::HTime const& HValue::get_time( void ) const {
+	M_PROLOG
+	if ( _data.type() != static_cast<int>( TYPE::TIME ) ) {
+		throw HModelException( "Getting time from non-time value." );
+	}
+	return ( _data.get<yaal::hcore::HTime>() );
 	M_EPILOG
 }
 

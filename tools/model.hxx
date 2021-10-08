@@ -11,6 +11,7 @@
 #include "hcore/hhashmap.hxx"
 #include "hcore/hvariant.hxx"
 #include "hcore/hnumber.hxx"
+#include "hcore/htime.hxx"
 #include "hcore/hexception.hxx"
 
 namespace yaal {
@@ -30,9 +31,10 @@ public:
 		INTEGER = 1,
 		REAL = 2,
 		NUMBER = 3,
-		ARRAY = 4,
-		MAP = 5,
-		LITERAL = 6
+		TIME = 4,
+		ARRAY = 5,
+		MAP = 6,
+		LITERAL = 7
 	};
 	enum class LITERAL {
 #undef TRUE
@@ -44,7 +46,7 @@ public:
 	};
 	typedef yaal::hcore::HArray<HValue> array_t;
 	typedef yaal::hcore::HOrderedHashMap<yaal::hcore::HString, HValue> members_t;
-	typedef yaal::hcore::HVariant<yaal::hcore::HString, int long long, double long, yaal::hcore::HNumber, array_t, members_t, LITERAL> data_t;
+	typedef yaal::hcore::HVariant<yaal::hcore::HString, int long long, double long, yaal::hcore::HNumber, yaal::hcore::HTime, array_t, members_t, LITERAL> data_t;
 private:
 	data_t _data;
 public:
@@ -63,6 +65,7 @@ public:
 	HValue( double value_ ) : HValue( static_cast<double long>( value_ ) ) {}
 	HValue( float value_ ) : HValue( static_cast<double long>( value_ ) ) {}
 	HValue( yaal::hcore::HNumber const& );
+	HValue( yaal::hcore::HTime const& );
 	HValue( array_t const& );
 	HValue( array_t&& );
 	HValue( members_t const& );
@@ -84,6 +87,7 @@ public:
 	int long long get_integer( void ) const;
 	double long get_real( void ) const;
 	yaal::hcore::HNumber const& get_number( void ) const;
+	yaal::hcore::HTime const& get_time( void ) const;
 	LITERAL get_literal( void ) const;
 	array_t const& get_elements( void ) const;
 	array_t& get_elements( void );
