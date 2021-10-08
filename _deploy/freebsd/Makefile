@@ -21,7 +21,8 @@ LICENSE_PERMS=dist-mirror no-dist-sell pkg-mirror no-pkg-sell
 LIB_DEPENDS= \
 	libpcre.so:${PORTSDIR}/devel/pcre \
 	libxml2.so:${PORTSDIR}/textproc/libxml2 \
-	libxslt.so:${PORTSDIR}/textproc/libxslt
+	libxslt.so:${PORTSDIR}/textproc/libxslt \
+	libyaml.so:${PORTSDIR}/textproc/libyaml
 BUILD_DEPENDS= \
 	libtool:${PORTSDIR}/devel/libtool \
 	pkgconf:${PORTSDIR}/devel/pkgconf \

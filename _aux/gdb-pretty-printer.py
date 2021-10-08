@@ -60,7 +60,7 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HSet<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHSetPrinter( val_ )
-	regex = re.compile( "^yaal::hcore::HHashMap<.*>$" )
+	regex = re.compile( "^yaal::hcore::HHashMap<.*HHashContainer.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHHashMapPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HHashSet<.*>$" )

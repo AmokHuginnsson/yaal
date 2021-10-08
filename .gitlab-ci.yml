@@ -38,6 +38,7 @@ before_script:
     libtool
     libxml2-dev
     libxslt1-dev
+    libyaml-dev
     locales
     lsb-release
     make

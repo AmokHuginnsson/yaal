@@ -65,7 +65,7 @@ bool HValue::operator == ( HValue const& other_ ) const {
 		case ( TYPE::INTEGER ): return ( get_integer() == other_.get_integer() );
 		case ( TYPE::REAL ):    return ( get_real()    == other_.get_real() );
 		case ( TYPE::NUMBER ):  return ( get_number()  == other_.get_number() );
-		case ( TYPE::TIME ):	  return ( get_time()    == other_.get_time() );
+		case ( TYPE::TIME ):    return ( get_time()    == other_.get_time() );
 		case ( TYPE::STRING ):  return ( get_string()  == other_.get_string() );
 		case ( TYPE::LITERAL ): return ( get_literal() == other_.get_literal() );
 		case ( TYPE::ARRAY ): {

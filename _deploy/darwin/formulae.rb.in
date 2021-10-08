@@ -8,6 +8,8 @@ class Yaal < Formula
 	depends_on "pcre"
 	depends_on "libxml2"
 	depends_on "libxslt"
+	depends_on "libxslt"
+	depends_on "libyaml"
 	depends_on "openssl"
 	depends_on "gettext"
 	depends_on "sqlite"

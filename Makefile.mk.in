@@ -69,7 +69,7 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT),$(LIB_NAME)_)))
 # Solaris is seriously broken operating system.
 LIBS_BASE      = -lc
 HCORE_LIBS     = @HCORE_LIBS@ @PCRE_LIBS@ @SSL_LIBS@
-TOOLS_LIBS     = @TOOLS_LIBS@ @XML2_LIBS@ @XSLT_LIBS@ @EXSLT_LIBS@
+TOOLS_LIBS     = @TOOLS_LIBS@ @XML2_LIBS@ @XSLT_LIBS@ @EXSLT_LIBS@ @YAML_LIBS@
 
 LIBS_hcore     = $(LIBS_BASE) -lssl -lcrypto $(HCORE_LIBS)
 DEPS_tools     = $(TARGET_hcore)
