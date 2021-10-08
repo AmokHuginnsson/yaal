@@ -4,12 +4,14 @@
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hjson.hxx"
+#include "escape.hxx"
 #include "hcore/system.hxx"
 #include "tools/hidentifierlexer.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools::model;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
@@ -38,7 +40,13 @@ void indent( yaal::hcore::HStreamInterface& out_, int level_, bool enabled_ ) {
 void dump( HValue const& value_, yaal::hcore::HStreamInterface& out_, int indentLevel_, bool indent_ ) {
 	M_PROLOG
 	switch ( value_.type() ) {
-		case ( HValue::TYPE::STRING ):  out_ << '"' << value_.get_string() << '"'; break;
+		case ( HValue::TYPE::STRING ): {
+			HString s( value_.get_string() );
+			escape( s, cxx_escape_table() );
+			EscapeSet es( "\"", 1 );
+			escape( s, es );
+			out_ << '"' << s << '"';
+		} break;
 		case ( HValue::TYPE::INTEGER ): out_ << value_.get_integer(); break;
 		case ( HValue::TYPE::REAL ):    out_ << value_.get_real(); break;
 		case ( HValue::TYPE::NUMBER ):  out_ << value_.get_number().to_string(); break;
