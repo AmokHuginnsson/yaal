@@ -3,10 +3,10 @@
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "model.hxx"
 #include "objectfactory.hxx"
 #include "helper.hxx"
 #include "time.hxx"
+#include "model.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
