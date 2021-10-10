@@ -5,6 +5,7 @@
 *.tar
 *.tar.gz
 *.txz
+*.pkg
 *~
 .cproject
 .gdbhistory
