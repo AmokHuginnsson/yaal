@@ -1,0 +1,135 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  CONTINUOUS_INTEGRATION_SYSTEM: github-actions
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Service containers to run with `runner-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+      mariadb:
+        image: mariadb:latest
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Set Environment Variables
+        id: build_environment
+        run: |
+          umask 0077
+          echo "home=${HOME}" >> ${GITHUB_ENV}
+          echo "workspace=${GITHUB_WORKSPACE}" >> ${GITHUB_ENV}
+          echo "LC_CTYPE=pl_PL.UTF-8" >> ${GITHUB_ENV}
+          echo "LC_COLLATE=pl_PL.UTF-8" >> ${GITHUB_ENV}
+          echo "TZ=Europe/Warsaw" >> ${GITHUB_ENV}
+          echo "TIMESTAMP=$(date +%Y%m%d%H%M%S)" >> ${GITHUB_ENV}
+          echo "PREFIX=${HOME}/usr" >> ${GITHUB_ENV}
+          echo "SYSCONFDIR=${HOME}/etc/conf" >> ${GITHUB_ENV}
+          echo "LOCALSTATEDIR=${HOME}/var" >> ${GITHUB_ENV}
+          echo "TRESS_POSTGRESQL_HOST=localhost" >> ${GITHUB_ENV}
+          echo "TRESS_MYSQL_HOST=127.0.0.1" >> ${GITHUB_ENV}
+          echo "localhost:*:*:postgres:postgres" >> ${HOME}/.pgpass
+
+      - name: Setup the Machine for the build
+        run: |
+          git -C .. clone https://codestation.org/repo/buildbot.git
+          sudo bash -x ./../buildbot/deploy/docker/lib/setup-machine.sh
+          sudo apt-get install firebird3.0-server
+          sudo bash -x ./../buildbot/deploy/docker/lib/setup-firebird.sh
+          sudo systemctl start firebird3.0
+
+      - name: Cache Compilation Results
+        id: use-ccache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.home }}/.ccache
+            ${{ env.workspace }}/../tress
+          key: ${{ runner.os }}-ccache-${{ env.TIMESTAMP }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: Download regression suite
+        run: |
+          cd ..
+          mkdir -p tress
+          git -C tress init
+          git -C tress fetch https://codestation.org/repo/tress.git HEAD
+          git -C tress reset --hard FETCH_HEAD --
+
+      - name: Setup Databases
+        run: |
+          docker restart $(docker ps -a -q --filter ancestor=postgres)
+          docker restart $(docker ps -a -q --filter ancestor=mariadb:latest)
+          while ! mysqladmin --user=root --password=password --host=127.0.0.1 ping ; do
+            sleep 1
+          done
+          cd ../tress
+          psql -U postgres -h localhost template1 < data/postgresql.sql
+          mysql -u root --password=password -h 127.0.0.1 < data/mysql.sql
+          bash -x ./data/firebird.sh
+
+      - name: Install Development Configuration Files
+        run: |
+          umask 0077
+          make purge
+          make
+          make install
+
+      - name: Build the Package
+        run: |
+          umask 0077
+          make -C _deploy/debian clean package bundle BUILD_ID="-0codestation${TIMESTAMP}"
+
+      - name: Dump logs
+        if: failure()
+        run: |
+          cd ../tress
+          cat x_tress.log
+
+      - name: Upload the Artifact
+        env:
+          CODESTATION_GITHUB_ACTIONS_FTP_PASS: ${{ secrets.CODESTATION_GITHUB_ACTIONS_FTP_PASS }}
+        run: test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set ssl:verify-certificate off;set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "github-actions,${CODESTATION_GITHUB_ACTIONS_FTP_PASS}" codestation.org ; do true ; done
+
