@@ -126,6 +126,7 @@ foreach ( $t in $target ) {
 }
 
 try {
+	$global:ProgressPreference = "SilentlyContinue"
 	$origEnvPath=$env:Path
 	$stackSize = ( Get-Location -Stack ).Count
 	Push-Location $PSScriptRoot
