@@ -78,7 +78,7 @@ package:
     - |
       sudo -H -i -u hack sh -e -x << EOS
       umask 0077
-      export CONTINUOUS_INTEGRATION_SYSTEM="gitlab" TIMESTAMP=`date +%Y%m%d%H%M%S` DEFAULT_TARGET="debug"
+      export CONTINUOUS_INTEGRATION_SYSTEM="gitlab" TIMESTAMP=\$(date +%Y%m%d%H%M%S) DEFAULT_TARGET="debug"
       export PREFIX="\${HOME}/usr" SYSCONFDIR="\${HOME}/etc/conf" LOCALSTATEDIR="\${HOME}/var"
       export LC_CTYPE=pl_PL.UTF-8 LC_COLLATE=pl_PL.UTF-8 TZ=Europe/Warsaw
       export TRESS_POSTGRESQL_HOST=postgres TRESS_MYSQL_HOST=mysql
@@ -86,4 +86,4 @@ package:
       make install
       make -C _deploy/debian clean package bundle BUILD_ID="-0codestation\${TIMESTAMP}"
       EOS
-    - test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "gitlab,${GITLAB_FTP_PASS}" codestation.org ; do true ; done
+    - test -f debian/tmp/yaal-bundle.tar && while ! lftp -e 'set ssl:verify-certificate off;set xfer:timeout 4;set net:timeout 4;set net:persist-retries 1024;set net:max-retries 1024;set ftp:prefer-epsv false;set ftp:passive-mode true;put debian/tmp/yaal-bundle.tar;quit' -u "gitlab,${GITLAB_FTP_PASS}" codestation.org ; do true ; done
