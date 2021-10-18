@@ -34,10 +34,16 @@
 	<Type Name="yaal::hcore::HPointer&lt;*&gt;">
 		<DisplayString Condition="( _shared != 0 ) &amp;&amp; ( _shared->_referenceCounter[REFERENCE_COUNTER_TYPE::HOLDER] &gt; 0 )">{*_object}</DisplayString>
 		<DisplayString Condition="( _shared == 0 ) || ( _shared->_referenceCounter[REFERENCE_COUNTER_TYPE::HOLDER] == 0 )">nullptr</DisplayString>
+		<Expand>
+			<ExpandedItem>*_object</ExpandedItem>
+		</Expand>
 	</Type>
 	<Type Name="yaal::hcore::HResource&lt;*,*&gt;">
 		<DisplayString Condition="_holder._resource != 0">{*_holder._resource}</DisplayString>
 		<DisplayString Condition="_holder._resource == 0">nullptr</DisplayString>
+		<Expand>
+			<ExpandedItem>_holder._resource</ExpandedItem>
+		</Expand>
 	</Type>
 	<Type Name="yaal::hcore::HPair&lt;*,*&gt;">
 		<DisplayString>&lt;{first},{second}&gt;</DisplayString>
@@ -74,7 +80,7 @@
 			</LinkedListItems>
 		</Expand>
 	</Type>
-	<Type Name="yaal::hcore::HMap&lt;*,*,*,*,*&gt;" ExcludeView="ShowElementsByIndex">
+	<Type Name="yaal::hcore::HMap&lt;*,*,*,*,*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumLow">
 		<!--AlternativeType Name="yaal::hcore::HMultiMap&lt;*&gt;" /-->
 		<DisplayString>yaal::hcore::HMap from {"$T1"} to {"$T2"} of size {_engine._size}</DisplayString>
 		<Expand>
@@ -90,6 +96,85 @@
 			</TreeItems>
 		</Expand>
 	</Type>
+	<Type Name="yaal::hcore::HMap&lt;*,*,*,*,*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumLow">
+		<DisplayString>yaal::hcore::HLookupMap from {"$T1"} to {"$T2"} of size {_engine._data._size}</DisplayString>
+		<Expand>
+			<Item Name="size">_engine._data._size</Item>
+			<Item Name="[comparator]" ExcludeView="simple">_engine._compare</Item>
+			<ArrayItems>
+				<Size>_engine._data._size</Size>
+				<ValuePointer>_engine._data._buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	<Type Name="yaal::hcore::HSet&lt;*,*,*&gt;" ExcludeView="ShowElementsByIndex">
+		<!--AlternativeType Name="yaal::hcore::HMultiMap&lt;*&gt;" /-->
+		<DisplayString>yaal::hcore::HSet of {"$T1"} of size {_engine._size}</DisplayString>
+		<Expand>
+			<Item Name="size">_engine._size</Item>
+			<Item Name="[comparator]" ExcludeView="simple">_engine._compare</Item>
+			<Item Name="[allocator]" ExcludeView="simple">_engine._allocator</Item>
+			<TreeItems>
+				<!--Size>_key._size</Size-->
+				<HeadPointer>(engine_type::HNode*)_engine._root</HeadPointer>
+				<LeftPointer>(yaal::hcore::HSet&lt;$T1,$T2,$T3&gt;::engine_type::HNode*)_left</LeftPointer>
+				<RightPointer>(yaal::hcore::HSet&lt;$T1,$T2,$T3&gt;::engine_type::HNode*)_right</RightPointer>
+				<ValueNode>_key,view(MapHelper)</ValueNode>
+			</TreeItems>
+		</Expand>
+	</Type>
+	<Type Name="yaal::hcore::HHashMap&lt;*,*,*,*,*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumLow">
+		<DisplayString>yaal::hcore::HHashMap from {"$T1"} to {"$T2"} of size {_engine._size} with prime {_engine._prime}</DisplayString>
+		<Expand>
+			<Item Name="size">_engine._size</Item>
+			<Item Name="[hasher]" ExcludeView="simple">_engine._hasher</Item>
+			<Item Name="[equals]" ExcludeView="simple">_engine._equals</Item>
+			<Item Name="[allocator]" ExcludeView="simple">_engine._allocator</Item>
+			<CustomListItems>
+				<Variable Name="index" InitialValue="-1" />
+				<Variable Name="atom" InitialValue="(engine_type::HAtom*)nullptr" />
+				<Variable Name="buckets" InitialValue="(engine_type::HAtom**)_engine._buckets._data" />
+				<Size>_engine._size</Size>
+				<Loop>
+					<Loop>
+						<If Condition="atom != nullptr">
+							<Exec>atom = atom->_next</Exec>
+						</If>
+						<If Condition="atom == nullptr">
+							<Exec>++ index</Exec>
+							<Break Condition="index &gt;= _engine._prime"/>
+							<Exec>atom = buckets[index]</Exec>
+						</If>
+						<Break Condition="atom != nullptr"/>
+					</Loop>
+					<Break Condition="atom == nullptr"/>
+					<Item>atom->_value,na</Item>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+	<Type Name="yaal::hcore::HHashMap&lt;*,*,*,*,*&gt;" ExcludeView="ShowElementsByIndex" Priority="MediumLow">
+		<DisplayString>yaal::hcore::HOrderedHashMap from {"$T1"} to {"$T2"} of size {_engine._size} with cover {_engine._cover}</DisplayString>
+		<Expand>
+			<Item Name="size">_engine._size</Item>
+			<Item Name="[hasher]" ExcludeView="simple">_engine._hasher</Item>
+			<Item Name="[equals]" ExcludeView="simple">_engine._equals</Item>
+			<CustomListItems>
+				<Variable Name="index" InitialValue="-1" />
+				<Variable Name="store" InitialValue="(engine_type::HAtom*)_engine._store._data" />
+				<Size>_engine._size</Size>
+				<Loop>
+					<Loop>
+						<Exec>++ index</Exec>
+						<Break Condition="index &gt;= ( _engine._size + _engine._erased )"/>
+						<Break Condition="store[index]._hash != 0xffffffff"/>
+					</Loop>
+					<Break Condition="index &gt;= ( _engine._size + _engine._erased )"/>
+					<Item>store[index]._value,na</Item>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
 	<Type Name="yaal::hcore::HPair&lt;*,*&gt;" IncludeView="MapHelper">
 		<DisplayString>{second}</DisplayString>
 	</Type>
@@ -98,7 +183,10 @@
 		<DisplayString Condition="!_negative">{(yaal::hcore::HNumber::integer_t*)_canonical._data,[_leafCount]}</DisplayString>
 	</Type>
 	<Type Name="yaal::hcore::HTime">
-		<DisplayString>{_broken.tm_year + 1900}-{_broken.tm_mon + 1}-{_broken.tm_mday} {_broken.tm_hour}:{_broken.tm_min}:{_broken.tm_sec,d}</DisplayString>
+		<DisplayString>
+			{_broken.tm_year + 1900}-{(_broken.tm_mon + 1) / 10,d}{(_broken.tm_mon + 1) % 10,d}-{_broken.tm_mday / 10,d}{_broken.tm_mday % 10,d}
+			 {_broken.tm_hour / 10,d}{_broken.tm_hour % 10,d}:{_broken.tm_min / 10,d}{_broken.tm_min % 10,d}:{_broken.tm_sec / 10,d}{_broken.tm_sec % 10,d}
+		</DisplayString>
 	</Type>
 </AutoVisualizer>
 <!-- vim:set ft=xml:-->

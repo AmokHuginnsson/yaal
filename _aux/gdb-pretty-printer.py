@@ -63,6 +63,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HHashMap<.*HHashContainer.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHHashMapPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HHashMap<.*HOrderedHashContainer.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHOrderedHashMapPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HHashSet<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHHashSetPrinter( val_ )
@@ -717,6 +720,72 @@ class YaalHCoreHHashMapPrinter:
 
 	def to_string( self ):
 		return ( "yaal::hcore::HHashMap of `%s` to `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
+
+	def display_hint( self ):
+		return 'map'
+
+class OrderedHashContainerIterator( object ):
+	def __init__( self, atoms_, size_ ):
+		self._atom = atoms_
+		self._index = 0
+		self._size = size_
+		self._count = 0
+		while self._index < self._size:
+			if self._atom.dereference()['_hash'] != 0xffffffff:
+				break
+			self._index += 1
+			self._atom += 1
+
+	def do_next( self ):
+		while self._index < self._size:
+			self._index += 1
+			self._atom += 1
+			if self._atom.dereference()['_hash'] != 0xffffffff:
+				break
+
+	def value( self ):
+		return self._atom.dereference()['_value']
+
+class YaalHCoreHOrderedHashMapPrinter:
+	"Print a yaal::hcore::HOrderedHashMap"
+
+	class Iterator( OrderedHashContainerIterator ):
+		def __iter__( self ):
+			return self
+
+		def __next__( self ):
+			return ( self.next() )
+
+		def next( self ):
+			if self._count == ( self._size * 2 ):
+				raise StopIteration
+			count = self._count
+			if ( count % 2 ) == 0:
+				elt = self.value()['first']
+			else:
+				elt = self.value()['second']
+				self.do_next()
+			self._count = self._count + 1
+			return ( '[%d]' % count, elt )
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def nodeType( self ):
+		keyType = self._val.type.template_argument( 0 )
+		dataType = self._val.type.template_argument( 1 )
+		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s,%s>" % ( keyType.const(), dataType ) )
+		hasherType = self._val.type.template_argument( 2 );
+		equalType = self._val.type.template_argument( 3 );
+		nodeType = gdb.lookup_type( "yaal::hcore::HOrderedHashContainer<%s,%s,%s,yaal::hcore::hashmap_helper<%s,%s> >::HAtom" % ( valueType, hasherType, equalType, keyType, dataType ) ).pointer()
+		return nodeType
+
+	def children( self ):
+		it = self.Iterator( self._val['_engine']['_store']['_data'].cast( self.nodeType() ), self._val['_engine']['_size'] + self._val['_engine']['_erased'] )
+		return it
+
+	def to_string( self ):
+		return ( "yaal::hcore::HOrderedHashMap of `%s` to `%s` of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
