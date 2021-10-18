@@ -395,9 +395,9 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hc
 }
 
 template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
-yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hm_ ) {
 	M_PROLOG
-	return ( container_dump_name( out, hs_, "hash_map" ) );
+	return ( container_dump_name( out, hm_, "hash_map" ) );
 	M_EPILOG
 }
 
@@ -409,6 +409,24 @@ yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hc
 	typedef yaal::hcore::HPair<key_t, value_t> element_t;
 
 	return ( container_scan_name<hash_map_t, inserter_t, element_t>( in, hm_, static_cast<inserter_t>( &hash_map_t::insert ), "hash_map" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t>
+yaal::hcore::HStreamInterface& write( yaal::hcore::HStreamInterface& out, yaal::hcore::HOrderedHashMap<key_t, value_t, hasher_t> const& ohm_ ) {
+	M_PROLOG
+	return ( container_dump_name( out, ohm_, "ordered_hash_map" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t>
+yaal::hcore::HStreamInterface& read( yaal::hcore::HStreamInterface& in, yaal::hcore::HOrderedHashMap<key_t, value_t, hasher_t>& ohm_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HOrderedHashMap<key_t, value_t, hasher_t> ordered_hash_map_t;
+	typedef typename ordered_hash_map_t::insert_result ( ordered_hash_map_t::* inserter_t )( typename ordered_hash_map_t::value_type const& );
+	typedef yaal::hcore::HPair<key_t, value_t> element_t;
+
+	return ( container_scan_name<ordered_hash_map_t, inserter_t, element_t>( in, ohm_, static_cast<inserter_t>( &ordered_hash_map_t::insert ), "ordered_hash_map" ) );
 	M_EPILOG
 }
 
@@ -857,18 +875,34 @@ yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, 
 }
 
 template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hm_ ) {
 	M_PROLOG
 	using tools::stream::write;
-	return ( write( out, hs_ ) );
+	return ( write( out, hm_ ) );
 	M_EPILOG
 }
 
 template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
-yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t>& hs_ ) {
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t>& hm_ ) {
 	M_PROLOG
 	using tools::stream::read;
-	return ( read( in, hs_ ) );
+	return ( read( in, hm_ ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HOrderedHashMap<key_t, value_t, hasher_t> const& ohm_ ) {
+	M_PROLOG
+	using tools::stream::write;
+	return ( write( out, ohm_ ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t>
+yaal::hcore::HStreamInterface& operator >> ( yaal::hcore::HStreamInterface& in, yaal::hcore::HOrderedHashMap<key_t, value_t, hasher_t>& ohm_ ) {
+	M_PROLOG
+	using tools::stream::read;
+	return ( read( in, ohm_ ) );
 	M_EPILOG
 }
 
