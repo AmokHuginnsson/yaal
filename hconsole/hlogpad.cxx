@@ -15,7 +15,7 @@ namespace hconsole {
 
 HLogPad::HLogLine::HLogLine( void )
 	: _type( NONE )
-	, _attribute( COLOR::ATTR_NORMAL )
+	, _attribute( COLOR::ATTR_DEFAULT )
 	, _text() {
 	M_PROLOG
 	return;
@@ -35,7 +35,7 @@ HLogPad::HLogPad( HWindow* parent_, int row_, int column_,
 	, _lines( 0 )
 	, _offsetRow( 0 )
 	, _offsetColumn( 0 )
-	, _attribute( COLOR::ATTR_NORMAL )
+	, _attribute( COLOR::ATTR_DEFAULT )
 	, _contents() {
 	M_PROLOG
 	attr_.apply( *this );
@@ -55,8 +55,8 @@ void HLogPad::do_paint( void ) {
 	draw_label();
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( ' '_ycp, 0, _widthRaw );
-	COLOR::color_t bg( _focused ? COLOR::BG_GRAY : COLOR::BG_BLACK );
-	_attribute = COLOR::combine( COLOR::ATTR_NORMAL, bg );
+	COLOR::color_t bg( _focused ? COLOR::BG_GRAY : COLOR::ATTR_DEFAULT );
+	_attribute = COLOR::combine( COLOR::ATTR_DEFAULT, bg );
 	for ( int i( 0 ); i < _heightRaw; ++ i ) {
 		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer );
 	}
@@ -67,7 +67,7 @@ void HLogPad::do_paint( void ) {
 		int column( 0 ); /* total length of currently printed line */
 		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it ) {
 			if ( it->_type == HLogLine::ATTRIBUTE ) {
-				_attribute = COLOR::combine( it->_attribute, bg );
+				_attribute = ( it->_attribute != COLOR::ATTR_DEFAULT ) && ( bg == COLOR::ATTR_DEFAULT ) ? it->_attribute : COLOR::combine( it->_attribute, bg );
 			} else {
 				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) ) {
 					if ( _offsetColumn > column ) {

@@ -76,7 +76,10 @@ HRawFile::HRawFile( file_descriptor_t fd_, OWNERSHIP ownership_ )
 HRawFile::~HRawFile( void ) {
 	M_PROLOG
 	if ( ( _ownership == OWNERSHIP::ACQUIRED ) && ( _fileDescriptor >= 0 ) ) {
-		HRawFile::close();
+		try {
+			HRawFile::close();
+		} catch ( HOpenSSLException const& ) {
+		}
 	}
 	M_DESTRUCTOR_EPILOG
 }

@@ -161,13 +161,16 @@ void init_glyphs( void ) {
  */
 struct ATTR {
 	inline static int encode( int attr_ ) {
-		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>( attr_ ) ) ) );
+		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>( 1 + attr_ ) ) ) );
 	}
 	inline static int encode_bright_by_bold( int attr_ ) {
+		if ( attr_ == COLOR::ATTR_DEFAULT ) {
+			return static_cast<int>( COLOR_PAIR( static_cast<int unsigned>( 1 + attr_ ) ) );
+		}
 		return (
 			static_cast<int>(
 				COLOR_PAIR(
-					static_cast<int unsigned>(
+					1 + static_cast<int unsigned>(
 						( ( attr_ & COLOR::BG_MASK ) >> 1 )            /* background */
 						| ( attr_ & COLOR::FG_MASK )                   /* foreground */
 					)
@@ -177,19 +180,26 @@ struct ATTR {
 		);
 	}
 	inline static int decode( int color_, int ) {
-		return ( static_cast<int>( color_ ) );
+		return ( -1 + static_cast<int>( color_ ) );
 	}
 	inline static int decode_bright_by_bold( int color_, int attr_ ) {
+		int color( -1 + ( color_ & ~( static_cast<int>( A_BOLD | A_BLINK ) ) ) );
+		if ( color == -1 ) {
+			return color;
+		}
 		return (
 			static_cast<int>(
-				( color_ & static_cast<int>( obinary<0111>::value ) )
-				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) << 1 )
+				( color & static_cast<int>( obinary<0111>::value ) )
+				| ( ( color & static_cast<int>( obinary<0111000>::value ) ) << 1 )
 				| ( ( attr_ & static_cast<int>( A_BOLD ) ) ? COLOR::FG_BOLD : 0 )
 				| ( attr_ & static_cast<int>( A_BLINK ) ? COLOR::BG_BLINK : 0 )
 			)
 		);
 	}
 	inline static int encode_broken_bright_background( int attr_ ) {
+		if ( attr_ == COLOR::ATTR_DEFAULT ) {
+			return static_cast<int>( COLOR_PAIR( static_cast<int unsigned>( 1 + attr_ ) ) );
+		}
 		int attr( 0 );
 		/*
 		 * On broken terminals we use trick to get bright background,
@@ -200,7 +210,7 @@ struct ATTR {
 			attr = (
 				static_cast<int>(
 					COLOR_PAIR(
-						static_cast<int unsigned>(
+						1 + static_cast<int unsigned>(
 								( ( attr_ & COLOR::FG_MASK ) << 3 )
 							| ( ( attr_ & COLOR::BG_MASK ) >> 4 )
 						)
@@ -214,11 +224,15 @@ struct ATTR {
 		return attr;
 	}
 	inline static int decode_broken_bright_background( int color_, int attr_ ) {
+		int color( -1 + ( color_ & ~( static_cast<int>( A_BOLD | A_BLINK | A_REVERSE ) ) ) );
+		if ( color == -1 ) {
+			return color;
+		}
 		int attr( 0 );
 		if ( attr_ & static_cast<int>( A_REVERSE ) ) {
 			attr = static_cast<int>(
-				( ( color_ & static_cast<int>( obinary<0111>::value ) ) << 4 )
-				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) >> 3 )
+				( ( color & static_cast<int>( obinary<0111>::value ) ) << 4 )
+				| ( ( color & static_cast<int>( obinary<0111000>::value ) ) >> 3 )
 				| ( attr_ & static_cast<int>( A_BLINK ) ? COLOR::FG_BOLD : 0 )
 				| COLOR::BG_BLINK
 			);
@@ -358,19 +372,19 @@ void HConsole::enter_curses( void ) {
 	curs_set( CURSOR::INVISIBLE );
 	/* init color pairs */
 	M_ENSURE( use_default_colors() == OK );
-	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
+	M_ENSURE( assume_default_colors( -1, -1 ) == OK );
 	static int const COLOR_MAX( yaal::size( colors ) / ( _brightByBold ? 2 : 1 ) );
 	for ( int bg( 0 ); bg < COLOR_MAX; ++ bg ) {
 		for ( int fg( 0 ); fg < COLOR_MAX; ++ fg ) {
 			init_pair(
-				static_cast<short>( bg * COLOR_MAX + fg ),
+				static_cast<short>( 1 + bg * COLOR_MAX + fg ),
 				colors[ fg ],
 				colors[ bg ]
 			);
 		}
 	}
 	_enabled = true;
-	set_attr( COLOR::ATTR_NORMAL );
+	set_attr( COLOR::ATTR_DEFAULT );
 	set_background( _screenBackground_ );
 	if ( ::getenv( "YAAL_NO_MOUSE" ) ) {
 		_useMouse_ = USE_MOUSE::NO;
@@ -420,8 +434,8 @@ void HConsole::leave_curses( void ) {
 		static_cast<void>( mouse::mouse_close() );
 		_mouseDes = -1;
 	}
-	set_attr( COLOR::ATTR_NORMAL );
-	set_background( COLOR::ATTR_NORMAL );
+	set_attr( COLOR::ATTR_DEFAULT );
+	set_background( COLOR::ATTR_DEFAULT );
 	M_ENSURE( ::waddstr( static_cast<WINDOW*>( _window ), "" ) != ERR );
 	M_ENSURE( ::fflush( nullptr ) == 0 );
 	flushinp(); /* Always returns OK */
@@ -463,15 +477,15 @@ void HConsole::set_attr( COLOR::color_t attr_ ) const {
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}
-	char unsigned byte( static_cast<char unsigned>( attr_ ) );
+	int attr( static_cast<int>( attr_ ) );
 	fwd_wattrset(
 		static_cast<WINDOW*>( _window ),
 		! _brightByBold
-			? static_cast<attr_t>( ATTR::encode( byte ) )
+			? static_cast<attr_t>( ATTR::encode( attr ) )
 			: (
 				_brokenBrightBackground
-					? static_cast<attr_t>( ATTR::encode_broken_bright_background( byte ) )
-					: static_cast<attr_t>( ATTR::encode_bright_by_bold( byte ) )
+					? static_cast<attr_t>( ATTR::encode_broken_bright_background( attr ) )
+					: static_cast<attr_t>( ATTR::encode_bright_by_bold( attr ) )
 			)
 	);
 	return;
@@ -487,11 +501,11 @@ void HConsole::set_background( COLOR::color_t color_ ) const {
 		static_cast<WINDOW*>( _window ),
 		' ' | static_cast<chtype>(
 			! _brightByBold
-				? ATTR::encode( COLOR::FG_BLACK | color_ )
+				? ATTR::encode( color_ )
 				: (
 					_brokenBrightBackground
-						? ATTR::encode_broken_bright_background( COLOR::FG_BLACK | color_ )
-						: ATTR::encode_bright_by_bold( COLOR::FG_BLACK | color_ )
+						? ATTR::encode_broken_bright_background( color_ )
+						: ATTR::encode_bright_by_bold( color_ )
 				)
 		)
 	); /* meaningless value from macro */

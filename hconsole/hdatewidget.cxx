@@ -81,7 +81,7 @@ void HDateWidget::do_paint( void ) {
 		++ rowOffset;
 		int firstDayOfMonthInWeekIdx( get_first_day_of_month_in_week_index() );
 		int weeksInMonth( ( _time.get_days_in_month() + firstDayOfMonthInWeekIdx + HTime::DAYS_IN_WEEK - 1 ) / HTime::DAYS_IN_WEEK );
-		cons.set_attr( COLOR::ATTR_NORMAL );
+		cons.set_attr( COLOR::ATTR_DEFAULT );
 		cons.mvprintf( _rowRaw + rowOffset + 5, _columnRaw, "%*c", CAL_EDIT_WIDTH, ' ' );
 		set_attr_data();
 		for ( int i( 0 ); i < weeksInMonth; ++ i ) {

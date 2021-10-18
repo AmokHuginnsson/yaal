@@ -54,7 +54,6 @@ struct COLOR {
 		BG_BRIGHTCYAN    = BG_CYAN      | BG_BLINK,
 		BG_WHITE         = BG_LIGHTGRAY | BG_BLINK,
 		BG_MASK          = 0x70,
-		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1,
 		ATTR_RESET       = 256,
 		ATTR_BOLD        = 512,

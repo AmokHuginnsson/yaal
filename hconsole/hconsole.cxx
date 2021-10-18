@@ -23,7 +23,7 @@ namespace yaal {
 namespace hconsole {
 
 int _latency_ = 1;
-COLOR::color_t _screenBackground_ = COLOR::BG_BLACK;
+COLOR::color_t _screenBackground_ = COLOR::ATTR_DEFAULT;
 HWidget::OAttribute _attributeDisabled_ = {
 	static_cast<COLOR::color_t>( COLOR::FG_GREEN | COLOR::BG_BLACK | COLOR::BG_BLINK ),
 	static_cast<COLOR::color_t>( COLOR::FG_LIGHTGRAY | COLOR::BG_BLACK | COLOR::BG_BLINK )

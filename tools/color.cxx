@@ -35,6 +35,7 @@ COLOR::color_t COLOR::fg_to_bg( COLOR::color_t fg_ ) {
 		case ( FG_BRIGHTMAGENTA ): bg = BG_BRIGHTMAGENTA; break;
 		case ( FG_BRIGHTCYAN ):    bg = BG_BRIGHTCYAN;    break;
 		case ( FG_WHITE ):         bg = BG_WHITE;         break;
+		case ( ATTR_DEFAULT ):     bg = ATTR_DEFAULT;     break;
 		default: {
 			M_THROW( "Invalid color:", fg_ );
 		}
@@ -44,10 +45,38 @@ COLOR::color_t COLOR::fg_to_bg( COLOR::color_t fg_ ) {
 }
 
 COLOR::color_t COLOR::complementary( COLOR::color_t attr_ ) {
-	return ( static_cast<COLOR::color_t>( ~attr_ ) );
+	if ( attr_ == COLOR::ATTR_DEFAULT ) {
+		return COLOR::ATTR_REVERSE;
+	}
+	return ( static_cast<COLOR::color_t>( static_cast<int unsigned>( ~attr_ ) & 0xff ) );
+}
+
+inline COLOR::color_t complementary_default( COLOR::color_t attr_ ) {
+	if ( attr_ == COLOR::ATTR_DEFAULT ) {
+		return COLOR::ATTR_REVERSE;
+	}
+	int unsigned attr( static_cast<int unsigned>( attr_ ) );
+	int unsigned mask( 0xff );
+	if ( ( attr & 0x0f ) == 0 ) {
+		attr >>= 4;
+		mask = 0x0f;
+	} else if ( ( attr & 0xf0 ) == 0 ) {
+		attr <<= 4;
+		mask = 0xf0;
+	}
+	return ( static_cast<COLOR::color_t>( static_cast<int unsigned>( ~attr ) & mask ) );
 }
 
 COLOR::color_t COLOR::combine( COLOR::color_t part1_, COLOR::color_t part2_ ) {
+	if ( ( part1_ == COLOR::ATTR_DEFAULT ) && ( part2_ == COLOR::ATTR_DEFAULT ) ) {
+		return ( COLOR::ATTR_DEFAULT );
+	}
+	if ( part1_ == COLOR::ATTR_DEFAULT ) {
+		part1_ = complementary_default( part2_ );
+	}
+	if ( part2_ == COLOR::ATTR_DEFAULT ) {
+		part2_ = complementary_default( part1_ );
+	}
 	return ( static_cast<COLOR::color_t>( part1_ | part2_ ) );
 }
 
@@ -97,6 +126,8 @@ COLOR::color_t COLOR::from_string( yaal::hcore::HString const& name_ ) {
 		color = ATTR_BLINK;
 	} else if ( name == "reverse" ) {
 		color = ATTR_REVERSE;
+	} else if ( name == "default" ) {
+		color = ATTR_DEFAULT;
 	} else {
 		throw HColorException( "Bad color name: `"_ys.append( name_ ).append( "'." ) );
 	}

@@ -124,7 +124,10 @@ HSocket::HSocket( socket_type_t const& socketType_,
 HSocket::~HSocket( void ) {
 	M_PROLOG
 	if ( _needShutdown ) {
-		shutdown();
+		try {
+			shutdown();
+		} catch ( HOpenSSLException const& ) {
+		}
 	}
 	/*
 	 * There will be no memory leakage if shutdown() throws,

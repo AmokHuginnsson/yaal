@@ -237,7 +237,7 @@ command_compose_delay 16
 # colors common to all windows and controls
 
 # screen background color
-screen_background BLACK
+screen_background DEFAULT
 
 # color attributes for disabled control
 attribute_disabled GREEN GRAY LIGHTGRAY GRAY
