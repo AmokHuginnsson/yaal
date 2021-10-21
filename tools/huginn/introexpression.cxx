@@ -38,7 +38,6 @@ void HIntroExpression::get_variable_reference(
 ) {
 	M_PROLOG
 	frame_->values().emplace( frame_->thread()->object_factory().create_reference( frame_->get_variable_reference( execionStep_._index ) ) );
-	frame_->note_variable( execionStep_._identifierId, execionStep_._index );
 	return;
 	M_EPILOG
 }

@@ -130,6 +130,9 @@ void HFrame::note_variable( HHuginn::identifier_id_t identifier_ ) {
 
 void HFrame::note_variable( HHuginn::identifier_id_t identifier_, int index_ ) {
 	M_PROLOG
+	if ( _variableIdentifiers.get_size() >= _variables.get_size() ) {
+		_variableIdentifiers.resize( _variables.get_size() - 1 );
+	}
 	if ( static_cast<int>( _variableIdentifiers.get_size() ) == index_ ) {
 		_variableIdentifiers.push_back( identifier_ );
 	}
