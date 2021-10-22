@@ -286,12 +286,12 @@ OCompiler::OCompiler( HRuntime* runtime_ )
 
 void OCompiler::reset( int undoSteps_ ) {
 	M_PROLOG
-	_fileId = INVALID_FILE_ID;
-	_preloaded = false;
-	_isModule = false;
 	_mainCompiledStatementCount -= undoSteps_;
 	_mainExecutedStatementCount = _mainCompiledStatementCount;
 	_isIncremental = true;
+	_fileId = INVALID_FILE_ID;
+	_preloaded = false;
+	_isModule = false;
 	_scopeContextCache.clear();
 	_functionContextCache.clear();
 	_statementIdGenerator = INVALID_STATEMENT_IDENTIFIER;

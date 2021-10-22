@@ -278,7 +278,7 @@ int long HFile::do_read_some( void* buffer_, int long size_ ) {
 	if ( ! wasNonBlocking ) {
 		::fcntl( fd, F_SETFL, statusFlags );
 	}
-	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
+	return ( len ? len : ( ::std::feof( static_cast<FILE*>( _handle ) ) ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) ) );
 	M_EPILOG
 }
 

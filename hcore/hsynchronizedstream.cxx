@@ -1006,7 +1006,7 @@ bool HSynchronizedStream::do_good( void ) const {
 bool HSynchronizedStream::do_fail( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
-	bool failed( true );
+	bool failed( false );
 	if ( _streamRef == this ) {
 		failed = HStreamInterface::do_fail();
 	} else if ( _streamRef )  {
@@ -1021,9 +1021,9 @@ bool HSynchronizedStream::do_bad( void ) const {
 	HLock l( _mutex );
 	bool isBad( false );
 	if ( _streamRef == this ) {
-		isBad = HStreamInterface::do_good();
+		isBad = HStreamInterface::do_bad();
 	} else if ( _streamRef )  {
-		isBad = _streamRef->good();
+		isBad = _streamRef->bad();
 	}
 	return isBad;
 	M_EPILOG
