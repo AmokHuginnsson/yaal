@@ -1226,6 +1226,9 @@ HIntrospecteeInterface::variable_views_t HRuntime::get_locals( HThread* thread_,
 		HFrame::identifiers_t const& variableIdentifiers( f->variable_identifiers() );
 		M_ASSERT( variableIdentifiers.get_size() >= variableValues.get_size() );
 		for ( int i( 0 ), COUNT( static_cast<int>( variableValues.get_size() ) ); i < COUNT; ++ i ) {
+			if ( ! variableValues[i] ) {
+				continue;
+			}
 			variableViews.emplace_back( identifier_name( variableIdentifiers[ i ] ), variableValues[ i ] );
 		}
 	}

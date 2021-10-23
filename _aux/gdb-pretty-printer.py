@@ -12,7 +12,7 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HPointer<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHPointerPrinter( val_ )
-	regex = re.compile( "^yaal::tools::huginn::HValueReference<.*>$" )
+	regex = re.compile( "^yaal::tools::huginn::HValueReference(Observer)?<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalToolsHuginnHValueReferencePrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HResource<.*>$" )
@@ -81,8 +81,10 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::tools::HRing<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalToolsHRingPrinter( val_ )
-
 	return None
+
+def template( s_ ):
+	return s_.replace( ">>", "> >" ).replace( ">>", "> >" )
 
 class YaalHCoreHPointerPrinter:
 	"Print a yaal::hcore::HPointer"
@@ -138,6 +140,7 @@ class YaalToolsHuginnHValueReferencePrinter:
 		LookupType    = gdb.lookup_type( "yaal::tools::huginn::HLookup" ).pointer()
 		OrderType     = gdb.lookup_type( "yaal::tools::huginn::HOrder" ).pointer()
 		SetType       = gdb.lookup_type( "yaal::tools::huginn::HSet" ).pointer()
+		HeapType      = gdb.lookup_type( "yaal::tools::huginn::HHeap" ).pointer()
 
 		NONE      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::NONE" )[0].value() )
 		BOOLEAN   = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::BOOLEAN" )[0].value() )
@@ -153,6 +156,7 @@ class YaalToolsHuginnHValueReferencePrinter:
 		ORDER     = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::ORDER" )[0].value() )
 		LOOKUP    = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::LOOKUP" )[0].value() )
 		SET       = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::SET" )[0].value() )
+		HEAP      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::HEAP" )[0].value() )
 		BLOB      = int( gdb.lookup_symbol( "yaal::tools::HHuginn::TYPE::BLOB" )[0].value() )
 		Scalars = {
 			NONE:      ValueType,
@@ -170,17 +174,31 @@ class YaalToolsHuginnHValueReferencePrinter:
 			DICT:   DictType,
 			ORDER:  OrderType,
 			LOOKUP: LookupType,
-			SET:    SetType
+			SET:    SetType,
+			HEAP:   HeapType
 		}
 		print( "Huginn debug utility loaded." )
 	except Exception as e:
 		pass
 	class ValuePrinter:
-		def __init__( self_, ptr_, typeId_ ):
+		def __init__( self_, ptr_, class_, valueFieldName_ = "_value" ):
 			self_._ptr = ptr_
-			self_._class = YaalToolsHuginnHValueReferencePrinter.Scalars.get( typeId_ )
+			self_._class = class_
+			self_._valueFieldName = valueFieldName_
 		def to_string( self_ ):
-			return self_._ptr.cast( self_._class )["_value"]
+			return self_._ptr.cast( self_._class )[self_._valueFieldName]
+		def display_hint( self_ ):
+			return "string"
+	class NonePrinter:
+		def to_string( self_ ):
+			return "none"
+		def display_hint( self_ ):
+			return "string"
+	class ClassNamePrinter:
+		def __init__( self_, className_ ):
+			self_._className = className_
+		def to_string( self_ ):
+			return self_._className
 		def display_hint( self_ ):
 			return "string"
 	def __init__( self, val_ ):
@@ -190,6 +208,8 @@ class YaalToolsHuginnHValueReferencePrinter:
 		shared = self._val["_shared"]
 		if shared == 0:
 			return
+		if shared["_referenceCounter"][0] == 0:
+			return
 		baseType = YaalToolsHuginnHValueReferencePrinter.Scalars.get( 0 )
 		self._ptr = shared["_referenceCounter"][2].address.cast( baseType )
 		refType = self._val.type.template_argument( 0 ).unqualified().name
@@ -198,12 +218,30 @@ class YaalToolsHuginnHValueReferencePrinter:
 			self._innerPrinter = yaal_lookup_function( self._ptr )
 			return
 		typeId = int( self._ptr["_class"]["_typeId"]["_value"] )
-		if YaalToolsHuginnHValueReferencePrinter.Scalars and ( typeId in YaalToolsHuginnHValueReferencePrinter.Scalars ):
-			self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.ValuePrinter( self._ptr, typeId )
+		if typeId == YaalToolsHuginnHValueReferencePrinter.NONE:
+			self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.NonePrinter()
+		elif YaalToolsHuginnHValueReferencePrinter.Scalars and ( typeId in YaalToolsHuginnHValueReferencePrinter.Scalars ):
+			self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.ValuePrinter( self._ptr, YaalToolsHuginnHValueReferencePrinter.Scalars.get( typeId ) )
 		elif YaalToolsHuginnHValueReferencePrinter.Collections and ( typeId in YaalToolsHuginnHValueReferencePrinter.Collections ):
 			self._innerPrinter = yaal_lookup_function( self._ptr.cast( YaalToolsHuginnHValueReferencePrinter.Collections.get( typeId ) )["_data"] )
 		else:
-			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+			try:
+				identifier = int( self._ptr["_class"]["_identifierId"]["_value"] )
+				className = str( self._ptr["_class"]["_runtime"].dereference()["_identifierNames"]["_buf"][identifier] )
+				className = className.strip( "\"*" )
+				className = "".join( map( lambda x: x.title(), className.split( "_" ) ) )
+				cls = gdb.lookup_type( f"yaal::tools::huginn::H{className}" ).pointer()
+				valueFieldName = "_value"
+				if className == "Time":
+					valueFieldName = "_time"
+				elif className == "FunctionReference":
+					valueFieldName = "_identifierId"
+				else:
+					self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.ClassNamePrinter( className )
+				if self._innerPrinter is None:
+					self._innerPrinter = YaalToolsHuginnHValueReferencePrinter.ValuePrinter( self._ptr, cls, valueFieldName )
+			except:
+				self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
 		if self._innerPrinter is None:
 			return
 		if hasattr( self._innerPrinter, "children" ):
@@ -536,11 +574,13 @@ class YaalHCoreHMapPrinter:
 			if self._count == ( self._size * 2 ):
 				raise StopIteration
 			count = self._count
-			valueType = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
+			keyType = self._owner.type.template_argument( 0 )
+			dataType = self._owner.type.template_argument( 1 )
+			valueType = gdb.lookup_type( template( f"yaal::hcore::HPair<{keyType} const, {dataType}>" ) )
 			compareType = self._owner.type.template_argument( 2 )
-			helperType = "yaal::hcore::map_helper<%s,%s>" % ( self._owner.type.template_argument( 0 ), self._owner.type.template_argument( 1 ) )
+			helperType = template( f"yaal::hcore::map_helper<{keyType},{dataType}>" )
 			allocatorType = self._owner.type.template_argument( 3 )
-			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,%s,%s >::HNode" % ( valueType, compareType, helperType, allocatorType ) ).pointer()
+			nodeType = gdb.lookup_type( template( f"yaal::hcore::HSBBSTree<{valueType},{compareType},{helperType},{allocatorType}>::HNode" ) ).pointer()
 			if ( count % 2 ) == 0:
 				elt = self._item.cast( nodeType )['_key']['first']
 			else:
@@ -625,7 +665,11 @@ class YaalHCoreHSetPrinter:
 			valueType = self._owner.type.template_argument( 0 )
 			compareType = self._owner.type.template_argument( 1 )
 			allocatorType = self._owner.type.template_argument( 2 )
-			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,yaal::hcore::set_helper<%s>,%s >::HNode" % ( valueType, compareType, valueType, allocatorType ) ).pointer()
+			nodeType = gdb.lookup_type(
+				template(
+					f"yaal::hcore::HSBBSTree<{valueType},{compareType},yaal::hcore::set_helper<{valueType}>,{allocatorType}>::HNode"
+				)
+			).pointer()
 			elt = self._item.cast( nodeType )['_key']
 			self._item = self.do_next( self._item )
 			self._count = self._count + 1
@@ -702,11 +746,15 @@ class YaalHCoreHHashMapPrinter:
 	def nodeType( self ):
 		keyType = self._val.type.template_argument( 0 )
 		dataType = self._val.type.template_argument( 1 )
-		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s,%s>" % ( keyType.const(), dataType ) )
+		valueType = gdb.lookup_type( template( f"yaal::hcore::HPair<{keyType} const,{dataType}>" ) )
 		hasherType = self._val.type.template_argument( 2 );
 		equalType = self._val.type.template_argument( 3 );
 		allocatorType = self._val.type.template_argument( 4 );
-		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,%s,yaal::hcore::hashmap_helper<%s,%s>,%s >::HAtom" % ( valueType, hasherType, equalType, keyType, dataType, allocatorType ) ).pointer()
+		nodeType = gdb.lookup_type(
+			template(
+				f"yaal::hcore::HHashContainer<{valueType},{hasherType},{equalType},yaal::hcore::hashmap_helper<{keyType},{dataType}>,{allocatorType}>::HAtom"
+			)
+		).pointer()
 		return nodeType
 
 	def buckets( self ):
@@ -774,10 +822,14 @@ class YaalHCoreHOrderedHashMapPrinter:
 	def nodeType( self ):
 		keyType = self._val.type.template_argument( 0 )
 		dataType = self._val.type.template_argument( 1 )
-		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s,%s>" % ( keyType.const(), dataType ) )
+		valueType = gdb.lookup_type( template( f"yaal::hcore::HPair<{keyType.name} const,{dataType.name}>" ) )
 		hasherType = self._val.type.template_argument( 2 );
 		equalType = self._val.type.template_argument( 3 );
-		nodeType = gdb.lookup_type( "yaal::hcore::HOrderedHashContainer<%s,%s,%s,yaal::hcore::hashmap_helper<%s,%s> >::HAtom" % ( valueType, hasherType, equalType, keyType, dataType ) ).pointer()
+		nodeType = gdb.lookup_type(
+			template(
+				f"yaal::hcore::HOrderedHashContainer<{valueType},{hasherType},{equalType},yaal::hcore::hashmap_helper<{keyType},{dataType}>>::HAtom"
+			)
+		).pointer()
 		return nodeType
 
 	def children( self ):
