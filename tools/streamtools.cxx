@@ -199,6 +199,17 @@ HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ ) {
 
 namespace stream {
 
+void close( yaal::hcore::HStreamInterface& stream_ ) {
+	try {
+		if ( dynamic_cast<HRawFile*>( &stream_ ) ) {
+			static_cast<HRawFile&>( stream_ ).close();
+		} else if ( dynamic_cast<HFile*>( &stream_ ) ) {
+			static_cast<HFile&>( stream_ ).close();
+		}
+	} catch ( ... ) {
+	}
+}
+
 int long pump( yaal::hcore::HStreamInterface& source_, yaal::hcore::HStreamInterface& sink_ ) {
 	M_PROLOG
 	return ( pump( source_, sink_, system::get_page_size() ) );

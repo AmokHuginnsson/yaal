@@ -19,6 +19,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/duration.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
+#include "streamtools.hxx"
 #include "hterminal.hxx"
 #ifdef __HOST_OS_TYPE_CYGWIN__
 /* Work around for buggy child process handling in Cygwin. */
@@ -66,13 +67,8 @@ inline int stream_to_fd( yaal::hcore::HStreamInterface const* stream_ ) {
 
 static void close_and_invalidate( HStreamInterface::ptr_t& stream_ ) {
 	M_PROLOG
-	try {
-		if ( dynamic_cast<HRawFile*>( stream_.raw() ) ) {
-			static_cast<HRawFile*>( stream_.raw() )->close();
-		} else if ( dynamic_cast<HFile*>( stream_.raw() ) ) {
-			static_cast<HFile*>( stream_.raw() )->close();
-		}
-	} catch ( ... ) {
+	if ( !! stream_ ) {
+		stream::close( *stream_ );
 	}
 	stream_.reset();
 	return;

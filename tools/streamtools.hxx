@@ -70,6 +70,7 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 
 namespace stream {
 
+void close( yaal::hcore::HStreamInterface& );
 int long pump( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface& );
 int long pump( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, int );
 

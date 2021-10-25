@@ -40,6 +40,7 @@ public:
 	static HHuginn::value_t serialize( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t seek( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	static HHuginn::value_t pump_to( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
+	static HHuginn::value_t close( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t&, int );
 	bool is_valid( void ) const;
 	static HHuginn::class_t get_class( HRuntime* );
 	void raise( HThread*, yaal::hcore::HString const&, int, HClass const* = nullptr ) const;

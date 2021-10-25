@@ -140,6 +140,7 @@ public:
 			{ "write_line",      runtime_->create_method( &HStream::write_line ),  "( *strVal* ) - write entriety of given *strVal* info this stream" },
 			{ "serialize",       runtime_->create_method( &HStream::serialize ),   "( *val* ) - serialize given *val* info this stream" },
 			{ "pump_to",         runtime_->create_method( &HStream::pump_to ),     "( *otherStream* ) - rewrite all data that could be read from *thisStream* to *otherStream*" },
+			{ "close",           runtime_->create_method( &HStream::close ),       "close this `Stream`, no further operations will be available" },
 		};
 		redefine( nullptr, fd );
 		_seekEnumerationClass = add_enumeration_as_member(
@@ -402,6 +403,16 @@ HHuginn::value_t HStream::pump_to( huginn::HThread* thread_, HHuginn::value_t* o
 		src->raise( thread_, e.what(), position_ );
 	}
 	return ( copiedBytes >= 0 ? of.create_integer( copiedBytes ) : of.none_value() );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::close( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Stream.close", values_, 0, 0, thread_, position_ );
+	HStream* stream( static_cast<HStream*>( object_->raw() ) );
+	tools::stream::close( *stream->raw() );
+	HObjectFactory& of( thread_->object_factory() );
+	return ( of.none_value() );
 	M_EPILOG
 }
 
