@@ -10,7 +10,7 @@
 
 ## Software:
   - Debian (latest development branch, currently `unstable` aka `Sid`, and always latest stable release)
-  - Ubuntu (latest development branch and latest stable release, currently 20.04 and 21.04 respectively)
+  - Ubuntu (latest development branch and latest stable release, currently 20.04 and 21.10 respectively)
   - CentOS (latest stable release, currently 8)
   - Fedora (latest stable release, currently 34)
   - FreeBSD (latest stable release, currently 13.0-RELEASE)
