@@ -609,7 +609,10 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ), parser_ & PARSER::IGNORE_CONVERSION_ERRORS );
-				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data() ) >= 0 ) ) {
+				if (
+					( ( ( parser_ & PARSER::KEEP_EMPTY ) == PARSER::KEEP_EMPTY ) && ( _varTmpBuffer.find_one_of( "\r\n" ) == HString::npos ) )
+					|| ( _varTmpBuffer.find_other_than( character_class<CHARACTER_CLASS::WHITESPACE>().data() ) != HString::npos )
+				) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 				}
 			}
@@ -952,7 +955,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 		} else if ( type == HXml::HNode::TYPE::CONTENT ) {
 			HString const& value = (*it).get_value();
 			_xml->_utf8[0] = value;
-			if ( ! value.is_empty() && ( value[0] == '&' ) && ( value[value.get_length() - 1] == ';' ) ) {
+			if ( ! value.is_empty() && ( ( value.front() == '&' ) && ( value.back() == ';' ) ) ) {
 				rc = xmlTextWriterWriteRaw( writer.get(),
 						reinterpret_cast<xmlChar const*>( _xml->_utf8[0].c_str() ) );
 			} else {
