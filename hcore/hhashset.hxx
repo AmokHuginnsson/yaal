@@ -10,6 +10,7 @@
 #include <initializer_list>
 
 #include "hcore/hhashcontainer.hxx"
+#include "hcore/horderedhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 
 namespace yaal {
@@ -21,8 +22,9 @@ namespace hcore {
 template<typename type_t>
 struct hashset_helper {
 	typedef type_t key_type;
-	inline static key_type const& key( type_t const& key_ )
-		{	return key_;	}
+	inline static key_type const& key( type_t const& key_ ) {
+		return key_;
+	}
 };
 
 /*! \brief Hash set container implementation.
@@ -31,7 +33,8 @@ template<
 	typename type_t,
 	typename hasher_t = hash<type_t>,
 	typename equal_key_t = yaal::equal_to<type_t>,
-	typename allocator_t = allocator::system<type_t>
+	typename allocator_t = allocator::system<type_t>,
+	typename engine_t = HHashContainer<type_t, hasher_t, equal_key_t, hashset_helper<type_t>, allocator_t>
 >
 class HHashSet final {
 public:
@@ -40,18 +43,19 @@ public:
 	typedef type_t value_type;
 	typedef hasher_t hasher_type;
 	typedef equal_key_t equal_key_type;
-	typedef HHashContainer<value_type, hasher_type, equal_key_type, hashset_helper<value_type>, allocator_t> engine_t;
+	typedef engine_t engine_type;
 	typedef typename engine_t::size_type size_type;
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef typename engine_t::node_size node_size;
 	typedef typename engine_t::node_type node_type;
-	typedef HHashSet<value_type, hasher_type, equal_key_type, allocator_t> this_type;
+	typedef HHashSet<value_type, hasher_type, equal_key_type, allocator_t, engine_type> this_type;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		typename engine_t::HIterator _engine;
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
 		HIterator( void )
-			: base_type(), _engine() {
+			: base_type()
+			, _engine() {
 			return;
 		}
 		HIterator( HIterator const& ) = default;
@@ -94,8 +98,11 @@ public:
 			return ( _engine.node_id() );
 		}
 	private:
-		friend class HHashSet<key_type, hasher_type, equal_key_type, allocator_t>;
-		explicit HIterator( typename engine_t::HIterator const& it ) : base_type(), _engine( it ) {};
+		friend class HHashSet<key_type, hasher_type, equal_key_type, allocator_t, engine_type>;
+		explicit HIterator( typename engine_t::HIterator const& it )
+			: base_type()
+			, _engine( it ) {
+		}
 	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
@@ -245,6 +252,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	void compact( void ) {
+		M_PROLOG
+		_engine.compact();
+		return;
+		M_EPILOG
+	}
 	template<typename iterator_t>
 	void insert( iterator_t first, iterator_t last ) {
 		M_PROLOG
@@ -345,13 +358,26 @@ public:
 private:
 };
 
-template<typename key_type, typename hasher_t, typename equal_key_t, typename allocator_t>
+template<typename key_type, typename hasher_t, typename equal_key_t, typename allocator_t, typename engine_t>
 inline void swap(
-	yaal::hcore::HHashSet<key_type, hasher_t, equal_key_t, allocator_t>& a,
-	yaal::hcore::HHashSet<key_type, hasher_t, equal_key_t, allocator_t>& b
+	yaal::hcore::HHashSet<key_type, hasher_t, equal_key_t, allocator_t, engine_t>& a,
+	yaal::hcore::HHashSet<key_type, hasher_t, equal_key_t, allocator_t, engine_t>& b
 ) {
 	a.swap( b );
 }
+
+template<
+	typename type_t,
+	typename hasher_t = hash<type_t>,
+	typename equal_key_t = yaal::equal_to<type_t>
+>
+using HOrderedHashSet = HHashSet<
+	type_t,
+	hasher_t,
+	equal_key_t,
+	trait::no_type,
+	HOrderedHashContainer<type_t, hasher_t, equal_key_t, hashset_helper<type_t>>
+>;
 
 }
 

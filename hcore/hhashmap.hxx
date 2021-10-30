@@ -405,7 +405,8 @@ class HHashMap<key_type_t, data_type_t, hasher_t, equal_key_t, allocator_t, engi
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
-		: base_type(), _engine() {
+		: base_type()
+		, _engine() {
 		return;
 	}
 	HIterator( HIterator const& ) = default;
@@ -468,10 +469,10 @@ private:
 	}
 };
 
-template<typename key_type, typename data_type, typename hasher_t, typename equal_key_t, typename allocator_t>
+template<typename key_type, typename data_type, typename hasher_t, typename equal_key_t, typename allocator_t, typename engine_t>
 inline void swap(
-	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>& a,
-	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>& b ) {
+	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t, engine_t>& a,
+	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t, engine_t>& b ) {
 	a.swap( b );
 }
 
