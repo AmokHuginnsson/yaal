@@ -28,11 +28,13 @@ namespace set {
 class HSetIterator : public HSkippingIterator {
 	huginn::HSet::values_t* _set;
 	huginn::HSet::values_t::iterator _it;
+	bool _valid;
 public:
 	HSetIterator( huginn::HSet* owner_ )
 		: HSkippingIterator( owner_ )
 		, _set( &owner_->value() )
-		, _it( _set->begin() ) {
+		, _it( _set->begin() )
+		, _valid( true ) {
 		return;
 	}
 protected:
@@ -40,7 +42,7 @@ protected:
 		return ( *_it );
 	}
 	virtual bool do_is_valid( huginn::HThread*, int ) override {
-		return ( _it != _set->end() );
+		return ( _valid && ( _it != _set->end() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		if ( _skip == 0 ) {
@@ -50,7 +52,7 @@ protected:
 		}
 	}
 	virtual void do_invalidate( void ) override {
-		_it = _set->end();
+		_valid = false;
 	}
 	virtual void do_skip( HThread*, int ) override {
 		++ _it;
@@ -67,11 +69,13 @@ private:
 class HSetReverseIterator : public HSkippingIterator {
 	huginn::HSet::values_t* _set;
 	huginn::HSet::values_t::reverse_iterator _it;
+	bool _valid;
 public:
 	HSetReverseIterator( huginn::HSet* owner_ )
 		: HSkippingIterator( owner_ )
 		, _set( &owner_->value() )
-		, _it( _set->rbegin() ) {
+		, _it( _set->rbegin() )
+		, _valid( true ) {
 		return;
 	}
 protected:
@@ -79,7 +83,7 @@ protected:
 		return ( *_it );
 	}
 	virtual bool do_is_valid( HThread*, int ) override {
-		return ( _it != _set->rend() );
+		return ( _valid && ( _it != _set->rend() ) );
 	}
 	virtual void do_next( HThread*, int ) override {
 		if ( _skip == 0 ) {
@@ -89,7 +93,7 @@ protected:
 		}
 	}
 	virtual void do_invalidate( void ) override {
-		_it = _set->rend();
+		_valid = false;
 	}
 	virtual void do_skip( HThread*, int ) override {
 		++ _it;
@@ -240,10 +244,10 @@ HHuginn::value_t reversed_view( huginn::HThread* thread_, HHuginn::value_t const
 
 }
 
-HSet::HSet( HClass const* class_, allocator_t const& allocator_ )
+HSet::HSet( HClass const* class_ )
 	: HInvalidatingIterable( class_ )
 	, _helper()
-	, _data( _helper, _helper, allocator_ ) {
+	, _data( _helper, _helper ) {
 	return;
 }
 
@@ -265,6 +269,9 @@ void HSet::erase( huginn::HThread* thread_, HHuginn::value_t const& key_, int po
 	if ( it != _data.end() ) {
 		skip( thread_, it.node_id(), position_ );
 		_data.erase( it );
+		if ( ! _observers || _observers->is_empty() ) {
+			_data.compact();
+		}
 	}
 	return;
 	M_EPILOG
@@ -282,6 +289,9 @@ void HSet::clear( void ) {
 	M_PROLOG
 	invalidate();
 	_data.clear();
+	if ( ! _observers || _observers->is_empty() ) {
+		_data.compact();
+	}
 	return;
 	M_EPILOG
 }

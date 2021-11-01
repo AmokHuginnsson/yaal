@@ -19,15 +19,12 @@ class HSet : public HInvalidatingIterable {
 public:
 	typedef HSet this_type;
 	typedef HIterable base_type;
-	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_prototype_t;
-	typedef yaal::hcore::HPool<values_prototype_t::node_size::value> pool_t;
-	typedef allocator::shared_pool<values_prototype_t::node_type> allocator_t;
-	typedef yaal::hcore::HHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&, allocator_t> values_t;
+	typedef yaal::hcore::HOrderedHashSet<HHuginn::value_t, HValueHashHelper&, HValueHashHelper&> values_t;
 private:
 	mutable HValueHashHelper _helper;
 	values_t _data;
 public:
-	HSet( HClass const*, allocator_t const& );
+	HSet( HClass const* );
 	void insert( huginn::HThread*, HHuginn::value_t const&, int );
 	bool has_key( huginn::HThread*, HHuginn::value_t const&, int ) const;
 	void erase( huginn::HThread*, HHuginn::value_t const&, int );
