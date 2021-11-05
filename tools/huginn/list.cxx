@@ -231,7 +231,7 @@ inline HHuginn::value_t erase( huginn::HThread* thread_, HHuginn::value_t* objec
 					++ erased;
 				}
 				++ index;
-				return ( toRemove );
+				return toRemove;
 			}
 		),
 		data.end()

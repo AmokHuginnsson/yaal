@@ -208,7 +208,7 @@ public:
 	}
 	allocator_type const& get_allocator( void ) const {
 		static allocator_type const allocator;
-		return ( allocator );
+		return allocator;
 	}
 	size_type get_size( void ) const {
 		M_PROLOG
@@ -433,7 +433,7 @@ private:
 			atomFunc_( dstStore_ + size, &srcAtom );
 			++ size;
 		}
-		return ( size );
+		return size;
 		M_EPILOG
 	}
 	bool grow_index_map( size_type val_ ) {

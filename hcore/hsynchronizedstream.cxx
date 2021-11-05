@@ -307,7 +307,7 @@ int long HSynchronizedStream::do_output( void const* buffer_, int long size_ ) {
 	} else if ( _streamRef ) {
 		nWritten = _streamRef->write( buffer_, size_ );
 	}
-	return ( nWritten );
+	return nWritten;
 	M_EPILOG
 }
 
@@ -536,7 +536,7 @@ int long HSynchronizedStream::do_input( void* buffer_, int long size_ ) {
 	} else if ( _streamRef ) {
 		nRead = _streamRef->read( buffer_, size_ );
 	}
-	return ( nRead );
+	return nRead;
 	M_EPILOG
 }
 
