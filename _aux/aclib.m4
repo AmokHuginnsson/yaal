@@ -242,11 +242,11 @@ dnl Detect installed compiler package.
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_DETECT_COMPILER], [
 	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
-	AC_PROG_CC([${CC} gcc clang])
-	AC_PROG_CXX([${CXX} g++ clang++ clang])
+	AC_PROG_CC
+	AC_PROG_CXX
 	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
-	AC_PROG_CPP([${CC} gcc clang])
-	AC_PROG_CXXCPP([${CXX} g++ clang++ clang])
+	AC_PROG_CPP
+	AC_PROG_CXXCPP
 ])
 
 dnl YAAL_CHECK_COMPILER_VERSION
@@ -255,8 +255,8 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_CHECK_COMPILER_VERSION], [
 	AC_REQUIRE([YAAL_DETECT_COMPILER])
 	AC_MSG_CHECKING([compiler version])
-	GCC_MAJOR=$(echo | cpp -dM | grep __GNUC__ | awk '{print [$]3}')
-	GCC_MINOR=$(echo | cpp -dM | grep __GNUC_MINOR__ | awk '{print [$]3}')
+	GCC_MAJOR=$(echo | ${CXXCPP} -E -dM -xc++ "${srcdir}/_aux/empty" | grep __GNUC__ | awk '{print [$]3}')
+	GCC_MINOR=$(echo | ${CXXCPP} -E -dM -xc++ "${srcdir}/_aux/empty" | grep __GNUC_MINOR__ | awk '{print [$]3}')
 	AC_MSG_RESULT([major $GCC_MAJOR, minor $GCC_MINOR. ])
 ])
 
