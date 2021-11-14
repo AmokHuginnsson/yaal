@@ -497,7 +497,7 @@ dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=["${CXXFLAGS_ORIG}"]
-CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
+CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual -Wno-unused-command-line-argument"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
 									 int main( int, char** ) { printw("x"); return ( 0 ); }]])],
 	[AC_MSG_RESULT([[no :)]])],

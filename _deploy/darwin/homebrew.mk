@@ -37,7 +37,7 @@ $(FORMULAE_DIR)/$(FORMULAE): $(VERIFY_DIR) formulae.rb.in
 
 $(FORMULAE_DIR)/$(ARTIFACT_RAW): $(VERIFY_DIR) $(FORMULAE_DIR)/$(FORMULAE)
 	@cd $(FORMULAE_DIR) \
-	&& brew install --build-bottle --fetch-HEAD --force -v $(FORMULAE) \
+	&& brew install --build-bottle --fetch-HEAD --force -v --formula $(FORMULAE) \
 	&& cd - && cd ../../../tress/ \
 	&& env -u DYLD_LIBRARY_PATH -u DYLD_FALLBACK_LIBRARY_PATH -u LIBRARY_PATH \
 		CPLUS_INCLUDE_PATH=/usr/local/include C_INCLUDE_PATH=/usr/local/include \
