@@ -18,17 +18,6 @@ fi
 
 shift
 
-gitId="${@}"
-
-if [ -z "${gitId}" ] ; then
-	echo "gitId not set!"
-	exit 1
-fi
-
-if [ "x${gitId}" = "xtrue" ] ; then
-	exit 0
-fi
-
 newCommitId="$(mktemp "${commitId}.XXXXXXXXXX")"
 
 echo "#define COMMIT_ID \"$(${dirRoot}/_aux/commit-id)\"" > "${newCommitId}"

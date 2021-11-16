@@ -377,7 +377,7 @@ link_directories( ${CMAKE_LIBRARY_PATH} )
 if ( NOT CMAKE_HOST_WIN32 )
 	add_custom_target(
 		commit_id ALL
-		COMMAND "${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id" "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx" "${GITID}"
+		COMMAND "${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id" "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx"
 		COMMENT "Regenerating commit_id.hxx."
 	)
 else()
