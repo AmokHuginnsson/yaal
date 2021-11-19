@@ -140,10 +140,11 @@ def main():
 	isPreamble = True
 	isOptions = False
 	for l in lines:
+		bigIndent = l.startswith( " " * 9 )
 		line = l.strip()
 		if line == "Options:":
 			continue
-		optionStart = line.startswith( "-" ) and not line.startswith( "- " )
+		optionStart = not bigIndent and line.startswith( "-" ) and not line.startswith( "- " )
 		if optionStart:
 			isPreamble = False
 			isOptions = True
