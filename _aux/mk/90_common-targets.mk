@@ -55,11 +55,8 @@ do-install: all
 	$(if $(CLOU_BIN), $(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) $(foreach clou,$(CLOU_BIN),&& $(INSTALL) -m755 $(clou) $(DIR_BIN)/$(patsubst %$(EXEC_NAME),$(PRJNAME),$(clou)) && ) ) ) \
 	$(if $(CLOU_LIB), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB) && $(INSTALL) -m755 $(CLOU_LIB) $(DIR_LIB)/ && ) ) \
 	$(if $(CLOU_MODULES), $(call invoke,$(INSTALL) -d -m755 $(DIR_LIB)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_MODULES) $(DIR_LIB)/$(PRJNAME)/ && ) ) \
-	$(if $(CLOU_CONF), \
-		$(call invoke,$(INSTALL) -d -m755 $(dir $(DIR_SYSCONF)/$(call second,$(firstword $(CLOU_CONF)))) && \
-		$(foreach clou,$(CLOU_CONF),$(INSTALL) -m644 $(call first,$(clou)) $(DIR_SYSCONF)/$(call second,$(clou)) && ) ) \
-	) \
-	$(if $(CLOU_SHARE), $(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_SHARE) $(DIR_SHARE)/$(PRJNAME)/ && ) ) \
+	$(if $(CLOU_CONF), $(foreach clou,$(CLOU_CONF),$(call invoke,$(call auto_install,$(DIR_SYSCONF),$(clou))) && ) ) \
+	$(if $(CLOU_SHARE), $(foreach clou,$(CLOU_SHARE),$(call invoke,$(call auto_install,$(DIR_SHARE)/$(PRJNAME),$(clou))) && ) ) \
 	$(if $(CLOU_LOCALSTATE), $(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/$(PRJNAME) && $(INSTALL) -m644 $(CLOU_LOCALSTATE) $(DIR_LOCALSTATE)/$(PRJNAME)/ && ) ) \
 	$(if $(CLOU_INCLUDE), $(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && $(INSTALL) -m644 $(CLOU_INCLUDE) $(DIR_HEADERS)/ && ) ) \
 	$(if $(CLOU_DOC), $(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(CLOU_DOC) $(DIR_DOC)/ && ) ) \

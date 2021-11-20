@@ -44,3 +44,12 @@ TO_UPPER = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f
 first = $(firstword $(subst :, ,$(1)))
 second = $(word 2,$(subst :, ,$(1)))
 
+implicit_dest_path=$(firstword $(subst :,$(SPACE),$(1)))
+explicit_dest_path=$(subst :,,$(word 2,$(subst :,$(SPACE):,$(1))))
+strip_count=$(subst :,,$(word 3,$(subst :,$(SPACE):,$(1))))
+inc=$(if $(1),$(word $(1),2 3 4 5 6 7 8 9 10),1)
+strip_leading=$(subst $(SPACE),/,$(wordlist $(call inc,$(call strip_count,$(1))),1000,$(subst /,$(SPACE),$(patsubst $(DIR_ROOT)/%,%,$(call implicit_dest_path,$(1))))))
+dest_path=$(or $(call explicit_dest_path,$(1)),$(call strip_leading,$(1)))
+dest_dir=$(dir $(call dest_path,$(1)))
+auto_install=$(INSTALL) -d -m755 $(1)/$(dir $(call dest_path,$(2))) && $(INSTALL) -m644 $(call implicit_dest_path,$(2)) $(1)/$(call dest_path,$(2))
+
