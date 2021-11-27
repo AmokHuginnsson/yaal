@@ -90,11 +90,12 @@ public:
 	void merge( HExpression& );
 	void oper( OPERATOR, int );
 	void commit_oper( OPERATOR, int, int );
-	void try_collape( int, int );
-	void try_collape_assign( int, int );
-	void try_collape_assign_action( HHuginn::TYPE, OExecutionStep::action_t, OExecutionStep::action_t );
-	void try_collape_assign_integer( int, int );
-	void try_collape_assign_real( int, int );
+	void try_collapse( int, int );
+	void try_collapse_assign( int, int );
+	void try_collapse_assign_action( HHuginn::TYPE, OExecutionStep::action_t, OExecutionStep::action_t );
+	void try_collapse_assign_integer( int, int );
+	void try_collapse_assign_real( int, int );
+	void try_collapse_assign_number( int, int );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
 	template<typename huginn_type, typename operator_type>
@@ -109,6 +110,10 @@ public:
 	void oper_assign_real_ref( OExecutionStep const&, huginn::HFrame* );
 	template<OPERATOR>
 	void oper_assign_real_val( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_number_ref( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_number_val( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_number( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_string( OExecutionStep const&, huginn::HFrame* );
 	void plus_integer( OExecutionStep const&, huginn::HFrame* );
