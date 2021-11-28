@@ -1066,6 +1066,10 @@ void HExpression::try_collapse_assign( int fileId_, int position_ ) {
 			try_collapse_assign_number( fileId_, position_ );
 			break;
 		}
+		case ( HHuginn::TYPE::STRING ): {
+			try_collapse_assign_string( fileId_, position_ );
+			break;
+		}
 		default: {
 		}
 	}
@@ -1201,6 +1205,22 @@ void HExpression::try_collapse_assign_number( int fileId_, int position_ ) {
 	M_EPILOG
 }
 
+void HExpression::try_collapse_assign_string( int, int ) {
+	M_PROLOG
+	int instructionCount( static_cast<int>( _instructions.get_size() ) );
+	switch ( _instructions[instructionCount - 2]._operator ) {
+		case ( OPERATOR::PLUS_ASSIGN ): {
+			try_collapse_assign_action( HHuginn::TYPE::STRING, &HExpression::oper_assign_string_ref<OPERATOR::PLUS_ASSIGN>, &HExpression::oper_assign_string_val<OPERATOR::PLUS_ASSIGN> );
+			break;
+		}
+		default: {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 void HExpression::try_collapse_assign_action( HHuginn::TYPE type_, OExecutionStep::action_t refAction_, OExecutionStep::action_t valAction_ ) {
 	M_PROLOG
 	int stepCount( static_cast<int>( _executionSteps.get_size() ) );
@@ -1233,6 +1253,10 @@ void HExpression::try_collapse_assign_action( HHuginn::TYPE type_, OExecutionSte
 		}
 		case ( HHuginn::TYPE::NUMBER ): {
 			es._number = get_number( es._value );
+			break;
+		}
+		case ( HHuginn::TYPE::STRING ): {
+			es._string = get_string( es._value );
 			break;
 		}
 		default: {
@@ -1810,6 +1834,38 @@ void HExpression::oper_assign_number_val( OExecutionStep const& es_, HFrame* fra
 		&HObjectFactory::number_class,
 		&operator_dispatcher_type::template self<HNumber::value_type>,
 		es_._number
+	);
+	return;
+	M_EPILOG
+}
+
+template<OPERATOR operator_tag>
+void HExpression::oper_assign_string_ref( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
+	oper_assign_ref<HString>(
+		frame_,
+		operator_tag,
+		HHuginn::TYPE::STRING,
+		&HObjectFactory::string_class,
+		&operator_dispatcher_type::template self<HString::value_type>,
+		es_._string
+	);
+	return;
+	M_EPILOG
+}
+
+template<OPERATOR operator_tag>
+void HExpression::oper_assign_string_val( OExecutionStep const& es_, HFrame* frame_ ) {
+	M_PROLOG
+	typedef operator_dispatcher<operator_tag> operator_dispatcher_type;
+	oper_assign_val<HString>(
+		frame_,
+		operator_tag,
+		HHuginn::TYPE::STRING,
+		&HObjectFactory::string_class,
+		&operator_dispatcher_type::template self<HString::value_type>,
+		es_._string
 	);
 	return;
 	M_EPILOG

@@ -96,6 +96,7 @@ public:
 	void try_collapse_assign_integer( int, int );
 	void try_collapse_assign_real( int, int );
 	void try_collapse_assign_number( int, int );
+	void try_collapse_assign_string( int, int );
 	void close_parenthesis( OExecutionStep const&, huginn::HFrame* );
 	void plus( OExecutionStep const&, huginn::HFrame* );
 	template<typename huginn_type, typename operator_type>
@@ -114,6 +115,10 @@ public:
 	void oper_assign_number_ref( OExecutionStep const&, huginn::HFrame* );
 	template<OPERATOR>
 	void oper_assign_number_val( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_string_ref( OExecutionStep const&, huginn::HFrame* );
+	template<OPERATOR>
+	void oper_assign_string_val( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_number( OExecutionStep const&, huginn::HFrame* );
 	void plus_assign_string( OExecutionStep const&, huginn::HFrame* );
 	void plus_integer( OExecutionStep const&, huginn::HFrame* );
